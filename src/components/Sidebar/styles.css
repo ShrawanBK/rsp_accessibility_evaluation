@@ -1,0 +1,14 @@
+.nav-container {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.heading {
+    color: red !important;
+}
+
+.nav-link {
+    flex-grow: 1;
+    overflow-y: auto;
+}

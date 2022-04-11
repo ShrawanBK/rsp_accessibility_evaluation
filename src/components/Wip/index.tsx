@@ -1,12 +1,12 @@
 import React from 'react';
 // import styles from './styles.css';
 
-function Test() {
+function Wip() {
     return (
         <div>
-            Test
+            WIP
         </div>
     );
 }
 
-export default Test;
+export default Wip;

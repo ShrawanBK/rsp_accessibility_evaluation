@@ -4,11 +4,12 @@
     overflow: auto;
 }
 
-.heading {
-    color: red !important;
+.nav-link {
+    background: transparent;
 }
 
-.nav-link {
-    flex-grow: 1;
-    overflow-y: auto;
+.nav-link-active {
+    background-color: rgb(100, 93, 93);
+    width: 100%;
+    text-align: center;
 }

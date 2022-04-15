@@ -1,10 +1,25 @@
-import { Button, FormControl, FormErrorMessage, FormHelperText, FormLabel, Flex, Input, HStack, useBoolean } from '@chakra-ui/react';
 import React, { ChangeEvent, useCallback, useState } from 'react';
+import {
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    HStack,
+} from '@chakra-ui/react';
+
 import './styles.css';
 
-function ScanForm() {
+interface Props {
+    processingUrl: boolean;
+    onScanWebsite: (url: string) => void;
+}
+
+function ScanForm(props: Props) {
+    const {
+        processingUrl,
+        onScanWebsite,
+    } = props;
     const [url, setUrl] = useState<string>();
-    const [processingUrl, setProcessingUrl] = useBoolean();
 
     const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value);
 
@@ -13,12 +28,13 @@ function ScanForm() {
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
-            setProcessingUrl.on();
+            if (!url) {
+                return;
+            }
+            onScanWebsite(url);
             // NOTE: Time out is the response time when url processed
-            setTimeout(() => setProcessingUrl.off(), 2000);
-            console.warn(`Url: ${url}`);
         },
-        [setProcessingUrl, url],
+        [onScanWebsite, url],
     );
 
     return (
@@ -31,15 +47,15 @@ function ScanForm() {
                         type="url"
                         value={url}
                         onChange={handleUrlChange}
-                        width="75%"
+                        width="80%"
                         placeholder="Enter website url"
                     />
                     <Button
                         type="submit"
                         disabled={errored || processingUrl}
-                        width="25%"
+                        width="20%"
                     >
-                        Scan
+                        SCAN
                     </Button>
                 </HStack>
                 {/*

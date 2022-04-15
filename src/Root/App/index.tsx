@@ -1,13 +1,17 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { Box, ChakraProvider, Flex, HStack } from '@chakra-ui/react';
-
-import ScanForm from '../../components/forms/ScanForm';
-import Sidebar from '../../components/Sidebar';
-import Wip from '../../components/Wip';
+import {
+    Box,
+    ChakraProvider,
+    Flex,
+} from '@chakra-ui/react';
 
 import './styles.css';
+
+import Sidebar from '../../components/Sidebar';
+import Wip from '../../components/Wip';
+import ScanWebsite from '../../views/ScanWebsite';
 
 function App() {
     return (
@@ -18,7 +22,7 @@ function App() {
                 </Box>
                 <Box p={8} flex={1}>
                     <Routes>
-                        <Route path="/" element={<ScanForm />} />
+                        <Route path="/" element={<ScanWebsite />} />
                         <Route path="/saved_scans" element={<Wip />} />
                     </Routes>
                 </Box>

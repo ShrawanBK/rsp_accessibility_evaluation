@@ -6,10 +6,14 @@
 
 .nav-link {
     background: transparent;
+    width: 100%;
+    padding: 8px;
 }
 
 .nav-link-active {
-    background-color: rgb(100, 93, 93);
+    background-color: #B3EFFF;
     width: 100%;
-    text-align: center;
+    color: #045981;
+    padding: 8px;
+    border-radius: 4px;
 }

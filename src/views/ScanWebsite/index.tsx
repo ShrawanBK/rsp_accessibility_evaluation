@@ -1,5 +1,8 @@
 import React, { useCallback } from 'react';
 import {
+    Box,
+    Divider,
+    Flex,
     Heading,
     useBoolean,
     VStack,
@@ -8,6 +11,7 @@ import {
 import ScanForm from '../../components/forms/ScanForm';
 import Info from '../../components/Info';
 import Loading from '../../components/Loading';
+import IssueStats from '../../components/IssueStats';
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
@@ -20,20 +24,30 @@ function ScanWebsite() {
         [setProcessingUrl],
     );
     return (
-        <VStack width="70%" align="stretch">
-            <Heading> Scan Website </Heading>
-            <ScanForm
-                processingUrl={processingUrl}
-                onScanWebsite={onScanWebsite}
-            />
-            {!processingUrl && (
-                <Info
-                    title="Scan & Audit Webpage"
-                    message="Get accessibility test result of your webpage by inputting URL and scan it."
-                    icon=""
+        <VStack align="stretch" spacing={8}>
+            <Flex>
+                <Heading>
+                    Scan Website
+                    <Divider />
+                </Heading>
+            </Flex>
+            <Box width="60%" marginTop="1vh">
+                <ScanForm
+                    processingUrl={processingUrl}
+                    onScanWebsite={onScanWebsite}
                 />
-            )}
-            {processingUrl && <Loading message="Waiting for Result" />}
+                {!processingUrl && (
+                    <Info
+                        title="Scan & Audit Webpage"
+                        message="Get accessibility test result of your webpage by inputting URL and scan it."
+                        icon=""
+                    />
+                )}
+                {processingUrl && <Loading message="Waiting for Result" />}
+            </Box>
+            <Box width="70%">
+                <IssueStats />
+            </Box>
         </VStack>
     );
 }

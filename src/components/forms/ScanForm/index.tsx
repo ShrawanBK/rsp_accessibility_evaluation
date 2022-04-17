@@ -39,7 +39,8 @@ function ScanForm(props: Props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <FormControl isInvalid={errored} flex={2}>
+            {/* TODO: Handle isInvalid later */}
+            <FormControl isInvalid={false} flex={2}>
                 <FormLabel htmlFor="url">URL</FormLabel>
                 <HStack spacing={0}>
                     <Input
@@ -48,7 +49,7 @@ function ScanForm(props: Props) {
                         value={url}
                         onChange={handleUrlChange}
                         width="80%"
-                        placeholder="Enter website url"
+                        placeholder="Enter website url (https://www.examplewebsite.example) "
                     />
                     <Button
                         type="submit"

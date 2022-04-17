@@ -5,6 +5,7 @@ import {
     Box,
     ChakraProvider,
     Flex,
+    extendTheme,
 } from '@chakra-ui/react';
 
 import './styles.css';
@@ -12,10 +13,32 @@ import './styles.css';
 import Sidebar from '../../components/Sidebar';
 import Wip from '../../components/Wip';
 import ScanWebsite from '../../views/ScanWebsite';
+import Fonts from './Fonts';
+
+const theme = extendTheme({
+    colors: {
+        brand: {
+            100: '#045981',
+            200: '#045981',
+            300: '#045981',
+            400: '#045981',
+            500: '#045981',
+            600: '#045981',
+            700: '#045981',
+            800: '#045981',
+            900: '#045981',
+        },
+    },
+    fonts: {
+        heading: 'Roboto',
+        body: 'Roboto',
+    },
+});
 
 function App() {
     return (
-        <ChakraProvider>
+        <ChakraProvider theme={theme}>
+            <Fonts />
             <Flex minHeight="100vh" minWidth="100vw">
                 <Box borderRightWidth="1px" width="14vw" paddingTop={8}>
                     <Sidebar />

@@ -1,24 +1,49 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import { Box, ChakraProvider, Flex, HStack } from '@chakra-ui/react';
+import {
+    Box,
+    ChakraProvider,
+    Flex,
+    extendTheme,
+} from '@chakra-ui/react';
 
-import ScanForm from '../../components/forms/ScanForm';
 import Sidebar from '../../components/Sidebar';
 import Wip from '../../components/Wip';
+import ScanWebsite from '../../views/ScanWebsite';
+import Fonts from './Fonts';
 
-import './styles.css';
+const theme = extendTheme({
+    colors: {
+        brand: {
+            100: '#045981',
+            200: '#045981',
+            300: '#045981',
+            400: '#045981',
+            500: '#045981',
+            600: '#045981',
+            700: '#045981',
+            800: '#045981',
+            900: '#045981',
+        },
+    },
+    fonts: {
+        heading: 'Roboto',
+        body: 'Roboto',
+    },
+});
 
 function App() {
     return (
-        <ChakraProvider>
-            <Flex minHeight="100vh" minWidth="100vw">
-                <Box borderRightWidth="1px">
+        <ChakraProvider theme={theme}>
+            <Fonts />
+            <Flex minHeight="100vh">
+                <Box borderRightWidth="1px" width="14vw" paddingTop={8}>
                     <Sidebar />
                 </Box>
-                <Box p={8} flex={1}>
+                <Box p={8} flex={1} background="#fbfcfd">
                     <Routes>
-                        <Route path="/" element={<ScanForm />} />
+                        <Route path="/" element={<ScanWebsite />} />
                         <Route path="/saved_scans" element={<Wip />} />
                     </Routes>
                 </Box>

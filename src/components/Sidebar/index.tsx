@@ -36,7 +36,10 @@ const sidebarMenus: SidebarMenu[] = [
 
 function Sidebar() {
     return (
-        <VStack p={2} spacing={4}>
+        <VStack
+            p={2}
+            spacing={4}
+        >
             <Image src={logoPath} alt="logo" />
             <Heading as="h6" size="md">
                 Accessibility Tools

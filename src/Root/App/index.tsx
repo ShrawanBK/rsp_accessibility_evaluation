@@ -8,8 +8,6 @@ import {
     extendTheme,
 } from '@chakra-ui/react';
 
-import './styles.css';
-
 import Sidebar from '../../components/Sidebar';
 import Wip from '../../components/Wip';
 import ScanWebsite from '../../views/ScanWebsite';
@@ -39,7 +37,7 @@ function App() {
     return (
         <ChakraProvider theme={theme}>
             <Fonts />
-            <Flex minHeight="100vh" minWidth="100vw">
+            <Flex minHeight="100vh">
                 <Box borderRightWidth="1px" width="14vw" paddingTop={8}>
                     <Sidebar />
                 </Box>

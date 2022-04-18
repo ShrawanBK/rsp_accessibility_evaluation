@@ -50,11 +50,17 @@ function ScanForm(props: Props) {
                         onChange={handleUrlChange}
                         width="80%"
                         placeholder="Enter website url (https://www.examplewebsite.example) "
+                        background="whiteAlpha.900"
+                        borderTopRightRadius={0}
+                        borderBottomRightRadius={0}
                     />
                     <Button
                         type="submit"
                         disabled={errored || processingUrl}
-                        width="20%"
+                        width="10%"
+                        colorScheme="brand"
+                        borderTopLeftRadius={0}
+                        borderBottomLeftRadius={0}
                     >
                         SCAN
                     </Button>

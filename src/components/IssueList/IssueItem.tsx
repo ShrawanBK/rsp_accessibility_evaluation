@@ -16,28 +16,24 @@ import {
 } from '@chakra-ui/react';
 
 import {
-    issueData,
     IssueDataObject,
 } from './data';
 import Paginator from '../Paginator';
 
-interface IssueListProps {
+interface IssueItemProps {
     // Make this compulsory
-    issueList?: IssueDataObject[];
+    issueItem: IssueDataObject;
 }
 
-function IssueList(props: IssueListProps) {
+function IssueItem(props: IssueItemProps) {
     // TODO: import issueData and work on this later
     const {
-        issueList = issueData,
+        issueItem,
     } = props;
 
-    console.warn({ issueList });
-    const data = issueData[0];
+    const [currentIssueItemIndex, setCurrentIssueItemIndex] = useState(0);
 
-    const [currentIssueIndex, setCurrentIssueIndex] = useState(0);
-
-    const currentIssue = data.issues[currentIssueIndex];
+    const currentIssueItem = issueItem.issues[currentIssueItemIndex];
 
     return (
         <Accordion
@@ -57,11 +53,11 @@ function IssueList(props: IssueListProps) {
                         flex="1"
                         textAlign="left"
                     >
-                        {data.title}
+                        {issueItem.title}
                     </Box>
                     {/* <AccordionIcon /> */}
                     <Text>
-                        {data.issues.length}
+                        {issueItem.issues.length}
                     </Text>
                 </AccordionButton>
                 <AccordionPanel
@@ -74,7 +70,7 @@ function IssueList(props: IssueListProps) {
                         alignItems="baseline"
                         spacing={4}
                         marginTop={4}
-                        key={currentIssue.id}
+                        key={currentIssueItem.id}
                     >
                         <Box
                             display="flex"
@@ -94,7 +90,7 @@ function IssueList(props: IssueListProps) {
                                         WCAG Criteria:
                                     </Heading>
                                     <Text>
-                                        {currentIssue.criteria}
+                                        {currentIssueItem.criteria}
                                     </Text>
                                     <Divider
                                         orientation="vertical"
@@ -110,7 +106,7 @@ function IssueList(props: IssueListProps) {
                                         Tags:
                                     </Heading>
                                     <HStack>
-                                        {currentIssue.tags.map((tag) => (
+                                        {currentIssueItem.tags.map((tag) => (
                                             <Tag key={tag}>
                                                 {tag}
                                             </Tag>
@@ -126,7 +122,7 @@ function IssueList(props: IssueListProps) {
                                         Impact:
                                     </Heading>
                                     <Text>
-                                        {currentIssue.impact}
+                                        {currentIssueItem.impact}
                                     </Text>
                                     <Divider
                                         orientation="vertical"
@@ -142,14 +138,14 @@ function IssueList(props: IssueListProps) {
                                         Found:
                                     </Heading>
                                     <Text>
-                                        {currentIssue.found}
+                                        {currentIssueItem.found}
                                     </Text>
                                 </HStack>
                             </VStack>
                             <Paginator
-                                pageIndex={currentIssueIndex}
-                                totalPages={data.issues.length}
-                                onChangePage={setCurrentIssueIndex}
+                                pageIndex={currentIssueItemIndex}
+                                totalPages={issueItem.issues.length}
+                                onChangePage={setCurrentIssueItemIndex}
                             />
                         </Box>
                         <Divider />
@@ -165,7 +161,7 @@ function IssueList(props: IssueListProps) {
                                 Issue Description
                             </Heading>
                             <Text>
-                                {currentIssue.description}
+                                {currentIssueItem.description}
                             </Text>
                         </VStack>
                         <VStack
@@ -180,7 +176,7 @@ function IssueList(props: IssueListProps) {
                                 Issue Description
                             </Heading>
                             <Text>
-                                {currentIssue.description}
+                                {currentIssueItem.description}
                             </Text>
                         </VStack>
                         <VStack
@@ -196,7 +192,7 @@ function IssueList(props: IssueListProps) {
                                 • Element Location
                             </Heading>
                             <Text>
-                                {currentIssue.location}
+                                {currentIssueItem.location}
                             </Text>
                         </VStack>
                         <VStack
@@ -214,7 +210,7 @@ function IssueList(props: IssueListProps) {
                                 • Element Source
                             </Heading>
                             <Code ml={1} p={4}>
-                                {currentIssue.source}
+                                {currentIssueItem.source}
                             </Code>
                         </VStack>
                         <VStack
@@ -229,7 +225,7 @@ function IssueList(props: IssueListProps) {
                                 How to Fix?
                             </Heading>
                             <Text>
-                                {currentIssue.solution}
+                                {currentIssueItem.solution}
                             </Text>
                         </VStack>
                     </VStack>
@@ -239,4 +235,4 @@ function IssueList(props: IssueListProps) {
     );
 }
 
-export default IssueList;
+export default IssueItem;

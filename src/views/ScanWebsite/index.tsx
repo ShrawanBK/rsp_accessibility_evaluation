@@ -13,6 +13,7 @@ import {
 import ScanForm from '../../components/forms/ScanForm';
 import IssueStats from '../../components/IssueStats';
 import IssueList from '../../components/IssueList';
+import UpdatedIssueList from '../../components/IssueList/UpdatedIndex';
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
@@ -102,6 +103,12 @@ function ScanWebsite() {
                     marginTop={8}
                 >
                     <IssueList />
+                </Box>
+                <Divider />
+                <Box
+                    marginTop={8}
+                >
+                    <UpdatedIssueList />
                 </Box>
             </Box>
         </VStack>

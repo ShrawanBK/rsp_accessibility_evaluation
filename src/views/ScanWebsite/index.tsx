@@ -2,9 +2,12 @@ import React, { useCallback } from 'react';
 import {
     Box,
     Button,
+    Checkbox,
+    CheckboxGroup,
     Divider,
     Flex,
     Heading,
+    HStack,
     Text,
     useBoolean,
     VStack,
@@ -13,6 +16,29 @@ import {
 import ScanForm from '../../components/forms/ScanForm';
 import IssueStats from '../../components/IssueStats';
 import IssueList from '../../components/IssueList';
+import SelectField from '../../components/SelectField';
+
+const mockIssueData = [
+    {
+        label: 'Issue 1',
+        value: 'Issue-1',
+    },
+    {
+        label: 'Issue 2',
+        value: 'Issue-2',
+    },
+];
+
+const mockCriteriaData = [
+    {
+        label: 'Criteria 1',
+        value: 'Criteria-1',
+    },
+    {
+        label: 'Criteria 2',
+        value: 'Criteria-2',
+    },
+];
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
@@ -91,7 +117,34 @@ function ScanWebsite() {
                         SAVE
                     </Button>
                 </Box>
-
+                <HStack
+                    width="80%"
+                    alignItems="baseline"
+                    justifyContent="space-between"
+                >
+                    <Checkbox
+                        aria-label="issue.name"
+                        marginLeft={2}
+                        marginRight={2}
+                        maxWidth="20px"
+                    />
+                    <HStack width="100%">
+                        <SelectField
+                            options={mockIssueData}
+                            optionLabelSelector="label"
+                            valueSelector="value"
+                            placeholder="All Issues"
+                            variant="flushed"
+                        />
+                        <SelectField
+                            options={mockCriteriaData}
+                            optionLabelSelector="label"
+                            valueSelector="value"
+                            placeholder="All Criteria"
+                            variant="flushed"
+                        />
+                    </HStack>
+                </HStack>
                 <Box
                     width="80%"
                     marginTop={8}

@@ -12,12 +12,16 @@ import './styles.css';
 interface Props {
     processingUrl: boolean;
     onScanWebsite: (url: string) => void;
+    label?: string;
+    buttonLabel?: string;
 }
 
 function ScanForm(props: Props) {
     const {
         processingUrl,
         onScanWebsite,
+        label = 'URL',
+        buttonLabel = 'SCAN',
     } = props;
     const [url, setUrl] = useState<string>();
 
@@ -40,8 +44,13 @@ function ScanForm(props: Props) {
     return (
         <form onSubmit={handleSubmit}>
             {/* TODO: Handle isInvalid later */}
-            <FormControl isInvalid={false} flex={2}>
-                <FormLabel htmlFor="url">URL</FormLabel>
+            <FormControl
+                isInvalid={false}
+                flex={2}
+            >
+                <FormLabel htmlFor={label}>
+                    {label}
+                </FormLabel>
                 <HStack spacing={0}>
                     <Input
                         id="url"
@@ -62,7 +71,7 @@ function ScanForm(props: Props) {
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
                     >
-                        SCAN
+                        {buttonLabel}
                     </Button>
                 </HStack>
                 {/*

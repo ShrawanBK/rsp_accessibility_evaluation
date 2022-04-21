@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 
-import { IconButton, Box } from '@chakra-ui/react';
+import { IconButton, Box, Flex } from '@chakra-ui/react';
 
 import DoubleNextArrowIcon from '../icons/DoubleNextArrow';
 import DoublePreviousArrowIcon from '../icons/DoublePreviousArrow';
@@ -50,7 +50,10 @@ function Paginator(props: Props) {
     const nextArrowDisabled = pageIndex === maxPageIndex;
 
     return (
-        <div>
+        <Flex
+            justifyContent="space-between"
+            alignItems="center"
+        >
             <IconButton
                 onClick={onResetPage}
                 aria-label="First page"
@@ -65,7 +68,10 @@ function Paginator(props: Props) {
                 variant="outline"
                 disabled={previousArrowDisabled}
             />
-            <Box as="span" w="200px" mx="24px">
+            <Box
+                as="span"
+                mx="24px"
+            >
                 {pageIndex + 1}
                 {' '}
                 /
@@ -86,7 +92,7 @@ function Paginator(props: Props) {
                 variant="outline"
                 disabled={nextArrowDisabled}
             />
-        </div>
+        </Flex>
     );
 }
 

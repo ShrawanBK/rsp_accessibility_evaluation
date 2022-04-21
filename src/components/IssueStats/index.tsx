@@ -36,7 +36,6 @@ function IssueStats(props: IssueStatsProps) {
             <GridItem
                 rowSpan={2}
                 colSpan={1}
-                height="100%"
             >
                 <TotalIssueCard totalCount={34} />
             </GridItem>

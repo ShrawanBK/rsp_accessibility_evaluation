@@ -14,11 +14,6 @@ export interface IssueBody {
     source: string;
     solution: string;
 }
-export interface IssueDataObject {
-    title: string;
-    id: string | number;
-    issues: IssueBody[]
-}
 
 export interface Criteria {
     criteriaId: string;
@@ -49,13 +44,18 @@ export interface IssueObject {
 
 export const issues: IssueObject[] = [
     {
-        issueId: 'landmark-issue-1',
+        issueId: 'landmark-issue',
         name: 'Document should have one main landmark',
         criteria: [
             {
                 criteriaId: '1.1.1',
                 name: 'C-1.1.1',
                 note: 'This is C-1.1.1',
+            },
+            {
+                criteriaId: 'wcag143',
+                name: 'wcag143',
+                note: 'This is wcag143',
             },
         ],
         tags: ['cat.semantics', 'best-practice'],
@@ -83,13 +83,18 @@ export const issues: IssueObject[] = [
         note: 'This is the landmark-issue note.',
     },
     {
-        issueId: 'heading-issue-1',
+        issueId: 'heading-issue',
         name: 'Page should contain a level-one heading',
         criteria: [
             {
                 criteriaId: '1.1.1',
                 name: 'C-1.1.1',
                 note: 'This is C-1.1.1',
+            },
+            {
+                criteriaId: 'wcag243',
+                name: 'wcag243',
+                note: 'This is wcag243',
             },
         ],
         tags: ['cat.semantics', 'best-practice'],
@@ -123,68 +128,5 @@ export const issues: IssueObject[] = [
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the heading-issue note',
-    },
-];
-
-export const issueData: IssueDataObject[] = [
-    {
-        title: 'Document should have one main landmark',
-        id: 'landmark-id',
-        issues: [
-            {
-                id: 'landmark-issue-1',
-                criteria: '1.1.1',
-                impact: 'Moderate',
-                foundDate: '4/18/2022 at 1:27 AM',
-                found: 'Automatically',
-                tags: ['cat.semantics', 'best-practice'],
-                description: 'Ensures the document has a main landmark',
-                location: 'html',
-                source: '<html lang="en" data-theme="light" style="--chakra-ui-color-mode:light;">',
-                solution: 'Fix the following: Document does not have a main landmark',
-            },
-            {
-                id: 'landmark-issue-2',
-                criteria: '1.1.1',
-                impact: 'Moderate',
-                foundDate: '4/18/2022 at 1:27 AM',
-                found: 'Automatically',
-                tags: ['cat.semantics', 'best-practice'],
-                description: 'Ensures the document has a main landmark',
-                location: 'body',
-                source: '<body lang="en" data-theme="light" style="--chakra-ui-color-mode:light;">',
-                solution: 'Fix the following: Document does not have a main landmark',
-            },
-        ],
-    },
-    {
-        title: 'Page should contain a level-one heading',
-        id: 'heading-id',
-        issues: [
-            {
-                id: 'heading-issue-1',
-                criteria: '1.1.2',
-                impact: 'Critical',
-                foundDate: '14/18/2021 at 1:27 AM',
-                found: 'Automatically',
-                tags: ['cat.semantics', 'best-practice'],
-                description: 'Ensure that the page, or at least one of its frames contains a level-one heading',
-                location: 'html',
-                source: '<html lang="en" data-theme="light" style="--chakra-ui-color-mode:light;">',
-                solution: 'Fix the following: Page must have a level-one heading',
-            },
-            {
-                id: 'heading-issue-2',
-                criteria: '1.1.2',
-                impact: 'Critical',
-                foundDate: '14/18/2021 at 1:27 AM',
-                found: 'Automatically',
-                tags: ['cat.semantics', 'best-practice'],
-                description: 'Ensure that the page, or at least one of its frames contains a level-one heading',
-                location: '.nav-link-active > .css-1bnxa12 > .css-6gs9hh',
-                source: '<p class="chakra-text css-6gs9hh">Scan Website</p>',
-                solution: 'Fix the following: Page must have a level-one heading',
-            },
-        ],
     },
 ];

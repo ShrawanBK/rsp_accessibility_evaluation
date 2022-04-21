@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import {
     Text,
@@ -13,53 +13,87 @@ import {
     Code,
     HStack,
     Tag,
+    Tooltip,
+    Checkbox,
+    useBoolean,
 } from '@chakra-ui/react';
 
 import {
-    IssueDataObject,
+    IssueObject,
 } from './data';
 import Paginator from '../Paginator';
 
-interface IssueItemProps {
+interface IssueListProps {
     // Make this compulsory
-    issueItem: IssueDataObject;
+    issue: IssueObject;
+    selectedIssues: IssueObject['issueId'][] | undefined;
+    onUpdateSelectedIssue: (id: string) => void;
 }
 
-function IssueItem(props: IssueItemProps) {
-    // TODO: import issueData and work on this later
+function UpdatedIssueItem(props: IssueListProps) {
     const {
-        issueItem,
+        issue,
+        selectedIssues,
+        onUpdateSelectedIssue,
     } = props;
 
-    const [currentIssueItemIndex, setCurrentIssueItemIndex] = useState(0);
+    const [isExpanded, setIsExpanded] = useBoolean();
 
-    const currentIssueItem = issueItem.issues[currentIssueItemIndex];
+    const [currentOccurenceIndex, setCurrentOccurenceIndex] = useState(0);
+
+    const currentOccurence = issue.occurence[currentOccurenceIndex];
+
+    const isSelected = selectedIssues?.includes(issue.issueId);
+
+    const onClickCheckbox = useCallback(
+        () => onUpdateSelectedIssue(issue.issueId),
+        [issue.issueId, onUpdateSelectedIssue],
+    );
+
+    const wcagCriteria = useMemo(
+        () => issue.criteria.filter((c) => !c.name.startsWith('wcag')),
+        [issue.criteria],
+    );
+
+    const tags = useMemo(
+        () => issue.criteria.filter((c) => c.name.startsWith('wcag')),
+        [issue.criteria],
+    );
 
     return (
         <Accordion
             allowToggle
-            defaultIndex={0}
             borderColor="transparent"
+            onChange={setIsExpanded.toggle}
         >
             <AccordionItem>
-                <AccordionButton
-                    _expanded={{
-                        bg: '#B3EFFF',
-                        color: '#045981',
-                    }}
-                    bg="rgba(0, 0, 0, 0.04)"
+                <HStack
+                    justifyContent="center"
+                    alignItems="center"
+                    background={isExpanded ? '#B3EFFF' : 'rgba(0, 0, 0, 0.04)'}
                 >
-                    <Box
-                        flex="1"
-                        textAlign="left"
+                    <Checkbox
+                        aria-label={issue.name}
+                        checked={isSelected}
+                        onChange={onClickCheckbox}
+                        borderColor={isSelected ? 'transparent' : '#045981'}
+                        marginLeft={4}
+                    />
+                    <AccordionButton
+                        _expanded={{
+                            bg: '#B3EFFF',
+                            color: '#045981',
+                        }}
+                        justifyContent="space-between"
                     >
-                        {issueItem.title}
-                    </Box>
-                    {/* <AccordionIcon /> */}
-                    <Text>
-                        {issueItem.issues.length}
-                    </Text>
-                </AccordionButton>
+                        <Text>
+                            {issue.name}
+                        </Text>
+                        <Text>
+                            {issue.occurence.length}
+                        </Text>
+                    </AccordionButton>
+                </HStack>
                 <AccordionPanel
                     pb={4}
                     border="1px solid #E5E5E5"
@@ -70,7 +104,7 @@ function IssueItem(props: IssueItemProps) {
                         alignItems="baseline"
                         spacing={4}
                         marginTop={4}
-                        key={currentIssueItem.id}
+                        key={currentOccurence.occurenceId}
                     >
                         <Box
                             display="flex"
@@ -89,9 +123,16 @@ function IssueItem(props: IssueItemProps) {
                                     >
                                         WCAG Criteria:
                                     </Heading>
-                                    <Text>
-                                        {currentIssueItem.criteria}
-                                    </Text>
+                                    {wcagCriteria.map((criteria) => (
+                                        <Tooltip
+                                            key={criteria.criteriaId}
+                                            label={criteria.note}
+                                        >
+                                            <Tag>
+                                                {criteria.name}
+                                            </Tag>
+                                        </Tooltip>
+                                    ))}
                                     <Divider
                                         orientation="vertical"
                                         borderColor="black"
@@ -106,10 +147,15 @@ function IssueItem(props: IssueItemProps) {
                                         Tags:
                                     </Heading>
                                     <HStack>
-                                        {currentIssueItem.tags.map((tag) => (
-                                            <Tag key={tag}>
-                                                {tag}
-                                            </Tag>
+                                        {tags.map((tag) => (
+                                            <Tooltip
+                                                key={tag.criteriaId}
+                                                label={tag.note}
+                                            >
+                                                <Tag>
+                                                    {tag.name}
+                                                </Tag>
+                                            </Tooltip>
                                         ))}
                                     </HStack>
                                 </HStack>
@@ -122,7 +168,7 @@ function IssueItem(props: IssueItemProps) {
                                         Impact:
                                     </Heading>
                                     <Text>
-                                        {currentIssueItem.impact}
+                                        {issue.impact}
                                     </Text>
                                     <Divider
                                         orientation="vertical"
@@ -138,14 +184,14 @@ function IssueItem(props: IssueItemProps) {
                                         Found:
                                     </Heading>
                                     <Text>
-                                        {currentIssueItem.found}
+                                        {issue.found}
                                     </Text>
                                 </HStack>
                             </VStack>
                             <Paginator
-                                pageIndex={currentIssueItemIndex}
-                                totalPages={issueItem.issues.length}
-                                onChangePage={setCurrentIssueItemIndex}
+                                pageIndex={currentOccurenceIndex}
+                                totalPages={issue.occurence.length}
+                                onChangePage={setCurrentOccurenceIndex}
                             />
                         </Box>
                         <Divider />
@@ -161,7 +207,7 @@ function IssueItem(props: IssueItemProps) {
                                 Issue Description
                             </Heading>
                             <Text>
-                                {currentIssueItem.description}
+                                {currentOccurence.description}
                             </Text>
                         </VStack>
                         <VStack
@@ -176,7 +222,7 @@ function IssueItem(props: IssueItemProps) {
                                 Issue Description
                             </Heading>
                             <Text>
-                                {currentIssueItem.description}
+                                {currentOccurence.description}
                             </Text>
                         </VStack>
                         <VStack
@@ -192,7 +238,7 @@ function IssueItem(props: IssueItemProps) {
                                 • Element Location
                             </Heading>
                             <Text>
-                                {currentIssueItem.location}
+                                {currentOccurence.location}
                             </Text>
                         </VStack>
                         <VStack
@@ -210,7 +256,7 @@ function IssueItem(props: IssueItemProps) {
                                 • Element Source
                             </Heading>
                             <Code ml={1} p={4}>
-                                {currentIssueItem.source}
+                                {currentOccurence.source}
                             </Code>
                         </VStack>
                         <VStack
@@ -225,7 +271,7 @@ function IssueItem(props: IssueItemProps) {
                                 How to Fix?
                             </Heading>
                             <Text>
-                                {currentIssueItem.solution}
+                                {currentOccurence.fix}
                             </Text>
                         </VStack>
                     </VStack>
@@ -235,4 +281,4 @@ function IssueItem(props: IssueItemProps) {
     );
 }
 
-export default IssueItem;
+export default UpdatedIssueItem;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 import {
     Grid,
@@ -7,25 +7,38 @@ import {
     Divider,
 } from '@chakra-ui/react';
 
-import {
-    impactMockData,
-    ImpactData,
-    issueTypeData,
-} from './data';
-
 import TotalIssueCard from './TotalIssueCard';
-import ImpactDataItem from './ImpactDataItem';
 import IssueTypeCard from './IssueTypeCard';
+import ImpactDataCard from './ImpactDataCard';
+
+import {
+    ImpactStats,
+    IssueTypeStats,
+} from '../../views/ScanWebsite/data';
 
 export interface IssueStatsProps {
-    impactDataList?: ImpactData[];
+    issueTypeStats: IssueTypeStats[] | undefined;
+    impactStats: ImpactStats[] | undefined;
 }
 
 // TODO: Finalize the data structure with BE
 function IssueStats(props: IssueStatsProps) {
     const {
-        impactDataList = impactMockData,
+        impactStats,
+        issueTypeStats,
     } = props;
+
+    const totalIssuesCount = useMemo(
+        () => {
+            if (!impactStats) {
+                return undefined;
+            }
+            const countArray = [...impactStats].map((i) => i.count);
+            const sum = countArray.reduce((a, b) => a + b);
+            return sum;
+        },
+        [impactStats],
+    );
     return (
         <Grid
             templateRows="repeat(2, 1fr)"
@@ -37,17 +50,13 @@ function IssueStats(props: IssueStatsProps) {
                 rowSpan={2}
                 colSpan={1}
             >
-                <TotalIssueCard totalCount={34} />
+                <TotalIssueCard totalCount={totalIssuesCount} />
             </GridItem>
             <GridItem
                 colSpan={3}
                 rowSpan={2}
             >
-                <IssueTypeCard
-                    automatic={issueTypeData.automatic}
-                    guided={issueTypeData.guided}
-                    reviewable={issueTypeData.reviewable}
-                />
+                <IssueTypeCard issueTypeStats={issueTypeStats} />
             </GridItem>
             <GridItem
                 rowSpan={2}
@@ -67,21 +76,9 @@ function IssueStats(props: IssueStatsProps) {
                 colSpan={3}
                 rowSpan={2}
             >
-                <Grid
-                    p={2}
-                    templateRows="repeat(2, 1fr)"
-                    templateColumns="repeat(2, 1fr)"
-                >
-                    {
-                        impactDataList.map((item) => (
-                            <ImpactDataItem
-                                key={item.impact}
-                                impact={item.impact}
-                                count={item.count}
-                            />
-                        ))
-                    }
-                </Grid>
+                <ImpactDataCard
+                    impactStats={impactStats}
+                />
             </GridItem>
         </Grid>
     );

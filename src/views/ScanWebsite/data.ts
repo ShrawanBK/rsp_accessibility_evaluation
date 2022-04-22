@@ -42,7 +42,7 @@ export interface IssueObject {
     note: string;
 }
 
-export const issues: IssueObject[] = [
+export const issuesMockData: IssueObject[] = [
     {
         issueId: 'landmark-issue',
         name: 'Document should have one main landmark',
@@ -128,5 +128,51 @@ export const issues: IssueObject[] = [
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the heading-issue note',
+    },
+];
+
+export interface ImpactStats {
+    impact: Impact;
+    count: number;
+}
+
+export const impactStatsMockData: ImpactStats[] = [
+    {
+        impact: 'Critical',
+        count: 20,
+    },
+    {
+        impact: 'Serious',
+        count: 10,
+    },
+    {
+        impact: 'Moderate',
+        count: 5,
+    },
+    {
+        impact: 'Minor',
+        count: 0,
+    },
+];
+
+export type IssueType = 'automatic' | 'guided' | 'needs review';
+
+export interface IssueTypeStats {
+    typeFound: IssueType;
+    count: number;
+}
+
+export const issueTypeMockStats: IssueTypeStats[] = [
+    {
+        typeFound: 'automatic',
+        count: 15,
+    },
+    {
+        typeFound: 'guided',
+        count: 15,
+    },
+    {
+        typeFound: 'needs review',
+        count: 5,
     },
 ];

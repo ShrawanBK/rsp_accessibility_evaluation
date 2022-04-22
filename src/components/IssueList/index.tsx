@@ -4,21 +4,17 @@ import {
     Box,
 } from '@chakra-ui/react';
 
-import {
-    issues,
-    IssueObject,
-} from './data';
-
 import IssueItem from './IssueItem';
+import { IssueObject } from '../../views/ScanWebsite/data';
+import Placeholder from '../Placeholder';
 
 interface IssueListProps {
-    // Make this compulsory
-    issueList?: IssueObject[];
+    issueList: IssueObject[] | undefined;
 }
 
 function IssueList(props: IssueListProps) {
     const {
-        issueList = issues,
+        issueList,
     } = props;
 
     const [selectedIssueIds, setSelectedIssueIds] = useState<IssueObject['issueId'][]>();
@@ -49,7 +45,9 @@ function IssueList(props: IssueListProps) {
     );
 
     if (!issueList || issueList.length <= 0) {
-        return null;
+        return (
+            <Placeholder />
+        );
     }
 
     return (

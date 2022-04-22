@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 import {
-    Image,
+    Center,
     Text,
     VStack,
 } from '@chakra-ui/react';
 
 export interface InfoProps {
-    icon: string; // TODO: Update later to icon
+    icon: ReactElement;
     title: string;
     message: string;
 }
@@ -19,17 +19,18 @@ function Info(props: InfoProps) {
         message,
     } = props;
     return (
-        <VStack p={5} spacing={4}>
-            {/* TODO: Update image to icon */}
-            <Image
-                src="https://bit.ly/dan-abramov"
-                height={100}
-                width={100}
-                alt={icon}
-            />
+        <VStack
+            p={5}
+            spacing={8}
+            justifyContent="space-around"
+        >
+            <Center>
+                {icon}
+            </Center>
             <Text
                 fontSize="x-large"
                 fontWeight="bold"
+                zIndex={999}
             >
                 {title}
             </Text>
@@ -38,6 +39,7 @@ function Info(props: InfoProps) {
                 width="40%"
                 align="center"
                 fontSize="xl"
+                zIndex={999}
             >
                 {message}
             </Text>

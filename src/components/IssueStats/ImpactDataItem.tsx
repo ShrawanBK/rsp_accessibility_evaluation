@@ -5,12 +5,12 @@ import {
     Heading,
     Text,
 } from '@chakra-ui/react';
-import { ImpactData } from './data';
 
-interface ImpactDataItemProps extends ImpactData {
-    rest?: {
-        [x: string]: number;
-    }
+import { Impact } from '../../views/ScanWebsite/data';
+
+interface ImpactDataItemProps {
+    impact: Impact,
+    count: number;
 }
 
 export default function ImpactDataItem(props: ImpactDataItemProps) {

@@ -3,7 +3,6 @@ import {
     Box,
     Button,
     Checkbox,
-    CheckboxGroup,
     Divider,
     Flex,
     Heading,
@@ -58,11 +57,13 @@ function ScanWebsite() {
             align="stretch"
             spacing={8}
             p={4}
+            role="main"
         >
             <Flex>
                 <Heading
-                    as="h5"
+                    as="h2"
                     size="lg"
+                    role="heading"
                 >
                     Scan Website
                     <Divider />
@@ -100,6 +101,8 @@ function ScanWebsite() {
                             fontWeight="semibold"
                             letterSpacing="wide"
                             fontSize="2xl"
+                            role="heading"
+                            as="h2"
                         >
                             Result
                         </Heading>
@@ -117,41 +120,39 @@ function ScanWebsite() {
                         SAVE
                     </Button>
                 </Box>
-                <HStack
-                    width="80%"
-                    alignItems="baseline"
-                    justifyContent="space-between"
-                >
-                    <Checkbox
-                        aria-label="issue.name"
-                        marginLeft={2}
-                        marginRight={2}
-                        maxWidth="20px"
-                    />
-                    <HStack width="100%">
-                        <SelectField
-                            options={mockIssueData}
-                            optionLabelSelector="label"
-                            valueSelector="value"
-                            placeholder="All Issues"
-                            variant="flushed"
-                        />
-                        <SelectField
-                            options={mockCriteriaData}
-                            optionLabelSelector="label"
-                            valueSelector="value"
-                            placeholder="All Criteria"
-                            variant="flushed"
-                        />
-                    </HStack>
-                </HStack>
                 <Box
                     width="80%"
                     marginTop={8}
                 >
                     <IssueStats />
                 </Box>
-                <Box marginTop={8}>
+                <HStack
+                    justifyContent="flex-start"
+                    marginTop={8}
+                >
+                    <Checkbox
+                        aria-label="issue.name"
+                        maxWidth="20px"
+                        margin={4}
+                    />
+                    <HStack width="80%">
+                        <SelectField
+                            options={mockIssueData}
+                            optionLabelSelector="label"
+                            valueSelector="value"
+                            placeholder="All Issues"
+                            label="Select Issues"
+                        />
+                        <SelectField
+                            options={mockCriteriaData}
+                            optionLabelSelector="label"
+                            valueSelector="value"
+                            placeholder="All Criteria"
+                            label="Select Criteria"
+                        />
+                    </HStack>
+                </HStack>
+                <Box marginTop={4}>
                     <IssueList />
                 </Box>
             </Box>

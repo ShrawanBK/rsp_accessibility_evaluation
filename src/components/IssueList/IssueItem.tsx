@@ -120,6 +120,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                         fontWeight="semibold"
                                         letterSpacing="wide"
                                         fontSize="md"
+                                        as="h3"
                                     >
                                         WCAG Criteria:
                                     </Heading>
@@ -143,6 +144,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                         fontWeight="semibold"
                                         letterSpacing="wide"
                                         fontSize="md"
+                                        as="h3"
                                     >
                                         Tags:
                                     </Heading>
@@ -164,6 +166,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                         fontWeight="semibold"
                                         letterSpacing="wide"
                                         fontSize="md"
+                                        as="h3"
                                     >
                                         Impact:
                                     </Heading>
@@ -180,6 +183,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                         fontWeight="semibold"
                                         letterSpacing="wide"
                                         fontSize="md"
+                                        as="h3"
                                     >
                                         Found:
                                     </Heading>
@@ -203,6 +207,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                 fontWeight="semibold"
                                 letterSpacing="wide"
                                 fontSize="md"
+                                as="h3"
                             >
                                 Issue Description
                             </Heading>
@@ -218,6 +223,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                 fontWeight="semibold"
                                 letterSpacing="wide"
                                 fontSize="md"
+                                as="h3"
                             >
                                 Issue Description
                             </Heading>
@@ -234,6 +240,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                 letterSpacing="wide"
                                 fontSize="md"
                                 ml={1}
+                                as="h4"
                             >
                                 • Element Location
                             </Heading>
@@ -252,6 +259,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                 letterSpacing="wide"
                                 fontSize="md"
                                 ml={1}
+                                as="h4"
                             >
                                 • Element Source
                             </Heading>
@@ -267,6 +275,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                                 fontWeight="semibold"
                                 letterSpacing="wide"
                                 fontSize="md"
+                                as="h3"
                             >
                                 How to Fix?
                             </Heading>

@@ -29,6 +29,7 @@ export default function ImpactDataItem(props: ImpactDataItemProps) {
                 letterSpacing={2}
                 textTransform="uppercase"
                 fontWeight="semibold"
+                as="h3"
             >
                 {impact}
             </Heading>

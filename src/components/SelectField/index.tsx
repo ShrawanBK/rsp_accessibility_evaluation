@@ -22,23 +22,24 @@ export interface SelectFieldProps<Type extends OptionValue> {
     label?: string;
     placeholder?: string;
     variant?: variant;
+    onSelectOption?: () => void;
 }
 
 function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
     const {
         options = [],
         valueSelector,
-        optionLabelSelector = 'option-label',
-        label,
+        optionLabelSelector = 'optionLabel',
+        label = 'label',
         placeholder,
         variant = 'outline',
+        onSelectOption,
     } = props;
 
     return (
         <FormControl
             isInvalid={false}
             p={2}
-            maxWidth="400px"
         >
             <FormLabel htmlFor={label}>
                 {label}
@@ -49,6 +50,9 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 isFullWidth
                 placeholder={placeholder}
                 variant={variant}
+                title={label}
+                id={label}
+                onChange={onSelectOption}
             >
                 {options.map((option) => {
                     const value = option[valueSelector as keyof typeof option];

@@ -26,6 +26,7 @@ export default function IssueTypeCard(props: IssueTypeCardProps) {
                     letterSpacing={2}
                     textTransform="uppercase"
                     fontWeight="semibold"
+                    as="h3"
                 >
                     automatic
                 </Heading>
@@ -44,6 +45,7 @@ export default function IssueTypeCard(props: IssueTypeCardProps) {
                     textTransform="uppercase"
                     fontWeight="semibold"
                     letterSpacing={2}
+                    as="h3"
                 >
                     guided
                 </Heading>

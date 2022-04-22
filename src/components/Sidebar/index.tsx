@@ -43,48 +43,46 @@ function Sidebar() {
         <VStack
             p={2}
             spacing={4}
+            role="complementary"
         >
             <Image
                 src={logoPath}
                 alt="logo"
-                title="logo"
                 role="img"
             />
             <Heading
-                as="h6"
+                as="h1"
                 size="md"
-                id="accessibility-tools-title"
                 role="heading"
+                aria-level={1}
             >
                 Accessibility Tools
             </Heading>
-            <React.Fragment aria-labelledby="accessibility-tools-title">
-                {
-                    sidebarMenus.map((menu) => (
-                        <Container
-                            key={menu.title}
-                            role="navigation"
-                            width="100%"
-                            display="flex"
-                            id={menu.ariaLabel}
-                            aria-label={menu.ariaLabel}
+            {
+                sidebarMenus.map((menu) => (
+                    <Container
+                        key={menu.title}
+                        role="navigation"
+                        width="100%"
+                        display="flex"
+                        id={menu.ariaLabel}
+                        aria-label={menu.ariaLabel}
+                    >
+                        <NavLink
+                            to={menu.path}
+                            className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
+                            aria-labelledby={menu.ariaLabel}
                         >
-                            <NavLink
-                                to={menu.path}
-                                className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
-                                aria-labelledby={menu.ariaLabel}
-                            >
-                                <Flex justifyContent="space-around">
-                                    {menu.icon}
-                                    <Text width="70%">
-                                        {menu.title}
-                                    </Text>
-                                </Flex>
-                            </NavLink>
-                        </Container>
-                    ))
-                }
-            </React.Fragment>
+                            <Flex justifyContent="space-around">
+                                {menu.icon}
+                                <Text width="70%">
+                                    {menu.title}
+                                </Text>
+                            </Flex>
+                        </NavLink>
+                    </Container>
+                ))
+            }
         </VStack>
     );
 }

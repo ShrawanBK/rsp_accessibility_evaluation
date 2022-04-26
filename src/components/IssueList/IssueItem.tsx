@@ -26,15 +26,17 @@ interface IssueListProps {
     // Make this compulsory
     issue: IssueObject;
     selectedIssues: IssueObject['issueId'][] | undefined;
-    onUpdateSelectedIssue: (id: string) => void;
+    onUpdateSelectedIssue: (id: IssueObject['issueId']) => void;
 }
 
-function UpdatedIssueItem(props: IssueListProps) {
+function IssueItem(props: IssueListProps) {
     const {
         issue,
         selectedIssues,
         onUpdateSelectedIssue,
     } = props;
+
+    console.log({ selectedIssues });
 
     const [isExpanded, setIsExpanded] = useBoolean();
 
@@ -42,7 +44,10 @@ function UpdatedIssueItem(props: IssueListProps) {
 
     const currentOccurence = issue.occurence[currentOccurenceIndex];
 
-    const isSelected = selectedIssues?.includes(issue.issueId);
+    const isSelected = useMemo(
+        () => [...selectedIssues ?? []]?.includes(issue.issueId),
+        [issue.issueId, selectedIssues],
+    );
 
     const onClickCheckbox = useCallback(
         () => onUpdateSelectedIssue(issue.issueId),
@@ -73,7 +78,7 @@ function UpdatedIssueItem(props: IssueListProps) {
                 >
                     <Checkbox
                         aria-label={issue.name}
-                        checked={isSelected}
+                        isChecked={isSelected}
                         onChange={onClickCheckbox}
                         borderColor={isSelected ? 'transparent' : '#045981'}
                         marginLeft={4}
@@ -289,4 +294,4 @@ function UpdatedIssueItem(props: IssueListProps) {
     );
 }
 
-export default UpdatedIssueItem;
+export default IssueItem;

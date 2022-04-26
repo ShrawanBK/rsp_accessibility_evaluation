@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import {
     Grid,
@@ -19,6 +19,7 @@ import {
 export interface IssueStatsProps {
     issueTypeStats: IssueTypeStats[] | undefined;
     impactStats: ImpactStats[] | undefined;
+    totalIssuesCount: number | undefined;
 }
 
 // TODO: Finalize the data structure with BE
@@ -26,19 +27,9 @@ function IssueStats(props: IssueStatsProps) {
     const {
         impactStats,
         issueTypeStats,
+        totalIssuesCount,
     } = props;
 
-    const totalIssuesCount = useMemo(
-        () => {
-            if (!impactStats) {
-                return undefined;
-            }
-            const countArray = [...impactStats].map((i) => i.count);
-            const sum = countArray.reduce((a, b) => a + b);
-            return sum;
-        },
-        [impactStats],
-    );
     return (
         <Grid
             templateRows="repeat(2, 1fr)"

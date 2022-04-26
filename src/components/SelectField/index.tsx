@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 
 import {
     FormControl,
@@ -17,24 +17,28 @@ type variant = 'outline' | 'filled' | 'flushed' | 'unstyled';
 
 export interface SelectFieldProps<Type extends OptionValue> {
     options: Option<Type>[];
-    valueSelector: string;
-    optionLabelSelector?: string;
     label?: string;
     placeholder?: string;
     variant?: variant;
-    onSelectOption?: () => void;
+    onSelectOption: (value: string) => void;
 }
 
 function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
     const {
         options = [],
-        valueSelector,
-        optionLabelSelector = 'optionLabel',
         label = 'label',
         placeholder,
         variant = 'outline',
         onSelectOption,
     } = props;
+
+    const onChange = useCallback(
+        (event: React.ChangeEvent<HTMLSelectElement>) => {
+            event.preventDefault();
+            onSelectOption(event.target.value);
+        },
+        [onSelectOption],
+    );
 
     return (
         <FormControl
@@ -52,20 +56,16 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 variant={variant}
                 title={label}
                 id={label}
-                onChange={onSelectOption}
+                onChange={onChange}
             >
-                {options.map((option) => {
-                    const value = option[valueSelector as keyof typeof option];
-                    const optLabel = option[optionLabelSelector as keyof typeof option];
-                    return (
-                        <option
-                            key={optLabel}
-                            value={value}
-                        >
-                            {optLabel}
-                        </option>
-                    );
-                })}
+                {options.map((option) => (
+                    <option
+                        key={option.label}
+                        value={option.value}
+                    >
+                        {option.label}
+                    </option>
+                ))}
             </Select>
         </FormControl>
     );

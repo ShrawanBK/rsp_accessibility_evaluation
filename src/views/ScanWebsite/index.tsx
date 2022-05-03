@@ -7,6 +7,12 @@ import {
     Flex,
     Heading,
     HStack,
+    Modal,
+    ModalBody,
+    ModalCloseButton,
+    ModalContent,
+    ModalHeader,
+    ModalOverlay,
     Text,
     useBoolean,
     VStack,
@@ -31,6 +37,12 @@ import {
     Criteria,
     Impact,
 } from './data';
+import SaveResultForm from '../../components/forms/SaveResult';
+
+export interface BasicData {
+    timeDate: string;
+    url: string;
+}
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
@@ -40,6 +52,8 @@ function ScanWebsite() {
     const [urlInvalidStatus, setUrlInvalidStatus] = useBoolean();
     const [selectedIssueIds, setSelectedIssueIds] = useState<IssueObject['issueId'][]>();
 
+    const [modalOpened, setModalOpened] = useBoolean();
+
     // handle control of Checkbox correspoding to "Select Issue"
     const [allIdsSelected, setAllIdsSelected] = useBoolean();
 
@@ -47,6 +61,8 @@ function ScanWebsite() {
     const [filterableCriteria, setFilterableCriteria] = useState<Criteria['criteriaId']>();
     const date = '27 December 2021';
     const time = '18:01 pm';
+
+    const [basicData, setBasicData] = useState<BasicData>();
 
     const issuesShown = !urlInvalidStatus && issues && !processingUrl;
 
@@ -97,6 +113,10 @@ function ScanWebsite() {
                 setIssueTypeStats(issueTypeMockStats);
                 setSelectedIssueIds(undefined);
                 setAllIdsSelected.off();
+                setBasicData({
+                    timeDate: new Date().toISOString(),
+                    url,
+                });
             }, 2000);
         },
         [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus],
@@ -301,10 +321,44 @@ function ScanWebsite() {
                             px={4}
                             h={8}
                             letterSpacing={1}
+                            onClick={setModalOpened.on}
+                            tabIndex={-1}
                         >
                             SAVE
                         </Button>
                     </Box>
+                    <Modal
+                        isOpen={modalOpened}
+                        onClose={setModalOpened.off}
+                        blockScrollOnMount={false}
+                        closeOnOverlayClick={false}
+                        aria-label="save-result-modal"
+                        id="modalling"
+                        aria-describedby="save-result-modal"
+                        aria-modal="false"
+                    >
+                        <ModalOverlay aria-modal="true" role="dialog" />
+                        <ModalContent
+                            role="main"
+                            tabIndex={-1}
+                        >
+                            <ModalHeader
+                                tabIndex={-1}
+                            >
+                                <Heading as="h1">
+                                    Results
+                                </Heading>
+                            </ModalHeader>
+                            <ModalCloseButton tabIndex={-1} />
+                            <ModalBody tabIndex={-1}>
+                                <SaveResultForm
+                                    onSaveAction={() => console.warn('save result')}
+                                    basicData={basicData}
+                                    onCloseAction={() => console.warn('save cancelled')}
+                                />
+                            </ModalBody>
+                        </ModalContent>
+                    </Modal>
                     <Box
                         width="80%"
                         marginTop={8}
@@ -326,6 +380,7 @@ function ScanWebsite() {
                             borderColor="#045981"
                             onChange={onSelectAllIssues}
                             isChecked={allIdsSelected}
+                            tabIndex={-1}
                         />
                         <HStack width="80%">
                             <SelectField

@@ -57,6 +57,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 title={label}
                 id={label}
                 onChange={onChange}
+                tabIndex={-1}
             >
                 {options.map((option) => (
                     <option

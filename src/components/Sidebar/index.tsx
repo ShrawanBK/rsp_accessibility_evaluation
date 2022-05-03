@@ -67,13 +67,18 @@ function Sidebar() {
                         display="flex"
                         id={menu.ariaLabel}
                         aria-label={menu.ariaLabel}
+                        tabIndex={-1}
                     >
                         <NavLink
                             to={menu.path}
                             className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
                             aria-labelledby={menu.ariaLabel}
+                            tabIndex={-1}
                         >
-                            <Flex justifyContent="space-around">
+                            <Flex
+                                justifyContent="space-around"
+                                tabIndex={-1}
+                            >
                                 {menu.icon}
                                 <Text width="70%">
                                     {menu.title}

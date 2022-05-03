@@ -62,6 +62,7 @@ function ScanForm(props: Props) {
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
+                        tabIndex={-1}
                     />
                     <Button
                         type="submit"
@@ -70,6 +71,7 @@ function ScanForm(props: Props) {
                         colorScheme="brand"
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
+                        tabIndex={-1}
                     >
                         {buttonLabel}
                     </Button>

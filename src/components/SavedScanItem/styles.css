@@ -1,0 +1,36 @@
+.viewButton {
+    background-color: #00157F;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 50%;
+    margin-left: 5px;
+    transition-duration: 0.4s;
+  }
+
+  .viewButton:hover {
+    background-color: #00094B; /* Green */
+    color: white;
+  }
+  .deleteButton{
+    background-color: #FF0000;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    width: 50%;
+    margin-left: 5px;
+    transition-duration: 0.4s;
+  }
+
+  .deleteButton:hover {
+    background-color: rgb(162, 9, 9); /* Green */
+    color: white;
+  }

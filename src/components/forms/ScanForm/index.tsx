@@ -1,13 +1,13 @@
-import React, { ChangeEvent, useCallback, useState } from "react";
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import {
-  Button,
-  FormControl,
-  FormLabel,
-  Input,
-  HStack,
-} from "@chakra-ui/react";
+    Button,
+    FormControl,
+    FormLabel,
+    Input,
+    HStack,
+} from '@chakra-ui/react';
 
-import "./styles.css";
+import './styles.css';
 
 interface Props {
     processingUrl: boolean;
@@ -25,22 +25,21 @@ function ScanForm(props: Props) {
     } = props;
     const [url, setUrl] = useState<string>();
 
-  const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) =>
-    setUrl(e.target.value);
+    const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value);
 
-  const errored = !url;
+    const errored = !url;
 
-  const handleSubmit = useCallback(
-    (event) => {
-      event.preventDefault();
-      if (!url) {
-        return;
-      }
-      onScanWebsite(url);
-      // NOTE: Time out is the response time when url processed
-    },
-    [onScanWebsite, url]
-  );
+    const handleSubmit = useCallback(
+        (event) => {
+            event.preventDefault();
+            if (!url) {
+                return;
+            }
+            onScanWebsite(url);
+            // NOTE: Time out is the response time when url processed
+        },
+        [onScanWebsite, url],
+    );
 
     return (
         <form onSubmit={handleSubmit}>
@@ -86,8 +85,8 @@ function ScanForm(props: Props) {
                 ) : (
                     <FormErrorMessage>Email is required.</FormErrorMessage>
                 )} */}
-      </FormControl>
-    </form>
-  );
+            </FormControl>
+        </form>
+    );
 }
 export default ScanForm;

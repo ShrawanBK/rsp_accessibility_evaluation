@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react';
 
 interface TotalIssueCardProps {
-    totalCount: number;
+    totalCount: number | undefined;
 }
 
 export default function TotalIssueCard(props: TotalIssueCardProps) {
@@ -39,7 +39,7 @@ export default function TotalIssueCard(props: TotalIssueCardProps) {
                         fontSize="2xl"
                         color="white"
                     >
-                        {totalCount}
+                        {totalCount ?? 'N/A'}
                     </Heading>
                     <Text
                         fontSize="md"

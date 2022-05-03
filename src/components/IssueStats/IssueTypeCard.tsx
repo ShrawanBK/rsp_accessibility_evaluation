@@ -1,17 +1,43 @@
-import React from 'react';
-import { VStack, Box, Heading, Text } from '@chakra-ui/react';
-
+import React, { useMemo } from 'react';
 import {
-    IssueTypeDataInterface as IssueTypeCardProps,
-} from './data';
+    VStack,
+    Box,
+    Heading,
+    Text,
+} from '@chakra-ui/react';
 
-export default function IssueTypeCard(props: IssueTypeCardProps) {
+import { IssueTypeStats } from '../../views/ScanWebsite/data';
+
+export interface Props {
+    issueTypeStats: IssueTypeStats[] | undefined;
+}
+
+const getIssueTypeCount = (
+    type: IssueTypeStats['typeFound'],
+    list: IssueTypeStats[] | undefined,
+) => list?.find((i) => i.typeFound === type)?.count ?? 'N/A';
+
+export default function IssueTypeCard(props: Props) {
     const {
-        automatic,
-        guided,
-        reviewable,
+        issueTypeStats,
         ...rest
     } = props;
+
+    const automatic = useMemo(
+        () => getIssueTypeCount('automatic', issueTypeStats),
+        [issueTypeStats],
+    );
+
+    const reviewable = useMemo(
+        () => getIssueTypeCount('needs review', issueTypeStats),
+        [issueTypeStats],
+    );
+
+    const guided = useMemo(
+        () => getIssueTypeCount('guided', issueTypeStats),
+        [issueTypeStats],
+    );
+
     return (
         <VStack
             p={2}
@@ -26,6 +52,7 @@ export default function IssueTypeCard(props: IssueTypeCardProps) {
                     letterSpacing={2}
                     textTransform="uppercase"
                     fontWeight="semibold"
+                    as="h3"
                 >
                     automatic
                 </Heading>
@@ -44,6 +71,7 @@ export default function IssueTypeCard(props: IssueTypeCardProps) {
                     textTransform="uppercase"
                     fontWeight="semibold"
                     letterSpacing={2}
+                    as="h3"
                 >
                     guided
                 </Heading>

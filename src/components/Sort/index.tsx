@@ -1,16 +1,29 @@
 import React from 'react';
-import { Flex, FormLabel, Select } from '@chakra-ui/react';
+import SelectField from '../SelectField';
+
+const options = [
+    {
+        label: 'Name',
+        value: 'name',
+    },
+    {
+        label: 'Date',
+        value: 'date',
+    },
+    {
+        label: 'Type',
+        value: 'type',
+    },
+];
 
 function Sort() {
     return (
-        <Flex direction="column">
-            <FormLabel htmlFor="url">Sort By</FormLabel>
-            <Select placeholder="Select option">
-                <option value="option1">Name</option>
-                <option value="option2">Date</option>
-                <option value="option3">Type</option>
-            </Select>
-        </Flex>
+        <SelectField
+            options={options}
+            placeholder="Select option"
+            label="Sort By"
+            onSelectOption={() => console.warn('selected id')}
+        />
     );
 }
 

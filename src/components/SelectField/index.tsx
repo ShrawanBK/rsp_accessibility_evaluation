@@ -45,7 +45,10 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
             isInvalid={false}
             p={2}
         >
-            <FormLabel htmlFor={label}>
+            <FormLabel
+                htmlFor={label}
+                fontWeight="semibold"
+            >
                 {label}
             </FormLabel>
             <Select
@@ -58,6 +61,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 id={label}
                 onChange={onChange}
                 tabIndex={-1}
+                background="white"
             >
                 {options.map((option) => (
                     <option

@@ -40,7 +40,6 @@ function SaveResultForm(props: Props) {
     const handleWebsiteChange = (e: ChangeEvent<HTMLInputElement>) => setWebsite(e.target.value);
     const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
 
-    console.log({ note });
     const onCancelSave = useCallback(
         () => {
             setWebpage('');
@@ -157,20 +156,20 @@ function SaveResultForm(props: Props) {
                         type="reset"
                         colorScheme="brand"
                         variant="outline"
-                        h={8}
                         letterSpacing={1}
                         tabIndex={-1}
                         onClick={onCancelSave}
+                        py={4}
                     >
                         Cancel
                     </Button>
                     <Button
                         type="submit"
                         disabled={errored || isLoading}
-                        h={8}
                         letterSpacing={1}
                         colorScheme="brand"
                         tabIndex={-1}
+                        py={4}
                     >
                         Save
                     </Button>

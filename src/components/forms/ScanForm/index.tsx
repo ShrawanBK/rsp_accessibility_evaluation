@@ -14,6 +14,7 @@ interface Props {
     onScanWebsite: (url: string) => void;
     label?: string;
     buttonLabel?: string;
+    placeholder?: string;
 }
 
 function ScanForm(props: Props) {
@@ -22,6 +23,7 @@ function ScanForm(props: Props) {
         onScanWebsite,
         label = 'URL',
         buttonLabel = 'SCAN',
+        placeholder = 'Enter website url (https://www.examplewebsite.example)',
     } = props;
     const [url, setUrl] = useState<string>();
 
@@ -48,7 +50,10 @@ function ScanForm(props: Props) {
                 isInvalid={false}
                 flex={2}
             >
-                <FormLabel htmlFor={label}>
+                <FormLabel
+                    htmlFor={label}
+                    fontWeight="semibold"
+                >
                     {label}
                 </FormLabel>
                 <HStack spacing={0}>
@@ -58,11 +63,12 @@ function ScanForm(props: Props) {
                         value={url}
                         onChange={handleUrlChange}
                         width="80%"
-                        placeholder="Enter website url (https://www.examplewebsite.example) "
+                        placeholder={placeholder}
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
                         tabIndex={-1}
+                        height={12}
                     />
                     <Button
                         type="submit"
@@ -72,6 +78,7 @@ function ScanForm(props: Props) {
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
                         tabIndex={-1}
+                        height={12}
                     >
                         {buttonLabel}
                     </Button>

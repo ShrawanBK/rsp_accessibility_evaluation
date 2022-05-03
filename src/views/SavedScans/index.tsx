@@ -1,82 +1,89 @@
-import { Box, Divider, Flex, Heading, Spacer, VStack } from '@chakra-ui/react';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+    Box,
+    Divider,
+    Flex,
+    Heading,
+    HStack,
+    Spacer,
+    Text,
+    VStack,
+    useToast,
+} from '@chakra-ui/react';
+import ScanForm from '../../components/forms/ScanForm';
 
-import SearchScans from '../../components/forms/SearchScans';
-import SavedScansItem from '../../components/SavedScanItem';
+import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
+import Info from '../../components/Info';
+import Paginator from '../../components/Paginator';
+import SavedScanList from '../../components/SavedScanList';
 import Sort from '../../components/Sort';
+import { SavedScanItem, savedScanItemColumn, savedScanItemList } from './data';
 
 function SavedScan() {
-    const columns = [
-        {
-            description: 'Webpage',
-            accessor: 'webPage',
-        },
-        {
-            description: 'URL',
-            accessor: 'url',
-        },
-        {
-            description: 'Website',
-            accessor: 'website',
-        },
-        {
-            description: 'Scanned Date',
-            accessor: 'scannedDate',
-        },
-        {
-            description: 'Actions',
-            accessor: 'actions',
-        },
-    ];
+    const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
 
-    const data = [
-        {
-            id: 1,
-            webpage: 'Facebook Profile Page',
-            url: 'https://facebook.com',
-            website: 'Facebook',
-            scannedDate: '1:31 22 April 2022',
+    useEffect(
+        () => {
+            setSavedScanList(savedScanItemList);
         },
-        {
-            id: 2,
-            webpage: 'Facebook Profile Page',
-            url: 'https://facebook.com',
-            website: 'Facebook',
-            scannedDate: '1:31 22 April 2022',
-        },
-        {
-            id: 3,
-            webpage: 'Facebook Profile Page',
-            url: 'https://facebook.com',
-            website: 'Facebook',
-            scannedDate: '1:31 22 April 2022',
-        },
-        {
-            id: 4,
-            webpage: 'Facebook Profile Page',
-            url: 'https://facebook.com',
-            website: 'Facebook',
-            scannedDate: '1:31 22 April 2022',
-        },
-    ];
+        [],
+    );
+
     const onSearch = useCallback(
         (url: string) => {
             console.log('on processing url - ', url);
         },
-        [null],
+        [],
     );
+
+    const [deletableId, setDeletableId] = useState<string>();
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
+    const totalPages = 3;
+    const toast = useToast();
+
+    const onDeleteItem = useCallback(
+        () => {
+            if (!deletableId) {
+                return;
+            }
+            setSavedScanList((currentList) => (
+                currentList?.filter((item) => item.id !== deletableId)
+            ));
+
+            // NOTE MAKE IT ACCESSIBLE
+            toast({
+                title: 'Scan Item Deleted.',
+                description: "We've deleted the scan item.",
+                status: 'success',
+                duration: 3000,
+                isClosable: true,
+            });
+            setDeletableId(undefined);
+        },
+        [deletableId, toast],
+    );
+
     return (
-        <VStack align="stretch" spacing={8} p={4}>
-            <Flex>
-                <Heading as="h5" size="lg">
-                    Saved Scans
-                    <Divider />
-                </Heading>
-            </Flex>
+        <VStack
+            align="stretch"
+            spacing={8}
+            p={4}
+            role="main"
+        >
+            <Heading as="h1" size="lg">
+                Saved Scans
+                <Divider />
+            </Heading>
             <Box width="100%" marginTop="1vh">
-                <Flex>
-                    <Box width="60%">
-                        <SearchScans onSearch={onSearch} />
+                <Flex alignItems="center">
+                    <Box width="80%">
+                        <ScanForm
+                            processingUrl={false}
+                            onScanWebsite={() => console.warn('search pressed')}
+                            label="Webpage or Website Name"
+                            placeholder="Enter atleast 2 characters"
+                            buttonLabel="search"
+                        />
                     </Box>
                     <Spacer />
                     <Box width="20%">
@@ -85,11 +92,38 @@ function SavedScan() {
                 </Flex>
             </Box>
             <Box background="white" p={8} borderWidth="1px" borderRadius="md">
-                <SavedScansItem
-                    columns={columns}
-                    data={data}
-                    numberOfRecords={data.length}
-                />
+                {(!savedScanList || savedScanList.length <= 0) && (
+                    <Info
+                        title="No Saved Scan"
+                        message="Currently there is no saved scan of websites. Click here to start scan."
+                        icon={<ScanAndAuditIcon />}
+                    />
+                )}
+                {savedScanList && savedScanList.length >= 0 && (
+                    <VStack align="stretch">
+                        <SavedScanList
+                            columns={savedScanItemColumn}
+                            data={savedScanList}
+                            numberOfRecords={savedScanList.length}
+                            deletableId={deletableId}
+                            setDeletableId={setDeletableId}
+                            onDeleteItem={onDeleteItem}
+                        />
+                        <HStack justifyContent="flex-end">
+                            <Text>
+                                1 - 10 out of
+                                {' '}
+                                {savedScanList.length}
+                            </Text>
+                            <Paginator
+                                pageIndex={currentPageIndex}
+                                totalPages={totalPages}
+                                onChangePage={setCurrentPageIndex}
+                            />
+                        </HStack>
+                    </VStack>
+                )}
+
             </Box>
         </VStack>
     );

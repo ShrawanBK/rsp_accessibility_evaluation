@@ -40,6 +40,8 @@ function IssueStats(props: IssueStatsProps) {
             <GridItem
                 rowSpan={2}
                 colSpan={1}
+                height="100%"
+                py={3}
             >
                 <TotalIssueCard totalCount={totalIssuesCount} />
             </GridItem>

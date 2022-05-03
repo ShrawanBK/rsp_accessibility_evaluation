@@ -318,11 +318,10 @@ function ScanWebsite() {
                         <Button
                             type="button"
                             colorScheme="brand"
-                            px={4}
-                            h={8}
                             letterSpacing={1}
                             onClick={setModalOpened.on}
                             tabIndex={-1}
+                            py={4}
                         >
                             SAVE
                         </Button>
@@ -341,12 +340,16 @@ function ScanWebsite() {
                         <ModalContent
                             role="main"
                             tabIndex={-1}
+                            py={2}
                         >
                             <ModalHeader
                                 tabIndex={-1}
                             >
-                                <Heading as="h1">
-                                    Results
+                                <Heading
+                                    as="h1"
+                                    size="md"
+                                >
+                                    Save Result
                                 </Heading>
                             </ModalHeader>
                             <ModalCloseButton tabIndex={-1} />

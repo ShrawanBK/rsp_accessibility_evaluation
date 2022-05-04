@@ -33,17 +33,13 @@ interface IssueListProps {
     // Make this compulsory
     issue: IssueObject;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
-    deletableOccurenceData: DeletableOccurenceData | undefined;
 }
 
 function EditableIssueItem(props: IssueListProps) {
     const {
         issue,
         setDeletableOccurenceData,
-        deletableOccurenceData,
     } = props;
-
-    console.log({ deletableOccurenceData });
 
     const [isExpanded, setIsExpanded] = useBoolean();
 
@@ -66,9 +62,15 @@ function EditableIssueItem(props: IssueListProps) {
             setDeletableOccurenceData({
                 occurenceId: currentOccurence.occurenceId,
                 issueId: issue.issueId,
+                issueName: issue.name,
             });
         },
-        [currentOccurence.occurenceId, issue.issueId, setDeletableOccurenceData],
+        [
+            currentOccurence.occurenceId,
+            issue.issueId,
+            issue.name,
+            setDeletableOccurenceData,
+        ],
     );
 
     return (
@@ -210,7 +212,7 @@ function EditableIssueItem(props: IssueListProps) {
                                         tabIndex={-1}
                                         colorScheme="blue"
                                         background="blue.700"
-                                        onClick={() => console.warn('delete')}
+                                        onClick={() => console.warn('edit')}
                                     >
                                         Edit
                                     </Button>

@@ -10,8 +10,8 @@ import {
     Heading,
 } from '@chakra-ui/react';
 
-import DeleteRecordDialog from '../DeleteRecordDialog';
 import SavedScansItemRow from './SavedScanItemRow';
+import DeleteConfirmationDialog from '../DeleteConfirmationDialog';
 import { Column, SavedScanItem } from '../../views/SavedScans/data';
 
 interface Props {
@@ -76,11 +76,25 @@ function SavedScansList(props: Props) {
                     </Tbody>
                 </Table>
             </Box>
-            <DeleteRecordDialog
+            <DeleteConfirmationDialog
                 open={openDeleteRecordDialog}
                 onCancelDelete={onCloseDeleteRecordDialog}
-                deletableItem={deletableItem}
+                deletableItemId={deletableItem?.id}
                 onDelete={onDeleteItem}
+                header="Delete webpage"
+                areYouSureMsg="Are you sure you want to delete the following webpage?"
+                dialogBody={(
+                    <>
+                        <br />
+                        Webpage:
+                        {' '}
+                        {deletableItem?.webpage}
+                        <br />
+                        Website:
+                        {' '}
+                        {deletableItem?.website}
+                    </>
+                )}
             />
         </Box>
     );

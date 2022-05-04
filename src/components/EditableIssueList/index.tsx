@@ -10,14 +10,12 @@ import { DeletableOccurenceData } from '../../views/ScannedWebsiteDetail';
 interface IssueListProps {
     issueList: IssueObject[] | undefined;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
-    deletableOccurenceData: DeletableOccurenceData | undefined;
 }
 
 function EditableIssueList(props: IssueListProps) {
     const {
         issueList,
         setDeletableOccurenceData,
-        deletableOccurenceData,
     } = props;
 
     if (!issueList || issueList.length <= 0) {
@@ -33,7 +31,6 @@ function EditableIssueList(props: IssueListProps) {
                     key={issue.issueId}
                     issue={issue}
                     setDeletableOccurenceData={setDeletableOccurenceData}
-                    deletableOccurenceData={deletableOccurenceData}
                 />
             ))}
         </Box>

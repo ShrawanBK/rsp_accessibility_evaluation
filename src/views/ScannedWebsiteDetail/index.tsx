@@ -13,8 +13,9 @@ import {
     ModalOverlay,
     Spacer,
     Text,
-    toast,
+    ToastId,
     useBoolean,
+    useToast,
     VStack,
 } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
@@ -39,6 +40,8 @@ import {
 import IssueForm from '../../components/forms/IssueForm';
 import EditableIssueList from '../../components/EditableIssueList';
 import NextArrowIcon from '../../components/icons/NextArrow';
+import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
+import ToastBox from '../../components/ToastBox';
 
 export interface BasicData {
     timeDate: string;
@@ -48,6 +51,7 @@ export interface BasicData {
 export interface DeletableOccurenceData {
     occurenceId: string;
     issueId: string;
+    issueName: string;
 }
 
 function ScannedWebsiteDetail() {
@@ -149,7 +153,9 @@ function ScannedWebsiteDetail() {
             return issues;
         }
 
-        const tmpIssues = [...issues];
+        // remove the issue of there is no occurence.
+        const tmpIssues = [...issues].filter((item) => item.occurence.length > 0);
+
         if (!filterableImpactLevel && !filterableCriteria) {
             return tmpIssues;
         }
@@ -203,36 +209,78 @@ function ScannedWebsiteDetail() {
 
     const [deletableOccurenceData, setDeletableOccurenceData] = useState<DeletableOccurenceData>();
 
-    const onDeleteIssue = useCallback(
+    const toast = useToast();
+
+    const toastIdRef = React.useRef<string | number | undefined>();
+
+    function showToast(showableToast: ToastId | undefined) {
+        toastIdRef.current = showableToast;
+    }
+
+    const onCloseToast = useCallback(() => {
+        if (toastIdRef.current) {
+            toast.close(toastIdRef.current);
+            toast.closeAll();
+        }
+    }, [toast]);
+
+    const onCancelDeleteOccurence = useCallback(
+        () => setDeletableOccurenceData(undefined),
+        [setDeletableOccurenceData],
+    );
+
+    const onDeleteOccurence = useCallback(
         () => {
             if (!deletableOccurenceData) {
                 return;
             }
-            // setSavedScanList((currentList) => (
-            //     currentList?.filter((item) => item.id !== deletableId)
-            // ));
 
-            // toast({
-            //     status: 'success',
-            //     isClosable: true,
-            //     variant: 'subtle',
-            //     id: deletableOccurenceData,
-            //     duration: null,
-            //     position: 'top',
-            //     // render: () => (
-            //     //     <ToastBox
-            //     //         onCloseToast={onClose}
-            //     //         title="Delete Success"
-            //     //         description={`Webpage - ${deletableId} deleted successfully`}
-            //     //         status="success"
-            //     //     />
-            //     // ),
-            // });
+            setIssues((prevIssues) => {
+                const tmpIssueList = [...prevIssues];
+
+                const updatedIssueList = tmpIssueList.map((issueItem) => {
+                    if (issueItem.issueId !== deletableOccurenceData.issueId) {
+                        return issueItem;
+                    }
+                    return {
+                        ...issueItem,
+                        occurence: issueItem.occurence.filter(
+                            (oItem) => oItem.occurenceId !== deletableOccurenceData.occurenceId,
+                        ),
+                    };
+                });
+
+                return updatedIssueList;
+            });
+
+            const toastComponent = toast({
+                status: 'success',
+                isClosable: true,
+                variant: 'subtle',
+                id: deletableOccurenceData.occurenceId,
+                duration: null,
+                position: 'top',
+                render: () => (
+                    <ToastBox
+                        onCloseToast={onCloseToast}
+                        title="Delete Success"
+                        description={`Issue - ${deletableOccurenceData.issueName} deleted successfully`}
+                        status="success"
+                    />
+                ),
+            });
+            showToast(toastComponent);
 
             setDeletableOccurenceData(undefined);
         },
-        [deletableOccurenceData],
+        [
+            deletableOccurenceData,
+            onCloseToast,
+            toast,
+        ],
     );
+
+    const openDeleteOccurenceDialog = !!deletableOccurenceData;
 
     return (
         <VStack
@@ -241,6 +289,20 @@ function ScannedWebsiteDetail() {
             p={4}
             role="main"
         >
+            <DeleteConfirmationDialog
+                open={openDeleteOccurenceDialog}
+                onCancelDelete={onCancelDeleteOccurence}
+                deletableItemId={deletableOccurenceData?.occurenceId}
+                onDelete={onDeleteOccurence}
+                header="Delete Issue"
+                areYouSureMsg="Are you sure you want to delete following issue?"
+                dialogBody={(
+                    <>
+                        <br />
+                        {deletableOccurenceData?.issueName}
+                    </>
+                )}
+            />
             <HStack spacing={0}>
                 <Link to="/saved_scans">
                     <Text
@@ -397,7 +459,6 @@ function ScannedWebsiteDetail() {
                         <EditableIssueList
                             issueList={filteredIssues}
                             setDeletableOccurenceData={setDeletableOccurenceData}
-                            deletableOccurenceData={deletableOccurenceData}
                         />
                     </Box>
                 </Box>

@@ -9,8 +9,6 @@ import {
     Text,
     VStack,
     useToast,
-    IconButton,
-    CloseButton,
     ToastId,
 } from '@chakra-ui/react';
 import ScanForm from '../../components/forms/ScanForm';
@@ -51,7 +49,7 @@ function SavedScan() {
         toastIdRef.current = showableToast;
     }
 
-    const onClose = useCallback(() => {
+    const onCloseToast = useCallback(() => {
         if (toastIdRef.current) {
             toast.close(toastIdRef.current);
             toast.closeAll();
@@ -77,7 +75,7 @@ function SavedScan() {
                 position: 'top',
                 render: () => (
                     <ToastBox
-                        onCloseToast={onClose}
+                        onCloseToast={onCloseToast}
                         title="Delete Success"
                         description={`Webpage - ${deletableId} deleted successfully`}
                         status="success"
@@ -89,7 +87,7 @@ function SavedScan() {
 
             setDeletableId(undefined);
         },
-        [deletableId, onClose, toast],
+        [deletableId, onCloseToast, toast],
     );
 
     return (

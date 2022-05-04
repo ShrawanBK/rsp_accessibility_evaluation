@@ -10,21 +10,26 @@ import {
     Button,
     Spacer,
 } from '@chakra-ui/react';
-import { SavedScanItem } from '../../views/SavedScans/data';
 
 interface Props {
     open: boolean;
     onCancelDelete: () => void;
     onDelete: () => void;
-    deletableItem: SavedScanItem | undefined;
+    deletableItemId: string | undefined;
+    header?: string;
+    areYouSureMsg?: string;
+    dialogBody?: React.ReactNode;
 }
 
-function DeleteRecordDialog(props: Props) {
+function DeleteConfirmationDialog(props: Props) {
     const {
         open,
         onCancelDelete,
         onDelete,
-        deletableItem,
+        deletableItemId,
+        header = 'Delete',
+        areYouSureMsg = 'Are you sure?',
+        dialogBody,
     } = props;
     return (
         <AlertDialog
@@ -34,25 +39,18 @@ function DeleteRecordDialog(props: Props) {
             leastDestructiveRef={undefined}
             isCentered
             preserveScrollBarGap
-            id={deletableItem?.id}
+            id={deletableItemId}
         >
             <AlertDialogOverlay />
             <AlertDialogContent>
                 <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                    Delete webpage
+                    {header}
                 </AlertDialogHeader>
                 <AlertDialogCloseButton />
                 <AlertDialogBody>
-                    Are you sure you want to delete the following webpage?
+                    {areYouSureMsg}
                     <Spacer />
-                    <br />
-                    webpage:
-                    {' '}
-                    {deletableItem?.webpage}
-                    <br />
-                    Website:
-                    {' '}
-                    {deletableItem?.website}
+                    {dialogBody}
                 </AlertDialogBody>
 
                 <AlertDialogFooter>
@@ -77,4 +75,4 @@ function DeleteRecordDialog(props: Props) {
     );
 }
 
-export default DeleteRecordDialog;
+export default DeleteConfirmationDialog;

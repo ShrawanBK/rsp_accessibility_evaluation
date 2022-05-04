@@ -8,7 +8,6 @@ export interface IssueBody {
     impact: Impact;
     foundDate: string;
     found: string;
-    tags: string[];
     description: string;
     location: string;
     source: string;

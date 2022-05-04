@@ -7,6 +7,7 @@ import Sidebar from '../../components/Sidebar';
 import ScanWebsite from '../../views/ScanWebsite';
 import Fonts from './Fonts';
 import SavedScan from '../../views/SavedScans';
+import ScannedWebsiteDetail from '../../views/ScannedWebsiteDetail';
 
 const theme = extendTheme({
     colors: {
@@ -41,6 +42,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<ScanWebsite />} />
                         <Route path="/saved_scans" element={<SavedScan />} />
+                        <Route path="/saved_scans/:id" element={<ScannedWebsiteDetail />} />
                     </Routes>
                 </Box>
             </Flex>

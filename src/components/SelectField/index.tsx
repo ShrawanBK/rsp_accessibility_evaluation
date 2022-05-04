@@ -43,11 +43,9 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
     return (
         <FormControl
             isInvalid={false}
-            p={2}
         >
             <FormLabel
                 htmlFor={label}
-                fontWeight="semibold"
             >
                 {label}
             </FormLabel>

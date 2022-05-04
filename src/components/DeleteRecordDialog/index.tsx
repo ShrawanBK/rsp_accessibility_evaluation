@@ -34,6 +34,7 @@ function DeleteRecordDialog(props: Props) {
             leastDestructiveRef={undefined}
             isCentered
             preserveScrollBarGap
+            id={deletableItem?.id}
         >
             <AlertDialogOverlay />
             <AlertDialogContent>

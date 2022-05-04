@@ -6,6 +6,7 @@ import {
     Td,
     Tr,
 } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 import { SavedScanItem } from '../../views/SavedScans/data';
 
@@ -39,17 +40,22 @@ function SavedScansItemRow(props: Props) {
             <Td>{item.severity}</Td>
             <Td>
                 <HStack spacing={2}>
-                    <Button
-                        type="button"
-                        h={10}
-                        letterSpacing={1}
-                        tabIndex={-1}
-                        colorScheme="blue"
-                        background="blue.700"
-                        onClick={onViewButtonClicked}
+                    <Link
+                        to={`/saved_scans/${item.id}`}
+                        aria-label={`opening /saved_scans/${item.id}`}
                     >
-                        View
-                    </Button>
+                        <Button
+                            type="button"
+                            h={10}
+                            letterSpacing={1}
+                            tabIndex={-1}
+                            colorScheme="blue"
+                            background="blue.700"
+                            onClick={onViewButtonClicked}
+                        >
+                            View
+                        </Button>
+                    </Link>
                     <Button
                         type="button"
                         h={10}

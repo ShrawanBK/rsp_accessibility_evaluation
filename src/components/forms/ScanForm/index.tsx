@@ -52,7 +52,6 @@ function ScanForm(props: Props) {
             >
                 <FormLabel
                     htmlFor={label}
-                    fontWeight="semibold"
                 >
                     {label}
                 </FormLabel>
@@ -62,7 +61,7 @@ function ScanForm(props: Props) {
                         type="url"
                         value={url}
                         onChange={handleUrlChange}
-                        width="80%"
+                        width="90%"
                         placeholder={placeholder}
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}

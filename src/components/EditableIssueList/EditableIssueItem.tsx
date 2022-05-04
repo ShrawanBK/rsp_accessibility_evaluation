@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, {
+    useCallback,
+    useMemo,
+    useState,
+    SetStateAction,
+    Dispatch,
+} from 'react';
 
 import {
     Text,
@@ -14,43 +20,36 @@ import {
     HStack,
     Tag,
     Tooltip,
-    Checkbox,
     useBoolean,
+    Button,
 } from '@chakra-ui/react';
 
 import { IssueObject } from '../../views/ScanWebsite/data';
 
 import Paginator from '../Paginator';
+import { DeletableOccurenceData } from '../../views/ScannedWebsiteDetail';
 
 interface IssueListProps {
     // Make this compulsory
     issue: IssueObject;
-    selectedIssues: IssueObject['issueId'][] | undefined;
-    onUpdateSelectedIssue: (id: IssueObject['issueId']) => void;
+    setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
+    deletableOccurenceData: DeletableOccurenceData | undefined;
 }
 
-function IssueItem(props: IssueListProps) {
+function EditableIssueItem(props: IssueListProps) {
     const {
         issue,
-        selectedIssues,
-        onUpdateSelectedIssue,
+        setDeletableOccurenceData,
+        deletableOccurenceData,
     } = props;
+
+    console.log({ deletableOccurenceData });
 
     const [isExpanded, setIsExpanded] = useBoolean();
 
     const [currentOccurenceIndex, setCurrentOccurenceIndex] = useState(0);
 
     const currentOccurence = issue.occurence[currentOccurenceIndex];
-
-    const isSelected = useMemo(
-        () => [...selectedIssues ?? []]?.includes(issue.issueId),
-        [issue.issueId, selectedIssues],
-    );
-
-    const onClickCheckbox = useCallback(
-        () => onUpdateSelectedIssue(issue.issueId),
-        [issue.issueId, onUpdateSelectedIssue],
-    );
 
     const wcagCriteria = useMemo(
         () => issue.criteria.filter((c) => !c.name.startsWith('wcag')),
@@ -60,6 +59,16 @@ function IssueItem(props: IssueListProps) {
     const tags = useMemo(
         () => issue.criteria.filter((c) => c.name.startsWith('wcag')),
         [issue.criteria],
+    );
+
+    const onClickDelete = useCallback(
+        () => {
+            setDeletableOccurenceData({
+                occurenceId: currentOccurence.occurenceId,
+                issueId: issue.issueId,
+            });
+        },
+        [currentOccurence.occurenceId, issue.issueId, setDeletableOccurenceData],
     );
 
     return (
@@ -74,13 +83,6 @@ function IssueItem(props: IssueListProps) {
                     alignItems="center"
                     background={isExpanded ? '#B3EFFF' : 'rgba(0, 0, 0, 0.04)'}
                 >
-                    <Checkbox
-                        aria-label={issue.name}
-                        isChecked={isSelected}
-                        onChange={onClickCheckbox}
-                        borderColor={isSelected ? 'transparent' : '#045981'}
-                        marginLeft={4}
-                    />
                     <AccordionButton
                         _expanded={{
                             bg: '#B3EFFF',
@@ -194,11 +196,38 @@ function IssueItem(props: IssueListProps) {
                                     </Text>
                                 </HStack>
                             </VStack>
-                            <Paginator
-                                pageIndex={currentOccurenceIndex}
-                                totalPages={issue.occurence.length}
-                                onChangePage={setCurrentOccurenceIndex}
-                            />
+                            <VStack alignItems="flex-end">
+                                <Paginator
+                                    pageIndex={currentOccurenceIndex}
+                                    totalPages={issue.occurence.length}
+                                    onChangePage={setCurrentOccurenceIndex}
+                                />
+                                <HStack spacing={2}>
+                                    <Button
+                                        type="button"
+                                        h={10}
+                                        letterSpacing={1}
+                                        tabIndex={-1}
+                                        colorScheme="blue"
+                                        background="blue.700"
+                                        onClick={() => console.warn('delete')}
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        h={10}
+                                        letterSpacing={1}
+                                        tabIndex={-1}
+                                        colorScheme="red"
+                                        background="red.700"
+                                        onClick={onClickDelete}
+                                    >
+                                        Delete
+                                    </Button>
+                                </HStack>
+                            </VStack>
+
                         </Box>
                         <Divider />
                         <VStack
@@ -292,4 +321,4 @@ function IssueItem(props: IssueListProps) {
     );
 }
 
-export default IssueItem;
+export default EditableIssueItem;

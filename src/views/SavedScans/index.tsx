@@ -9,6 +9,9 @@ import {
     Text,
     VStack,
     useToast,
+    IconButton,
+    CloseButton,
+    ToastId,
 } from '@chakra-ui/react';
 import ScanForm from '../../components/forms/ScanForm';
 
@@ -18,6 +21,7 @@ import Paginator from '../../components/Paginator';
 import SavedScanList from '../../components/SavedScanList';
 import Sort from '../../components/Sort';
 import { SavedScanItem, savedScanItemColumn, savedScanItemList } from './data';
+import ToastBox from '../../components/ToastBox';
 
 function SavedScan() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
@@ -41,6 +45,19 @@ function SavedScan() {
     const totalPages = 3;
     const toast = useToast();
 
+    const toastIdRef = React.useRef<string | number | undefined>();
+
+    function showToast(showableToast: ToastId | undefined) {
+        toastIdRef.current = showableToast;
+    }
+
+    const onClose = useCallback(() => {
+        if (toastIdRef.current) {
+            toast.close(toastIdRef.current);
+            toast.closeAll();
+        }
+    }, [toast]);
+
     const onDeleteItem = useCallback(
         () => {
             if (!deletableId) {
@@ -51,16 +68,28 @@ function SavedScan() {
             ));
 
             // NOTE MAKE IT ACCESSIBLE
-            toast({
-                title: 'Scan Item Deleted.',
-                description: "We've deleted the scan item.",
+            const toastComponent = toast({
                 status: 'success',
-                duration: 3000,
                 isClosable: true,
+                variant: 'subtle',
+                id: deletableId,
+                duration: null,
+                position: 'top',
+                render: () => (
+                    <ToastBox
+                        onCloseToast={onClose}
+                        title="Delete Success"
+                        description={`Webpage - ${deletableId} deleted successfully`}
+                        status="success"
+                    />
+                ),
             });
+
+            showToast(toastComponent);
+
             setDeletableId(undefined);
         },
-        [deletableId, toast],
+        [deletableId, onClose, toast],
     );
 
     return (
@@ -76,7 +105,7 @@ function SavedScan() {
             </Heading>
             <Box width="100%" marginTop="1vh">
                 <Flex alignItems="center">
-                    <Box width="80%">
+                    <Box width="70%">
                         <ScanForm
                             processingUrl={false}
                             onScanWebsite={() => console.warn('search pressed')}

@@ -1,10 +1,8 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Button,
-    Checkbox,
     Divider,
-    Flex,
     Heading,
     HStack,
     Modal,
@@ -13,14 +11,15 @@ import {
     ModalContent,
     ModalHeader,
     ModalOverlay,
+    Spacer,
     Text,
+    toast,
     useBoolean,
     VStack,
 } from '@chakra-ui/react';
+import { useParams, Link } from 'react-router-dom';
 
-import ScanForm from '../../components/forms/ScanForm';
 import IssueStats from '../../components/IssueStats';
-import IssueList from '../../components/IssueList';
 import SelectField from '../../components/SelectField';
 import Loading from '../../components/Loading';
 import Info from '../../components/Info';
@@ -37,25 +36,30 @@ import {
     Criteria,
     Impact,
 } from './data';
-import SaveResultForm from '../../components/forms/SaveResult';
+import IssueForm from '../../components/forms/IssueForm';
+import EditableIssueList from '../../components/EditableIssueList';
+import NextArrowIcon from '../../components/icons/NextArrow';
 
 export interface BasicData {
     timeDate: string;
     url: string;
 }
 
-function ScanWebsite() {
+export interface DeletableOccurenceData {
+    occurenceId: string;
+    issueId: string;
+}
+
+function ScannedWebsiteDetail() {
+    const { id } = useParams();
+
     const [processingUrl, setProcessingUrl] = useBoolean();
-    const [issues, setIssues] = useState<IssueObject[]>();
-    const [impactStats, setImpactStats] = useState<ImpactStats[]>();
-    const [issueTypeStats, setIssueTypeStats] = useState<IssueTypeStats[]>();
+    const [issues, setIssues] = useState<IssueObject[]>(issuesMockData);
+    const [impactStats, setImpactStats] = useState<ImpactStats[]>(impactStatsMockData);
+    const [issueTypeStats, setIssueTypeStats] = useState<IssueTypeStats[]>(issueTypeMockStats);
     const [urlInvalidStatus, setUrlInvalidStatus] = useBoolean();
-    const [selectedIssueIds, setSelectedIssueIds] = useState<IssueObject['issueId'][]>();
 
     const [modalOpened, setModalOpened] = useBoolean();
-
-    // handle control of Checkbox correspoding to "Select Issue"
-    const [allIdsSelected, setAllIdsSelected] = useBoolean();
 
     const [filterableImpactLevel, setFilterableImpactLevel] = useState<Impact>();
     const [filterableCriteria, setFilterableCriteria] = useState<Criteria['criteriaId']>();
@@ -101,25 +105,21 @@ function ScanWebsite() {
         }));
     }, [issues]);
 
-    const onScanWebsite = useCallback(
-        (url: string) => {
-            setProcessingUrl.on();
-            console.warn('on processing url - ', url);
+    useEffect(
+        () => {
             setTimeout(() => {
                 setProcessingUrl.off();
                 setIssues(issuesMockData);
                 setImpactStats(impactStatsMockData);
                 setUrlInvalidStatus.off();
                 setIssueTypeStats(issueTypeMockStats);
-                setSelectedIssueIds(undefined);
-                setAllIdsSelected.off();
                 setBasicData({
                     timeDate: new Date().toISOString(),
-                    url,
+                    url: 'www.facebook.com',
                 });
             }, 2000);
         },
-        [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus],
+        [setProcessingUrl, setUrlInvalidStatus],
     );
 
     const onSelectFilterableImpactLevel = useCallback(
@@ -162,7 +162,9 @@ function ScanWebsite() {
         if (!filterableImpactLevel && filterableCriteria) {
             const filteredIssueByCriteria = tmpIssues.filter((issue) => {
                 const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
-                const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
+                const criteriaIndex = issueCriteriaIds.findIndex(
+                    (cid) => cid === filterableCriteria,
+                );
 
                 if (criteriaIndex < 0) {
                     return undefined;
@@ -178,7 +180,7 @@ function ScanWebsite() {
         );
         const filteredIssueByCriteria = filteredIssueByImpact.filter((issue) => {
             const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
-            const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
+            const criteriaIndex = issueCriteriaIds.findIndex((cid) => cid === filterableCriteria);
             if (criteriaIndex < 0) {
                 return undefined;
             }
@@ -199,81 +201,75 @@ function ScanWebsite() {
         [impactStats],
     );
 
-    const onSelectAllIssues = useCallback(
+    const [deletableOccurenceData, setDeletableOccurenceData] = useState<DeletableOccurenceData>();
+
+    const onDeleteIssue = useCallback(
         () => {
-            // filteredIssues
-            if (!selectedIssueIds || selectedIssueIds.length < 0) {
-                // const ids = impactLevelOptions.map((i) => i.value);
-                const ids = [...filteredIssues ?? []].map((issue) => issue.issueId);
-                setSelectedIssueIds(ids);
-                setAllIdsSelected.on();
-            } else {
-                setSelectedIssueIds(undefined);
-                setAllIdsSelected.off();
-            }
-        },
-        [filteredIssues, selectedIssueIds, setAllIdsSelected],
-    );
-
-    const onUpdateSelectedIssue = useCallback(
-        (id: IssueObject['issueId']) => {
-            // Add first checkbox
-            if (!selectedIssueIds || selectedIssueIds.length <= 0) {
-                setSelectedIssueIds([id]);
+            if (!deletableOccurenceData) {
                 return;
             }
+            // setSavedScanList((currentList) => (
+            //     currentList?.filter((item) => item.id !== deletableId)
+            // ));
 
-            const tmpSelectedIssueIds = [...selectedIssueIds];
+            // toast({
+            //     status: 'success',
+            //     isClosable: true,
+            //     variant: 'subtle',
+            //     id: deletableOccurenceData,
+            //     duration: null,
+            //     position: 'top',
+            //     // render: () => (
+            //     //     <ToastBox
+            //     //         onCloseToast={onClose}
+            //     //         title="Delete Success"
+            //     //         description={`Webpage - ${deletableId} deleted successfully`}
+            //     //         status="success"
+            //     //     />
+            //     // ),
+            // });
 
-            // check if the id exists
-            const selectedIdIndex = tmpSelectedIssueIds.findIndex((item) => item === id);
-
-            if (selectedIdIndex < 0) {
-                // if id does not exist, add the id to check the checkbox
-                setSelectedIssueIds([...tmpSelectedIssueIds, id]);
-                if (!filteredIssues) {
-                    return;
-                }
-                if ([...tmpSelectedIssueIds, id].length === [...filteredIssues].length) {
-                    // mark the "all checkbox" if all issues selected individually
-                    setAllIdsSelected.on();
-                }
-                return;
-            }
-
-            // if id exist, remove the id to uncheck the checkbox
-            setSelectedIssueIds(tmpSelectedIssueIds.filter((item) => item !== id));
-            setAllIdsSelected.off();
+            setDeletableOccurenceData(undefined);
         },
-        [filteredIssues, selectedIssueIds, setAllIdsSelected],
+        [deletableOccurenceData],
     );
 
     return (
         <VStack
             align="stretch"
-            spacing={8}
+            spacing={4}
             p={4}
             role="main"
         >
-            <Flex>
-                <Heading
-                    as="h2"
-                    size="lg"
-                    role="heading"
-                >
-                    Scan Website
-                    <Divider />
-                </Heading>
-            </Flex>
-            <Box
-                width="60%"
-                marginTop="1vh"
+            <HStack spacing={0}>
+                <Link to="/saved_scans">
+                    <Text
+                        textDecoration="underline"
+                        color="blue.700"
+                        fontWeight="semibold"
+                        letterSpacing={1}
+                    >
+                        Saved Scans
+                    </Text>
+                </Link>
+                <Box width={10}>
+                    <NextArrowIcon fill="black" />
+                </Box>
+                <Text>
+                    Website Id -
+                    {' '}
+                    {id}
+                </Text>
+                <Spacer />
+            </HStack>
+            <Heading
+                as="h2"
+                size="lg"
+                role="heading"
             >
-                <ScanForm
-                    processingUrl={processingUrl}
-                    onScanWebsite={onScanWebsite}
-                />
-            </Box>
+                Facebook Home - Scan Detail
+                <Divider />
+            </Heading>
             <Box width="60%">
                 {!processingUrl && !issues && (
                     <Info
@@ -311,9 +307,11 @@ function ScanWebsite() {
                                 role="heading"
                                 as="h2"
                             >
-                                Result
+                                URL: https://www.facebook.com
                             </Heading>
                             <Text>
+                                Website: Facebook |
+                                {' '}
                                 {`Scanned on ${date} at ${time}`}
                             </Text>
                         </VStack>
@@ -325,13 +323,13 @@ function ScanWebsite() {
                             tabIndex={-1}
                             py={4}
                         >
-                            SAVE
+                            Add Issue
                         </Button>
                     </Box>
                     <Modal
                         isOpen={modalOpened}
                         onClose={setModalOpened.off}
-                        // blockScrollOnMount
+                        blockScrollOnMount={false}
                         closeOnOverlayClick={false}
                         aria-label="save-result-modal"
                         id="modalling"
@@ -352,15 +350,16 @@ function ScanWebsite() {
                                     as="h1"
                                     size="md"
                                 >
-                                    Save Result
+                                    Add Issue
                                 </Heading>
                             </ModalHeader>
                             <ModalCloseButton tabIndex={-1} />
                             <ModalBody tabIndex={-1}>
-                                <SaveResultForm
-                                    onSaveAction={() => console.warn('save result')}
+                                <IssueForm
+                                    onSaveAction={() => console.warn('save issue')}
                                     basicData={basicData}
                                     onCloseAction={setModalOpened.off}
+                                    issueId={undefined}
                                 />
                             </ModalBody>
                         </ModalContent>
@@ -379,15 +378,6 @@ function ScanWebsite() {
                         justifyContent="flex-start"
                         marginTop={8}
                     >
-                        <Checkbox
-                            aria-label="issue.name"
-                            maxWidth="20px"
-                            margin={4}
-                            borderColor="#045981"
-                            onChange={onSelectAllIssues}
-                            isChecked={allIdsSelected}
-                            tabIndex={-1}
-                        />
                         <HStack width="80%">
                             <SelectField
                                 options={impactLevelOptions}
@@ -404,10 +394,10 @@ function ScanWebsite() {
                         </HStack>
                     </HStack>
                     <Box marginTop={4}>
-                        <IssueList
+                        <EditableIssueList
                             issueList={filteredIssues}
-                            selectedIssueIds={selectedIssueIds}
-                            onUpdateSelectedIssue={onUpdateSelectedIssue}
+                            setDeletableOccurenceData={setDeletableOccurenceData}
+                            deletableOccurenceData={deletableOccurenceData}
                         />
                     </Box>
                 </Box>
@@ -416,4 +406,4 @@ function ScanWebsite() {
     );
 }
 
-export default ScanWebsite;
+export default ScannedWebsiteDetail;

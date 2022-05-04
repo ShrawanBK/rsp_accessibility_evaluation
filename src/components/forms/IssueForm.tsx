@@ -7,9 +7,9 @@ import {
     HStack,
     VStack,
     Textarea,
-    useToast,
 } from '@chakra-ui/react';
 import { BasicData } from '../../views/ScanWebsite';
+import SelectField from '../SelectField';
 
 interface ResultFormData {
     url: BasicData['url'];
@@ -23,28 +23,43 @@ interface Props {
     onSaveAction: (data: ResultFormData) => void;
     basicData: BasicData | undefined;
     onCloseAction: (() => void) | undefined;
+    issueId: string | undefined,
 }
 
-function SaveResultForm(props: Props) {
+const options = [
+    { label: 'Critical', value: 'Critical' },
+    { label: 'Minor', value: 'Minor' },
+    { label: 'Moderate', value: 'Moderate' },
+    { label: 'Serious', value: 'Serious' },
+];
+
+function IssueForm(props: Props) {
     const {
         isLoading,
         onSaveAction,
         basicData,
         onCloseAction,
+        issueId,
     } = props;
 
-    const [webpage, setWebpage] = useState<string>('');
-    const [website, setWebsite] = useState<string>('');
+    const [name, setName] = useState<string>();
+    const [criteriaTags, setCriteriaTags] = useState<string>();
+    const [description, setDescription] = useState<string>();
     const [note, setNote] = useState<string>();
-
-    const handleWebpageChange = (e: ChangeEvent<HTMLInputElement>) => setWebpage(e.target.value);
-    const handleWebsiteChange = (e: ChangeEvent<HTMLInputElement>) => setWebsite(e.target.value);
+    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+    const handleCriteriaTagsChange = (
+        e: ChangeEvent<HTMLInputElement>,
+    ) => setCriteriaTags(e.target.value);
+    const handleDescriptionChange = (
+        e: ChangeEvent<HTMLTextAreaElement>,
+    ) => setDescription(e.target.value);
     const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
 
     const onCancelSave = useCallback(
         () => {
-            setWebpage('');
-            setWebsite('');
+            setName(undefined);
+            setCriteriaTags(undefined);
+            setDescription(undefined);
             setNote(undefined);
             if (onCloseAction) {
                 onCloseAction();
@@ -53,9 +68,7 @@ function SaveResultForm(props: Props) {
         [onCloseAction],
     );
 
-    const errored = !website || !webpage;
-
-    const toast = useToast();
+    const errored = !name || !criteriaTags;
 
     const handleSubmit = useCallback(
         (event) => {
@@ -63,37 +76,15 @@ function SaveResultForm(props: Props) {
             if (!basicData || errored) {
                 return;
             }
-            onSaveAction({
-                url: basicData.url,
-                scanTime: basicData.timeDate,
-                website,
-                webpage,
+            console.warn({
+                name,
+                criteriaTags,
+                description,
                 note,
             });
-
-            // NOTE MAKE IT ACCESSIBLE
-            toast({
-                title: 'Result Saved.',
-                description: "We've saved the result.",
-                status: 'success',
-                duration: 30000,
-                isClosable: true,
-                variant: 'subtle',
-            });
-            onCancelSave();
-
             // NOTE: Time out is the response time when url processed
         },
-        [
-            basicData,
-            errored,
-            note,
-            onCancelSave,
-            onSaveAction,
-            webpage,
-            website,
-            toast,
-        ],
+        [basicData, criteriaTags, description, errored, name, note],
     );
 
     return (
@@ -101,61 +92,56 @@ function SaveResultForm(props: Props) {
             <VStack spacing={4}>
                 {/* TODO: Handle isInvalid later */}
                 <FormControl>
-                    <FormLabel htmlFor="url">
-                        URL
+                    <FormLabel htmlFor="name">
+                        Name
                     </FormLabel>
                     <Input
-                        id="saved-url"
-                        type="url"
-                        value={basicData?.url ?? ''}
-                        placeholder="Website"
-                        background="blackAlpha.300"
-                        tabIndex={-1}
-                        readOnly
-                    />
-                </FormControl>
-                <FormControl>
-                    <FormLabel htmlFor="scanTime">
-                        Scan Time
-                    </FormLabel>
-                    <Input
-                        id="scanTime"
+                        id="name"
                         type="text"
-                        value={basicData?.timeDate ?? ''}
-                        placeholder="Scan Time"
-                        background="blackAlpha.300"
-                        tabIndex={-1}
-                        readOnly
-                    />
-                </FormControl>
-                <FormControl>
-                    <FormLabel htmlFor="webpage">
-                        Webpage *
-                    </FormLabel>
-                    <Input
-                        id="webpage"
-                        type="text"
-                        value={webpage}
-                        onChange={handleWebpageChange}
-                        placeholder="Enter webpage name (Example - Homepage)"
+                        value={name}
+                        onChange={handleNameChange}
+                        placeholder="Enter issue name"
                         background="whiteAlpha.900"
                         tabIndex={-1}
                         isRequired
+                        height={12}
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="website">
-                        Website *
+                    <FormLabel htmlFor="criteria-tags">
+                        Criteria / Tags
                     </FormLabel>
+                    {/* TODO: Implement multi-select */}
                     <Input
-                        id="website"
-                        type="url"
-                        value={website}
-                        onChange={handleWebsiteChange}
-                        placeholder="Enter website name (Example Website)"
+                        id="criteria-tags"
+                        type="text"
+                        value={criteriaTags}
+                        onChange={handleCriteriaTagsChange}
+                        placeholder="Select Criteria / Tags"
                         background="whiteAlpha.900"
                         tabIndex={-1}
                         isRequired
+                        height={12}
+                    />
+                </FormControl>
+                <SelectField
+                    options={options}
+                    placeholder="Select option"
+                    label="Impact"
+                    onSelectOption={() => console.warn('impact selected')}
+                />
+                <FormControl>
+                    <FormLabel htmlFor="description">
+                        description *
+                    </FormLabel>
+                    <Textarea
+                        id="description"
+                        value={description}
+                        onChange={handleDescriptionChange}
+                        placeholder="Enter issue description"
+                        tabIndex={-1}
+                        isRequired
+                        rows={4}
                     />
                 </FormControl>
                 <FormControl>
@@ -166,9 +152,9 @@ function SaveResultForm(props: Props) {
                         id="note"
                         value={note}
                         onChange={handleNoteChange}
-                        placeholder="Enter notes for the result."
+                        placeholder="Enter notes for the issue."
                         tabIndex={-1}
-                        rows={5}
+                        rows={4}
                     />
                 </FormControl>
                 <HStack
@@ -211,4 +197,4 @@ function SaveResultForm(props: Props) {
         </form>
     );
 }
-export default SaveResultForm;
+export default IssueForm;

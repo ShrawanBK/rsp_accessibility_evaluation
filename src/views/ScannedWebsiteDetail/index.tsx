@@ -1,5 +1,5 @@
 /* eslint-disable max-len */
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Button,
@@ -40,6 +40,7 @@ import NextArrowIcon from '../../components/icons/NextArrow';
 import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
 import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 export interface BasicData {
     scanTime: string;
@@ -224,20 +225,11 @@ function ScannedWebsiteDetail() {
 
     const [deletableOccurenceData, setDeletableOccurenceData] = useState<DeletableOccurenceData>();
 
-    const toast = useToast();
-
-    const toastIdRef = React.useRef<string | number | undefined>();
-
-    function showToast(showableToast: ToastId | undefined) {
-        toastIdRef.current = showableToast;
-    }
-
-    const onCloseToast = useCallback(() => {
-        if (toastIdRef.current) {
-            toast.close(toastIdRef.current);
-            toast.closeAll();
-        }
-    }, [toast]);
+    const {
+        toast,
+        showToast,
+        onCloseToast,
+    } = useContext(ToastBoxContext);
 
     const onCancelDeleteOccurence = useCallback(
         () => setDeletableOccurenceData(undefined),
@@ -274,7 +266,7 @@ function ScannedWebsiteDetail() {
                     //     return updatedIssueList;
                     // });
 
-                    const toastComponent = toast({
+                    const toastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
                         variant: 'subtle',
@@ -297,7 +289,7 @@ function ScannedWebsiteDetail() {
                 console.warn({ onDeleteOccurenceError });
             }
         },
-        [deletableOccurenceData, id, onCloseToast, toast],
+        [deletableOccurenceData, id, onCloseToast, showToast, toast],
     );
 
     const openDeleteOccurenceDialog = !!deletableOccurenceData;

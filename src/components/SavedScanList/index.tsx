@@ -23,7 +23,7 @@ interface Props {
     onDeleteItem: () => void
 }
 
-function SavedScansList(props: Props) {
+function SavedScanList(props: Props) {
     const {
         columns,
         data,
@@ -100,4 +100,4 @@ function SavedScansList(props: Props) {
     );
 }
 
-export default SavedScansList;
+export default SavedScanList;

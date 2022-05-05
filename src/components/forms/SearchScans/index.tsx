@@ -9,7 +9,7 @@ import React, { ChangeEvent, useCallback } from 'react';
 
 interface Props {
     searchField: string;
-    setSearchField: React.Dispatch<React.SetStateAction<string>>;
+    handleSearchFieldChange: (e: ChangeEvent<HTMLInputElement>) => void;
     onSearch: () => void;
 }
 
@@ -17,28 +17,19 @@ function SearchScans(props: Props) {
     const {
         onSearch,
         searchField,
-        setSearchField,
+        handleSearchFieldChange,
     } = props;
-
-    const handleSearchFieldChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => setSearchField(e.target.value), [setSearchField],
-    );
 
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
-            if (searchField === '') {
-                return;
-            }
             onSearch();
         },
-        [onSearch, searchField],
+        [onSearch],
     );
 
-    const buttonDisabled = searchField.length < 2;
     return (
         <form onSubmit={handleSubmit}>
-            { }
             <FormControl isInvalid={false} flex={2}>
                 <FormLabel htmlFor="serachField">Webpage or Website Name</FormLabel>
                 <HStack spacing={0}>
@@ -50,7 +41,7 @@ function SearchScans(props: Props) {
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
-                        defaultValue={searchField}
+                        value={searchField}
                     />
                     <Button
                         type="submit"
@@ -58,7 +49,6 @@ function SearchScans(props: Props) {
                         colorScheme="brand"
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
-                        disabled={buttonDisabled}
                     >
                         Search
                     </Button>

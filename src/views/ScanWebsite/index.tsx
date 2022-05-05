@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Button,
@@ -41,6 +41,7 @@ import {
 import SaveResultForm, { SaveResultFormData } from '../../components/forms/SaveResult';
 import apis from '../../utils/apis';
 import ToastBox from '../../components/ToastBox';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 export interface BasicData {
     scanTime: string;
@@ -270,19 +271,11 @@ function ScanWebsite() {
         [filteredIssues, selectedIssueIds, setAllIdsSelected],
     );
 
-    const toast = useToast();
-    const toastIdRef = React.useRef<string | number | undefined>();
-
-    function showToast(showableToast: ToastId | undefined) {
-        toastIdRef.current = showableToast;
-    }
-
-    const onCloseToast = useCallback(() => {
-        if (toastIdRef.current) {
-            toast.close(toastIdRef.current);
-            toast.closeAll();
-        }
-    }, [toast]);
+    const {
+        toast,
+        showToast,
+        onCloseToast,
+    } = useContext(ToastBoxContext);
 
     const navigate = useNavigate();
 
@@ -328,7 +321,8 @@ function ScanWebsite() {
                     setUrlInvalidStatus.off();
                     setAllIdsSelected.off();
                     setProcessingUrl.off();
-                    const successToastComponent = toast({
+
+                    const successToastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
                         variant: 'subtle',
@@ -362,7 +356,7 @@ function ScanWebsite() {
                     showToast(successToastComponent);
                 }
             } catch (error) {
-                const failureToastComponent = toast({
+                const failureToastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,
                     variant: 'subtle',
@@ -392,6 +386,7 @@ function ScanWebsite() {
             setProcessingUrl,
             setUrlInvalidStatus,
             toast,
+            showToast,
         ],
     );
 

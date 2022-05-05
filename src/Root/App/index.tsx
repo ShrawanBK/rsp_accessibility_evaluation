@@ -8,6 +8,7 @@ import ScanWebsite from '../../views/ScanWebsite';
 import Fonts from './Fonts';
 import SavedScan from '../../views/SavedScans';
 import ScannedWebsiteDetail from '../../views/ScannedWebsiteDetail';
+import ToastBoxContextProvider from '../../contexts/ToastBoxContext';
 
 const theme = extendTheme({
     colors: {
@@ -34,18 +35,20 @@ function App() {
     return (
         <ChakraProvider theme={theme}>
             <Fonts />
-            <Flex minHeight="100vh">
-                <Box borderRightWidth="1px" width="14vw" paddingTop={8}>
-                    <Sidebar />
-                </Box>
-                <Box p={8} flex={1} background="#fbfcfd">
-                    <Routes>
-                        <Route path="/" element={<ScanWebsite />} />
-                        <Route path="/saved_scans" element={<SavedScan />} />
-                        <Route path="/saved_scans/:id" element={<ScannedWebsiteDetail />} />
-                    </Routes>
-                </Box>
-            </Flex>
+            <ToastBoxContextProvider>
+                <Flex minHeight="100vh">
+                    <Box borderRightWidth="1px" width="14vw" paddingTop={8}>
+                        <Sidebar />
+                    </Box>
+                    <Box p={8} flex={1} background="#fbfcfd">
+                        <Routes>
+                            <Route path="/" element={<ScanWebsite />} />
+                            <Route path="/saved_scans" element={<SavedScan />} />
+                            <Route path="/saved_scans/:id" element={<ScannedWebsiteDetail />} />
+                        </Routes>
+                    </Box>
+                </Flex>
+            </ToastBoxContextProvider>
         </ChakraProvider>
     );
 }

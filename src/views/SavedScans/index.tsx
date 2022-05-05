@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useState } from 'react';
 import {
     Box,
     Divider,
@@ -10,8 +10,9 @@ import {
     VStack,
     useToast,
     ToastId,
+    Button,
+    Center,
 } from '@chakra-ui/react';
-import ScanForm from '../../components/forms/ScanForm';
 
 import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import Info from '../../components/Info';
@@ -22,8 +23,9 @@ import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
 import SearchScans from '../../components/forms/SearchScans';
 import SelectField from '../../components/SelectField';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
-const options = [
+const sortByOptions = [
     {
         label: 'Name',
         value: 'name',
@@ -41,26 +43,38 @@ const options = [
 function SavedScan() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
     const [searchField, setSearchField] = useState<string>('');
+    const handleSearchFieldChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => setSearchField(e.target.value), [],
+    );
+
     const [sortBy, setSortBy] = useState<string>('name');
     const [totalPages, setTotalPages] = useState<number>(1);
-    useEffect(() => {
-        const getInitialSavedScanList = async () => {
-            try {
-                const apiUrl = '/webpage?sortby=name&orderby=desc&pageNum=1&pageSize=10';
-                const response = await apis.get(apiUrl);
-                const dataResponse: SavedScanItem[] = await response.data;
-                setTotalPages(1);
-                if (!dataResponse || dataResponse.length <= 0) {
-                    setSavedScanList(undefined);
-                    return;
-                }
-                setSavedScanList(dataResponse);
-            } catch (error) {
-                console.warn({ error });
+    const getInitialSavedScanList = async () => {
+        try {
+            const apiUrl = '/webpage?sortby=name&orderby=desc&pageNum=1&pageSize=10';
+            const response = await apis.get(apiUrl);
+            const dataResponse: SavedScanItem[] = await response.data;
+            if (!dataResponse || dataResponse.length <= 0) {
+                setSavedScanList(undefined);
+                return;
             }
-        };
+            setTotalPages(1);
+            setSavedScanList(dataResponse);
+        } catch (error) {
+            console.warn({ error });
+        }
+    };
+    useEffect(() => {
         getInitialSavedScanList();
     }, []);
+
+    const onResetSearchList = useCallback(
+        () => {
+            setSearchField('');
+            getInitialSavedScanList();
+        },
+        [setSearchField],
+    );
 
     const getSavedScanList = useCallback(
         async () => {
@@ -73,6 +87,8 @@ function SavedScan() {
                     return;
                 }
                 setSavedScanList(dataResponse);
+                // NOTE - Upate this
+                setTotalPages(1);
             } catch (error) {
                 console.warn({ error });
             }
@@ -90,20 +106,14 @@ function SavedScan() {
 
     const [deletableId, setDeletableId] = useState<string>();
     const [currentPageIndex, setCurrentPageIndex] = useState(0);
-    const toast = useToast();
 
-    const toastIdRef = React.useRef<string | number | undefined>();
+    const resetButtonShown = searchField && (!savedScanList || savedScanList.length <= 0);
 
-    function showToast(showableToast: ToastId | undefined) {
-        toastIdRef.current = showableToast;
-    }
-
-    const onCloseToast = useCallback(() => {
-        if (toastIdRef.current) {
-            toast.close(toastIdRef.current);
-            toast.closeAll();
-        }
-    }, [toast]);
+    const {
+        toast,
+        showToast,
+        onCloseToast,
+    } = useContext(ToastBoxContext);
 
     const onDeleteItem = useCallback(
         async () => {
@@ -113,13 +123,14 @@ function SavedScan() {
                 }
                 const response = await apis.delete(`/webpage/${deletableId}`);
                 const deleteDataResponse: string = await response.data;
+                // FIX - Get appropriate response status from BE
                 if (deleteDataResponse === 'sucessfully deleted') {
                     setSavedScanList((currentList) => (
                         currentList?.filter((item) => item.id !== deletableId)
                     ));
 
-                    // NOTE MAKE IT ACCESSIBLE
-                    const toastComponent = toast({
+                    // NOTE - MAKE IT ACCESSIBLE
+                    const toastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
                         variant: 'subtle',
@@ -135,13 +146,12 @@ function SavedScan() {
                             />
                         ),
                     });
-
                     showToast(toastComponent);
 
                     setDeletableId(undefined);
                 } else {
                     // NOTE MAKE IT ACCESSIBLE
-                    const toastComponent = toast({
+                    const toastComponent = toast && toast({
                         status: 'error',
                         isClosable: true,
                         variant: 'subtle',
@@ -157,13 +167,12 @@ function SavedScan() {
                             />
                         ),
                     });
-
                     showToast(toastComponent);
                 }
             } catch (error) {
                 console.warn({ error });
                 // NOTE MAKE IT ACCESSIBLE
-                const toastComponent = toast({
+                const toastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,
                     variant: 'subtle',
@@ -183,7 +192,7 @@ function SavedScan() {
                 showToast(toastComponent);
             }
         },
-        [deletableId, onCloseToast, toast],
+        [deletableId, onCloseToast, showToast, toast],
     );
 
     return (
@@ -202,14 +211,14 @@ function SavedScan() {
                     <Box width="70%">
                         <SearchScans
                             searchField={searchField}
-                            setSearchField={setSearchField}
+                            handleSearchFieldChange={handleSearchFieldChange}
                             onSearch={getSavedScanList}
                         />
                     </Box>
                     <Spacer />
                     <Box width="20%">
                         <SelectField
-                            options={options}
+                            options={sortByOptions}
                             label="Sort By"
                             onSelectOption={onSelectSortBy}
                         />
@@ -223,6 +232,19 @@ function SavedScan() {
                         message="Currently there is no saved scan of websites. Click here to start scan."
                         icon={<ScanAndAuditIcon />}
                     />
+                )}
+                {resetButtonShown && (
+                    <Center>
+                        <Button
+                            colorScheme="red"
+                            onClick={onResetSearchList}
+                            background="red.700"
+                            alignSelf="center"
+                            justifySelf="center"
+                        >
+                            Reset Search
+                        </Button>
+                    </Center>
                 )}
                 {savedScanList && savedScanList.length > 0 && (
                     <VStack align="stretch">

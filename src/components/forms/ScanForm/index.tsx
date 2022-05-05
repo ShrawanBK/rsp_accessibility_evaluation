@@ -59,7 +59,7 @@ function ScanForm(props: Props) {
                     <Input
                         id="url"
                         type="url"
-                        value={url}
+                        defaultValue={url}
                         onChange={handleUrlChange}
                         width="90%"
                         placeholder={placeholder}

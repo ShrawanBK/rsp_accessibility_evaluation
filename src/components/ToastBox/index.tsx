@@ -1,12 +1,13 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 
-import { CloseButton, HStack, VStack, Text, useToast, ToastOptions } from '@chakra-ui/react';
+import { CloseButton, HStack, VStack, Text, ToastOptions } from '@chakra-ui/react';
 
 interface Props {
     onCloseToast: () => void;
     title?: string;
     description?: string;
-    status?: ToastOptions['status'],
+    status?: ToastOptions['status'];
+    actionableView?: React.ReactNode;
 }
 
 const backgroundColorOption = {
@@ -23,6 +24,7 @@ function ToastBox(props: Props) {
         title = 'title',
         description = 'description',
         status = 'success',
+        actionableView = null,
     } = props;
 
     const bgColor = backgroundColorOption[status];
@@ -50,12 +52,13 @@ function ToastBox(props: Props) {
                 <Text color="white">
                     {description}
                 </Text>
+                {actionableView}
             </VStack>
             <CloseButton
                 size="sm"
                 onClick={onCloseToast}
                 alignSelf="flex-start"
-                color="whiteAlpha.800"
+                color="white"
             />
         </HStack>
     );

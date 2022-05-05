@@ -20,6 +20,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import ScanForm from '../../components/forms/ScanForm';
 import IssueStats from '../../components/IssueStats';
@@ -55,6 +56,7 @@ interface ScanWebsiteResponse {
     impactStatistics: ImpactStatistics[];
     foundStatistics: FoundStatistics[];
 }
+
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
     const [issues, setIssues] = useState<IssueObject[]>();
@@ -110,42 +112,6 @@ function ScanWebsite() {
         }));
     }, [issues]);
 
-    //   const getArtworkDetail = async () => {
-    //     try {
-    //       const response = await apis.get(`/content/${artworkId}`, {
-    //         headers: {
-    //           "Access-Control-Allow-Origin": true,
-    //         },
-    //       });
-    //       if (!response) {
-    //         return;
-    //       }
-
-    //       setArtworkDetail(response.data);
-    //     } catch (error) {
-    //       console.warn({ error });
-    //     }
-    //   };
-
-    //   useEffect(() => {
-    //     getArtworkDetail();
-    //   }, []);
-
-    useEffect(() => {
-        const getCriteria = async () => {
-            try {
-                const response = await axios.delete('http://35.228.111.234:3000/webpage/625d636b0447d8d35ba977a0', {
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                });
-                console.log('criteriaResponse--', response);
-            } catch (error) {
-                console.warn({ error });
-            }
-        };
-        getCriteria();
-    }, []);
     const onScanWebsite = useCallback(
         async (scanUrl: string) => {
             try {
@@ -174,20 +140,6 @@ function ScanWebsite() {
         },
         [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus],
     );
-
-    // setTimeout(() => {
-    //     setProcessingUrl.off();
-    //     setIssues(issuesMockData);
-    //     setImpactStatistics(impactStatisticsMockData);
-    //     setUrlInvalidStatus.off();
-    //     setFoundStatistics(issueTypeMockStats);
-    //     setSelectedIssueIds(undefined);
-    //     setAllIdsSelected.off();
-    //     setBasicData({
-    //         timeDate: new Date().toISOString(),
-    //         url,
-    //     });
-    // }, 2000);
 
     const onSelectFilterableImpactLevel = useCallback(
         (value: string) => {
@@ -268,8 +220,11 @@ function ScanWebsite() {
 
     const onSelectAllIssues = useCallback(
         () => {
+            if (!filteredIssues || filteredIssues.length <= 0) {
+                return;
+            }
             // filteredIssues
-            if (!selectedIssueIds || selectedIssueIds.length < 0) {
+            if (!selectedIssueIds || selectedIssueIds.length < filteredIssues.length) {
                 // const ids = impactLevelOptions.map((i) => i.value);
                 const ids = [...filteredIssues ?? []].map((issue) => issue.name);
                 setSelectedIssueIds(ids);
@@ -314,14 +269,7 @@ function ScanWebsite() {
         },
         [filteredIssues, selectedIssueIds, setAllIdsSelected],
     );
-    // "name": "lapland web",
-    // "url": "lappy.com",
-    // "scanTime": "12:00pm",
-    // "note": "me testing yet another website",
-    // "website" : {
-    //     "name":"facebook",
-    //     "url": "fb.com"
-    // },
+
     const toast = useToast();
     const toastIdRef = React.useRef<string | number | undefined>();
 
@@ -336,14 +284,25 @@ function ScanWebsite() {
         }
     }, [toast]);
 
+    const navigate = useNavigate();
+
+    const onRedirectToDetailPage = useCallback(
+        (id: string) => {
+            onCloseToast();
+            navigate(`/saved_scans/${id}`);
+        },
+        [onCloseToast, navigate],
+    );
+
     const onSaveResult = useCallback(
         async (formData: SaveResultFormData) => {
             try {
                 if (!basicData) {
                     return;
                 }
-                console.log({
-                    name: basicData.name,
+                const requestBody = {
+                    // TODO : Fix the name here
+                    name: formData.webpage,
                     url: basicData.url,
                     scanTime: basicData.scanTime,
                     note: formData.note,
@@ -353,24 +312,22 @@ function ScanWebsite() {
                     },
                     // NOte - should be Selected Issues
                     issues: filteredIssues,
-                });
+                };
 
                 const response = await apis.post(
-                    'webpage', {
-                        name: basicData.name,
-                        url: basicData.url,
-                        scanTime: basicData.scanTime,
-                        note: formData.note,
-                        website: {
-                            name: formData.webpage,
-                            url: formData.website,
-                        },
-                        // NOte - should be Selected Issues
-                        issues: filteredIssues,
-                    },
+                    'webpage', requestBody,
                 );
 
                 if (response.status === 200) {
+                    const { id } = await response.data;
+                    setIssues(undefined);
+                    setImpactStatistics(undefined);
+                    setFoundStatistics(undefined);
+                    setSelectedIssueIds(undefined);
+                    setBasicData(undefined);
+                    setUrlInvalidStatus.off();
+                    setAllIdsSelected.off();
+                    setProcessingUrl.off();
                     const successToastComponent = toast({
                         status: 'success',
                         isClosable: true,
@@ -381,14 +338,28 @@ function ScanWebsite() {
                         render: () => (
                             <ToastBox
                                 onCloseToast={onCloseToast}
-                                title="Added Success"
-                                description="Added Successfully"
+                                title="Webpage added successfully"
+                                description="Your webpage has been added successfully"
                                 status="success"
+                                actionableView={(
+                                    <Button
+                                        type="button"
+                                        h={10}
+                                        letterSpacing={1}
+                                        tabIndex={-1}
+                                        colorScheme="white"
+                                        background="white.700"
+                                        onClick={() => onRedirectToDetailPage(id)}
+                                        variant="link"
+                                        color="white"
+                                    >
+                                        Click here to go view the detail!
+                                    </Button>
+                                )}
                             />
                         ),
                     });
                     showToast(successToastComponent);
-                    console.log('success---', response);
                 }
             } catch (error) {
                 const failureToastComponent = toast({
@@ -402,7 +373,7 @@ function ScanWebsite() {
                         <ToastBox
                             onCloseToast={onCloseToast}
                             title="Error adding"
-                            description="Could not add :( "
+                            description="Could not add. Try again"
                             status="error"
                         />
                     ),
@@ -412,31 +383,18 @@ function ScanWebsite() {
                 console.log('error bho yaar --', error);
             }
         },
-        [basicData, filteredIssues, onCloseToast, toast],
+        [
+            basicData,
+            filteredIssues,
+            onCloseToast,
+            onRedirectToDetailPage,
+            setAllIdsSelected,
+            setProcessingUrl,
+            setUrlInvalidStatus,
+            toast,
+        ],
     );
 
-    // const onConfirmPayment = useCallback(
-    //     async () => {
-    //         try {
-    //             const response = await apis.post(
-    //                 'payment',
-    //                 {
-    //                     bookingId: id,
-    //                     amount: totalPrice,
-    //                 },
-    //             );
-    //             if (response.status === 200) {
-    //                 showToastMessage('Payment Success. Thank you, have a nice visit');
-    //                 onUpdatePayment();
-    //                 onCloseModal();
-    //             }
-    //         } catch (error) {
-    //             console.warn({ error });
-    //             showToastMessage('Payment unsuccessful. Please retry.');
-    //         }
-    //     },
-    //     [id, totalPrice, onCloseModal],
-    // );
     return (
         <VStack
             align="stretch"

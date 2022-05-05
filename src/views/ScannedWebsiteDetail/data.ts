@@ -8,6 +8,7 @@ export interface IssueBody {
     impact: Impact;
     foundDate: string;
     found: string;
+    tags: string[];
     description: string;
     location: string;
     source: string;
@@ -33,7 +34,7 @@ export interface IssueObject {
     issueId: string;
     name: string;
     criteria: Criteria[];
-    occurence: Occurence[];
+    occurences: Occurence[];
     impact: Impact;
     timestamp: string;
     found: string;
@@ -56,7 +57,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag143',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensures the document has a main landmark',
@@ -94,7 +95,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag243',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensure that the page, or at least one of its frames contains a level-one heading',
@@ -145,7 +146,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is cat.aria',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: "Ensures ARIA attributes are allowed for an element's role",
@@ -196,7 +197,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is cat.heading',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: "Ensures ARIA attributes are allowed for an element's role",
@@ -248,7 +249,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag111',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensures <img> elements have alternate text or a role of none or presentation',
@@ -281,12 +282,12 @@ export const issuesMockData: IssueObject[] = [
     },
 ];
 
-export interface ImpactStats {
+export interface ImpactStatistics {
     impact: Impact;
     count: number;
 }
 
-export const impactStatsMockData: ImpactStats[] = [
+export const impactStatsMockData: ImpactStatistics[] = [
     {
         impact: 'critical',
         count: 1,
@@ -305,14 +306,14 @@ export const impactStatsMockData: ImpactStats[] = [
     },
 ];
 
-export type IssueType = 'automatic' | 'guided' | 'needs review';
+export type FoundType = 'automatic' | 'guided' | 'needs review';
 
-export interface IssueTypeStats {
-    typeFound: IssueType;
+export interface FoundStatistics {
+    typeFound: FoundType;
     count: number;
 }
 
-export const issueTypeMockStats: IssueTypeStats[] = [
+export const issueTypeMockStats: FoundStatistics[] = [
     {
         typeFound: 'automatic',
         count: 4,

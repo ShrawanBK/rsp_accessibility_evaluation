@@ -88,7 +88,7 @@ function SavedScansList(props: Props) {
                         <br />
                         Webpage:
                         {' '}
-                        {deletableItem?.webpage}
+                        {deletableItem?.name}
                         <br />
                         Website:
                         {' '}

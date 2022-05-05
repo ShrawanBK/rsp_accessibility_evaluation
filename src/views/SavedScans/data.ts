@@ -5,17 +5,16 @@ export interface Column {
 
 export interface SavedScanItem {
     id: string;
-    webpage: string;
+    name: string;
     url: string;
     website: string;
-    scannedDate: string;
-    severity: string;
+    scanTime: string;
 }
 
 export const savedScanItemColumn: Column[] = [
     {
-        description: 'Webpage',
-        accessor: 'webPage',
+        description: 'webpage',
+        accessor: 'webpage',
     },
     {
         description: 'URL',
@@ -27,11 +26,7 @@ export const savedScanItemColumn: Column[] = [
     },
     {
         description: 'Scanned Date',
-        accessor: 'scannedDate',
-    },
-    {
-        description: 'Severity',
-        accessor: 'severity',
+        accessor: 'scanTime',
     },
     {
         description: 'Actions',
@@ -42,98 +37,86 @@ export const savedScanItemColumn: Column[] = [
 export const savedScanItemList: SavedScanItem[] = [
     {
         id: '1',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '2',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '3',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '4',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '5',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '6',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '7',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '8',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '9',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '10',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '11',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
     {
         id: '12',
-        webpage: 'Facebook Profile Page',
+        name: 'Facebook Profile Page',
         url: 'https://facebook.com',
         website: 'Facebook',
-        scannedDate: '1:31 22 April 2022',
-        severity: '10%',
+        scanTime: '1:31 22 April 2022',
     },
 ];

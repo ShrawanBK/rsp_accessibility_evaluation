@@ -24,12 +24,11 @@ function IssueList(props: IssueListProps) {
             <Placeholder />
         );
     }
-
     return (
         <Box>
             {issueList.map((issue) => (
                 <IssueItem
-                    key={issue.issueId}
+                    key={issue.name}
                     issue={issue}
                     selectedIssues={selectedIssueIds}
                     onUpdateSelectedIssue={onUpdateSelectedIssue}

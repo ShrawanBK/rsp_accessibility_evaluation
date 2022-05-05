@@ -25,8 +25,8 @@ import Paginator from '../Paginator';
 interface IssueListProps {
     // Make this compulsory
     issue: IssueObject;
-    selectedIssues: IssueObject['issueId'][] | undefined;
-    onUpdateSelectedIssue: (id: IssueObject['issueId']) => void;
+    selectedIssues: IssueObject['name'][] | undefined;
+    onUpdateSelectedIssue: (id: IssueObject['name']) => void;
 }
 
 function IssueItem(props: IssueListProps) {
@@ -40,27 +40,39 @@ function IssueItem(props: IssueListProps) {
 
     const [currentOccurenceIndex, setCurrentOccurenceIndex] = useState(0);
 
-    const currentOccurence = issue.occurence[currentOccurenceIndex];
+    const currentOccurence = useMemo(
+        () => {
+            if (!issue.occurences || issue.occurences.length <= 0) {
+                return undefined;
+            }
+            return issue.occurences[currentOccurenceIndex];
+        },
+        [currentOccurenceIndex, issue.occurences],
+    );
 
     const isSelected = useMemo(
-        () => [...selectedIssues ?? []]?.includes(issue.issueId),
-        [issue.issueId, selectedIssues],
+        () => [...selectedIssues ?? []]?.includes(issue.name),
+        [issue.name, selectedIssues],
     );
 
     const onClickCheckbox = useCallback(
-        () => onUpdateSelectedIssue(issue.issueId),
-        [issue.issueId, onUpdateSelectedIssue],
+        () => onUpdateSelectedIssue(issue.name),
+        [issue.name, onUpdateSelectedIssue],
     );
 
     const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => !c.name.startsWith('wcag')),
+        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
     const tags = useMemo(
-        () => issue.criteria.filter((c) => c.name.startsWith('wcag')),
+        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
+
+    if (!currentOccurence) {
+        return null;
+    }
 
     return (
         <Accordion
@@ -92,7 +104,7 @@ function IssueItem(props: IssueListProps) {
                             {issue.name}
                         </Text>
                         <Text>
-                            {issue.occurence.length}
+                            {issue.occurences.length}
                         </Text>
                     </AccordionButton>
                 </HStack>
@@ -128,7 +140,7 @@ function IssueItem(props: IssueListProps) {
                                     </Heading>
                                     {wcagCriteria.map((criteria) => (
                                         <Tooltip
-                                            key={criteria.criteriaId}
+                                            key={criteria.criteriaId + criteria.name}
                                             label={criteria.note}
                                         >
                                             <Tag>
@@ -153,7 +165,7 @@ function IssueItem(props: IssueListProps) {
                                     <HStack>
                                         {tags.map((tag) => (
                                             <Tooltip
-                                                key={tag.criteriaId}
+                                                key={tag.criteriaId + tag.name}
                                                 label={tag.note}
                                             >
                                                 <Tag>
@@ -196,7 +208,7 @@ function IssueItem(props: IssueListProps) {
                             </VStack>
                             <Paginator
                                 pageIndex={currentOccurenceIndex}
-                                totalPages={issue.occurence.length}
+                                totalPages={issue.occurences.length}
                                 onChangePage={setCurrentOccurenceIndex}
                             />
                         </Box>

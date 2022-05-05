@@ -5,55 +5,60 @@ import {
     HStack,
     Input,
 } from '@chakra-ui/react';
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 
 interface Props {
-  onSearch: (url: string) => void;
+    searchField: string;
+    setSearchField: React.Dispatch<React.SetStateAction<string>>;
+    onSearch: () => void;
 }
 
 function SearchScans(props: Props) {
-    const { onSearch } = props;
-    const [url, setUrl] = useState<string>();
+    const {
+        onSearch,
+        searchField,
+        setSearchField,
+    } = props;
 
-    const errored = !url;
-
-    const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value);
+    const handleSearchFieldChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => setSearchField(e.target.value), [setSearchField],
+    );
 
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
-            if (!url) {
+            if (searchField === '') {
                 return;
             }
-            onSearch(url);
+            onSearch();
         },
-        [onSearch, url],
+        [onSearch, searchField],
     );
 
+    const buttonDisabled = searchField.length < 2;
     return (
         <form onSubmit={handleSubmit}>
-            {}
+            { }
             <FormControl isInvalid={false} flex={2}>
-                <FormLabel htmlFor="url">Webpage or Website Name</FormLabel>
+                <FormLabel htmlFor="serachField">Webpage or Website Name</FormLabel>
                 <HStack spacing={0}>
                     <Input
-                        id="url"
-                        type="url"
-                        value={url}
-                        onChange={handleUrlChange}
+                        id="searchField"
+                        onChange={handleSearchFieldChange}
                         width="80%"
-                        placeholder="Enter website url (https://www.examplewebsite.example) "
+                        placeholder="Enter atleast 2 characters"
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
+                        defaultValue={searchField}
                     />
                     <Button
                         type="submit"
-                        disabled={errored}
                         width="10%"
                         colorScheme="brand"
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
+                        disabled={buttonDisabled}
                     >
                         Search
                     </Button>

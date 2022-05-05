@@ -7,20 +7,17 @@ import {
     HStack,
     VStack,
     Textarea,
-    useToast,
 } from '@chakra-ui/react';
 import { BasicData } from '../../views/ScanWebsite';
 
-interface ResultFormData {
-    url: BasicData['url'];
-    scanTime: BasicData['timeDate'];
+export interface SaveResultFormData {
     website: string;
     webpage: string;
     note?: string;
 }
 interface Props {
     isLoading?: boolean;
-    onSaveAction: (data: ResultFormData) => void;
+    onSaveAction: (data: SaveResultFormData) => void;
     basicData: BasicData | undefined;
     onCloseAction: (() => void) | undefined;
 }
@@ -55,8 +52,6 @@ function SaveResultForm(props: Props) {
 
     const errored = !website || !webpage;
 
-    const toast = useToast();
-
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
@@ -64,36 +59,16 @@ function SaveResultForm(props: Props) {
                 return;
             }
             onSaveAction({
-                url: basicData.url,
-                scanTime: basicData.timeDate,
                 website,
                 webpage,
                 note,
             });
 
-            // NOTE MAKE IT ACCESSIBLE
-            toast({
-                title: 'Result Saved.',
-                description: "We've saved the result.",
-                status: 'success',
-                duration: 30000,
-                isClosable: true,
-                variant: 'subtle',
-            });
             onCancelSave();
 
             // NOTE: Time out is the response time when url processed
         },
-        [
-            basicData,
-            errored,
-            note,
-            onCancelSave,
-            onSaveAction,
-            webpage,
-            website,
-            toast,
-        ],
+        [basicData, errored, note, onCancelSave, onSaveAction, webpage, website],
     );
 
     return (
@@ -121,7 +96,7 @@ function SaveResultForm(props: Props) {
                     <Input
                         id="scanTime"
                         type="text"
-                        value={basicData?.timeDate ?? ''}
+                        value={basicData?.scanTime ?? ''}
                         placeholder="Scan Time"
                         background="blackAlpha.300"
                         tabIndex={-1}

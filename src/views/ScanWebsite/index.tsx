@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Button,
@@ -14,9 +14,12 @@ import {
     ModalHeader,
     ModalOverlay,
     Text,
+    ToastId,
     useBoolean,
+    useToast,
     VStack,
 } from '@chakra-ui/react';
+import axios from 'axios';
 
 import ScanForm from '../../components/forms/ScanForm';
 import IssueStats from '../../components/IssueStats';
@@ -28,27 +31,35 @@ import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import InvalidUrlIcon from '../../components/icons/InvalidUrl';
 
 import {
-    issuesMockData,
     IssueObject,
-    ImpactStats,
-    impactStatsMockData,
-    IssueTypeStats,
-    issueTypeMockStats,
+    ImpactStatistics,
+    FoundStatistics,
     Criteria,
     Impact,
 } from './data';
-import SaveResultForm from '../../components/forms/SaveResult';
+import SaveResultForm, { SaveResultFormData } from '../../components/forms/SaveResult';
+import apis from '../../utils/apis';
+import ToastBox from '../../components/ToastBox';
 
 export interface BasicData {
-    timeDate: string;
+    scanTime: string;
     url: string;
+    name: string;
 }
 
+interface ScanWebsiteResponse {
+    name: string;
+    url: string;
+    scanTime: string;
+    issues: IssueObject[];
+    impactStatistics: ImpactStatistics[];
+    foundStatistics: FoundStatistics[];
+}
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
     const [issues, setIssues] = useState<IssueObject[]>();
-    const [impactStats, setImpactStats] = useState<ImpactStats[]>();
-    const [issueTypeStats, setIssueTypeStats] = useState<IssueTypeStats[]>();
+    const [impactStatistics, setImpactStatistics] = useState<ImpactStatistics[]>();
+    const [foundStatistics, setFoundStatistics] = useState<FoundStatistics[]>();
     const [urlInvalidStatus, setUrlInvalidStatus] = useBoolean();
     const [selectedIssueIds, setSelectedIssueIds] = useState<IssueObject['issueId'][]>();
 
@@ -59,8 +70,6 @@ function ScanWebsite() {
 
     const [filterableImpactLevel, setFilterableImpactLevel] = useState<Impact>();
     const [filterableCriteria, setFilterableCriteria] = useState<Criteria['criteriaId']>();
-    const date = '27 December 2021';
-    const time = '18:01 pm';
 
     const [basicData, setBasicData] = useState<BasicData>();
 
@@ -70,7 +79,7 @@ function ScanWebsite() {
         if (!issues || issues.length <= 0) {
             return [];
         }
-        const possibleImpact: Impact[] = ['Critical', 'Minor', 'Moderate', 'Serious'];
+        const possibleImpact: Impact[] = ['critical', 'minor', 'moderate', 'serious'];
         const tmpImpact = [...issues].map((issue) => issue.impact);
 
         return possibleImpact.map((impact) => {
@@ -91,36 +100,94 @@ function ScanWebsite() {
         const tmpCriteria = [...issues].map((issue) => issue.criteria);
         const flatTmpCriteria = tmpCriteria.flat();
         const filteredCriteria = flatTmpCriteria.filter((c) => {
-            const duplicate = seen.has(c.criteriaId);
-            seen.add(c.criteriaId);
+            const duplicate = seen.has(c.name);
+            seen.add(c.name);
             return !duplicate;
         });
         return filteredCriteria.map((item) => ({
             label: item.name,
-            value: item.criteriaId,
+            value: item.name,
         }));
     }, [issues]);
 
-    const onScanWebsite = useCallback(
-        (url: string) => {
-            setProcessingUrl.on();
-            console.warn('on processing url - ', url);
-            setTimeout(() => {
-                setProcessingUrl.off();
-                setIssues(issuesMockData);
-                setImpactStats(impactStatsMockData);
-                setUrlInvalidStatus.off();
-                setIssueTypeStats(issueTypeMockStats);
-                setSelectedIssueIds(undefined);
-                setAllIdsSelected.off();
-                setBasicData({
-                    timeDate: new Date().toISOString(),
-                    url,
+    //   const getArtworkDetail = async () => {
+    //     try {
+    //       const response = await apis.get(`/content/${artworkId}`, {
+    //         headers: {
+    //           "Access-Control-Allow-Origin": true,
+    //         },
+    //       });
+    //       if (!response) {
+    //         return;
+    //       }
+
+    //       setArtworkDetail(response.data);
+    //     } catch (error) {
+    //       console.warn({ error });
+    //     }
+    //   };
+
+    //   useEffect(() => {
+    //     getArtworkDetail();
+    //   }, []);
+
+    useEffect(() => {
+        const getCriteria = async () => {
+            try {
+                const response = await axios.delete('http://35.228.111.234:3000/webpage/625d636b0447d8d35ba977a0', {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    },
                 });
-            }, 2000);
+                console.log('criteriaResponse--', response);
+            } catch (error) {
+                console.warn({ error });
+            }
+        };
+        getCriteria();
+    }, []);
+    const onScanWebsite = useCallback(
+        async (scanUrl: string) => {
+            try {
+                setProcessingUrl.on();
+                const response = await axios.get(`http://localhost:8080/scan?url=${scanUrl}`);
+                const dataResponse: ScanWebsiteResponse = response.data;
+                if (!dataResponse) {
+                    setProcessingUrl.off();
+                    return;
+                }
+                setIssues(dataResponse.issues);
+                setImpactStatistics(dataResponse.impactStatistics);
+                setFoundStatistics(dataResponse.foundStatistics);
+                setSelectedIssueIds(undefined);
+                setBasicData({
+                    scanTime: dataResponse.scanTime,
+                    url: dataResponse.url,
+                    name: dataResponse.name,
+                });
+                setUrlInvalidStatus.off();
+                setAllIdsSelected.off();
+                setProcessingUrl.off();
+            } catch (error) {
+                console.warn({ error });
+            }
         },
         [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus],
     );
+
+    // setTimeout(() => {
+    //     setProcessingUrl.off();
+    //     setIssues(issuesMockData);
+    //     setImpactStatistics(impactStatisticsMockData);
+    //     setUrlInvalidStatus.off();
+    //     setFoundStatistics(issueTypeMockStats);
+    //     setSelectedIssueIds(undefined);
+    //     setAllIdsSelected.off();
+    //     setBasicData({
+    //         timeDate: new Date().toISOString(),
+    //         url,
+    //     });
+    // }, 2000);
 
     const onSelectFilterableImpactLevel = useCallback(
         (value: string) => {
@@ -139,7 +206,7 @@ function ScanWebsite() {
                 setFilterableCriteria(undefined);
                 return;
             }
-            setFilterableCriteria(value ?? undefined);
+            setFilterableCriteria(value);
         },
         [],
     );
@@ -161,7 +228,7 @@ function ScanWebsite() {
         }
         if (!filterableImpactLevel && filterableCriteria) {
             const filteredIssueByCriteria = tmpIssues.filter((issue) => {
-                const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
+                const issueCriteriaIds = issue.criteria.map((c) => c.name);
                 const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
 
                 if (criteriaIndex < 0) {
@@ -177,7 +244,7 @@ function ScanWebsite() {
             (issue) => issue.impact === filterableImpactLevel,
         );
         const filteredIssueByCriteria = filteredIssueByImpact.filter((issue) => {
-            const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
+            const issueCriteriaIds = issue.criteria.map((c) => c.name);
             const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
             if (criteriaIndex < 0) {
                 return undefined;
@@ -189,14 +256,14 @@ function ScanWebsite() {
 
     const totalIssuesCount = useMemo(
         () => {
-            if (!impactStats) {
+            if (!impactStatistics) {
                 return undefined;
             }
-            const countArray = [...impactStats].map((i) => i.count);
+            const countArray = [...impactStatistics].map((i) => i.count);
             const sum = countArray.reduce((a, b) => a + b);
             return sum;
         },
-        [impactStats],
+        [impactStatistics],
     );
 
     const onSelectAllIssues = useCallback(
@@ -204,7 +271,7 @@ function ScanWebsite() {
             // filteredIssues
             if (!selectedIssueIds || selectedIssueIds.length < 0) {
                 // const ids = impactLevelOptions.map((i) => i.value);
-                const ids = [...filteredIssues ?? []].map((issue) => issue.issueId);
+                const ids = [...filteredIssues ?? []].map((issue) => issue.name);
                 setSelectedIssueIds(ids);
                 setAllIdsSelected.on();
             } else {
@@ -247,7 +314,129 @@ function ScanWebsite() {
         },
         [filteredIssues, selectedIssueIds, setAllIdsSelected],
     );
+    // "name": "lapland web",
+    // "url": "lappy.com",
+    // "scanTime": "12:00pm",
+    // "note": "me testing yet another website",
+    // "website" : {
+    //     "name":"facebook",
+    //     "url": "fb.com"
+    // },
+    const toast = useToast();
+    const toastIdRef = React.useRef<string | number | undefined>();
 
+    function showToast(showableToast: ToastId | undefined) {
+        toastIdRef.current = showableToast;
+    }
+
+    const onCloseToast = useCallback(() => {
+        if (toastIdRef.current) {
+            toast.close(toastIdRef.current);
+            toast.closeAll();
+        }
+    }, [toast]);
+
+    const onSaveResult = useCallback(
+        async (formData: SaveResultFormData) => {
+            try {
+                if (!basicData) {
+                    return;
+                }
+                console.log({
+                    name: basicData.name,
+                    url: basicData.url,
+                    scanTime: basicData.scanTime,
+                    note: formData.note,
+                    website: {
+                        name: formData.webpage,
+                        url: formData.website,
+                    },
+                    // NOte - should be Selected Issues
+                    issues: filteredIssues,
+                });
+
+                const response = await apis.post(
+                    'webpage', {
+                        name: basicData.name,
+                        url: basicData.url,
+                        scanTime: basicData.scanTime,
+                        note: formData.note,
+                        website: {
+                            name: formData.webpage,
+                            url: formData.website,
+                        },
+                        // NOte - should be Selected Issues
+                        issues: filteredIssues,
+                    },
+                );
+
+                if (response.status === 200) {
+                    const successToastComponent = toast({
+                        status: 'success',
+                        isClosable: true,
+                        variant: 'subtle',
+                        id: undefined,
+                        duration: null,
+                        position: 'top',
+                        render: () => (
+                            <ToastBox
+                                onCloseToast={onCloseToast}
+                                title="Added Success"
+                                description="Added Successfully"
+                                status="success"
+                            />
+                        ),
+                    });
+                    showToast(successToastComponent);
+                    console.log('success---', response);
+                }
+            } catch (error) {
+                const failureToastComponent = toast({
+                    status: 'error',
+                    isClosable: true,
+                    variant: 'subtle',
+                    id: undefined,
+                    duration: null,
+                    position: 'top',
+                    render: () => (
+                        <ToastBox
+                            onCloseToast={onCloseToast}
+                            title="Error adding"
+                            description="Could not add :( "
+                            status="error"
+                        />
+                    ),
+                });
+
+                showToast(failureToastComponent);
+                console.log('error bho yaar --', error);
+            }
+        },
+        [basicData, filteredIssues, onCloseToast, toast],
+    );
+
+    // const onConfirmPayment = useCallback(
+    //     async () => {
+    //         try {
+    //             const response = await apis.post(
+    //                 'payment',
+    //                 {
+    //                     bookingId: id,
+    //                     amount: totalPrice,
+    //                 },
+    //             );
+    //             if (response.status === 200) {
+    //                 showToastMessage('Payment Success. Thank you, have a nice visit');
+    //                 onUpdatePayment();
+    //                 onCloseModal();
+    //             }
+    //         } catch (error) {
+    //             console.warn({ error });
+    //             showToastMessage('Payment unsuccessful. Please retry.');
+    //         }
+    //     },
+    //     [id, totalPrice, onCloseModal],
+    // );
     return (
         <VStack
             align="stretch"
@@ -314,7 +503,7 @@ function ScanWebsite() {
                                 Result
                             </Heading>
                             <Text>
-                                {`Scanned on ${date} at ${time}`}
+                                {`Scanned on ${basicData?.scanTime}`}
                             </Text>
                         </VStack>
                         <Button
@@ -358,7 +547,7 @@ function ScanWebsite() {
                             <ModalCloseButton tabIndex={-1} />
                             <ModalBody tabIndex={-1}>
                                 <SaveResultForm
-                                    onSaveAction={() => console.warn('save result')}
+                                    onSaveAction={onSaveResult}
                                     basicData={basicData}
                                     onCloseAction={setModalOpened.off}
                                 />
@@ -370,8 +559,8 @@ function ScanWebsite() {
                         marginTop={8}
                     >
                         <IssueStats
-                            impactStats={impactStats}
-                            issueTypeStats={issueTypeStats}
+                            impactStatistics={impactStatistics}
+                            foundStatistics={foundStatistics}
                             totalIssuesCount={totalIssuesCount}
                         />
                     </Box>

@@ -45,15 +45,15 @@ function EditableIssueItem(props: IssueListProps) {
 
     const [currentOccurenceIndex, setCurrentOccurenceIndex] = useState(0);
 
-    const currentOccurence = issue.occurence[currentOccurenceIndex];
+    const currentOccurence = issue.occurences[currentOccurenceIndex];
 
     const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => !c.name.startsWith('wcag')),
+        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
     const tags = useMemo(
-        () => issue.criteria.filter((c) => c.name.startsWith('wcag')),
+        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
@@ -96,7 +96,7 @@ function EditableIssueItem(props: IssueListProps) {
                             {issue.name}
                         </Text>
                         <Text>
-                            {issue.occurence.length}
+                            {issue.occurences.length}
                         </Text>
                     </AccordionButton>
                 </HStack>
@@ -201,7 +201,7 @@ function EditableIssueItem(props: IssueListProps) {
                             <VStack alignItems="flex-end">
                                 <Paginator
                                     pageIndex={currentOccurenceIndex}
-                                    totalPages={issue.occurence.length}
+                                    totalPages={issue.occurences.length}
                                     onChangePage={setCurrentOccurenceIndex}
                                 />
                                 <HStack spacing={2}>

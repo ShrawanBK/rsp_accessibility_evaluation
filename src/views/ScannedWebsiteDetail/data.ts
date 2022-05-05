@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/prefer-default-export
 
-export type Impact = 'Critical' | 'Moderate' | 'Serious' | 'Minor';
+export type Impact = 'critical' | 'moderate' | 'serious' | 'minor';
 
 export interface IssueBody {
     id: string | number;
@@ -74,7 +74,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the second occurence of landmark issue',
             },
         ],
-        impact: 'Critical',
+        impact: 'critical',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the landmark-issue note.',
@@ -120,7 +120,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of heading issue',
             },
         ],
-        impact: 'Minor',
+        impact: 'minor',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the heading-issue note',
@@ -171,7 +171,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of ARIA-attributes-issue',
             },
         ],
-        impact: 'Serious',
+        impact: 'serious',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the ARIA-attributes-issue note',
@@ -222,7 +222,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of level-one heading',
             },
         ],
-        impact: 'Moderate',
+        impact: 'moderate',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the level-one heading note',
@@ -274,7 +274,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of image-text-alternatives',
             },
         ],
-        impact: 'Moderate',
+        impact: 'moderate',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the level-one heading note',
@@ -288,19 +288,19 @@ export interface ImpactStats {
 
 export const impactStatsMockData: ImpactStats[] = [
     {
-        impact: 'Critical',
+        impact: 'critical',
         count: 1,
     },
     {
-        impact: 'Serious',
+        impact: 'serious',
         count: 1,
     },
     {
-        impact: 'Moderate',
+        impact: 'moderate',
         count: 2,
     },
     {
-        impact: 'Minor',
+        impact: 'minor',
         count: 1,
     },
 ];

@@ -16,13 +16,20 @@ const options = [
     },
 ];
 
-function Sort() {
+interface Props {
+    onSelectSortBy: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+function Sort(props: Props) {
+    const {
+        onSelectSortBy,
+    } = props;
     return (
         <SelectField
             options={options}
             placeholder="Select option"
             label="Sort By"
-            onSelectOption={() => console.warn('selected id')}
+            onSelectOption={onSelectSortBy}
         />
     );
 }

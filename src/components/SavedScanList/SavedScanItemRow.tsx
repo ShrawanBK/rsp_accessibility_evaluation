@@ -33,11 +33,10 @@ function SavedScansItemRow(props: Props) {
 
     return (
         <Tr>
-            <Td>{item.webpage}</Td>
+            <Td>{item.name}</Td>
             <Td>{item.url}</Td>
             <Td>{item.website}</Td>
-            <Td>{item.scannedDate}</Td>
-            <Td>{item.severity}</Td>
+            <Td>{item.scanTime}</Td>
             <Td>
                 <HStack spacing={2}>
                     <Link

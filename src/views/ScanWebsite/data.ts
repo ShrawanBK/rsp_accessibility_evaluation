@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/prefer-default-export
 
-export type Impact = 'Critical' | 'Moderate' | 'Serious' | 'Minor';
+export type Impact = 'critical' | 'moderate' | 'serious' | 'minor';
 
 export interface IssueBody {
     id: string | number;
@@ -34,7 +34,7 @@ export interface IssueObject {
     issueId: string;
     name: string;
     criteria: Criteria[];
-    occurence: Occurence[];
+    occurences: Occurence[];
     impact: Impact;
     timestamp: string;
     found: string;
@@ -57,7 +57,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag143',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensures the document has a main landmark',
@@ -75,7 +75,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the second occurence of landmark issue',
             },
         ],
-        impact: 'Critical',
+        impact: 'critical',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the landmark-issue note.',
@@ -95,7 +95,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag243',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensure that the page, or at least one of its frames contains a level-one heading',
@@ -121,7 +121,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of heading issue',
             },
         ],
-        impact: 'Minor',
+        impact: 'minor',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the heading-issue note',
@@ -146,7 +146,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is cat.aria',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: "Ensures ARIA attributes are allowed for an element's role",
@@ -172,7 +172,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of ARIA-attributes-issue',
             },
         ],
-        impact: 'Serious',
+        impact: 'serious',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the ARIA-attributes-issue note',
@@ -197,7 +197,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is cat.heading',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: "Ensures ARIA attributes are allowed for an element's role",
@@ -223,7 +223,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of level-one heading',
             },
         ],
-        impact: 'Moderate',
+        impact: 'moderate',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the level-one heading note',
@@ -249,7 +249,7 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is wcag111',
             },
         ],
-        occurence: [
+        occurences: [
             {
                 occurenceId: '625d636b0447d8d35ba977a2',
                 description: 'Ensures <img> elements have alternate text or a role of none or presentation',
@@ -275,45 +275,45 @@ export const issuesMockData: IssueObject[] = [
                 note: 'This is note to be noted for the third occurence of image-text-alternatives',
             },
         ],
-        impact: 'Moderate',
+        impact: 'moderate',
         timestamp: '2022-04-18 16:11:07',
         found: 'Automatically',
         note: 'This is the level-one heading note',
     },
 ];
 
-export interface ImpactStats {
+export interface ImpactStatistics {
     impact: Impact;
     count: number;
 }
 
-export const impactStatsMockData: ImpactStats[] = [
+export const impactStatsMockData: ImpactStatistics[] = [
     {
-        impact: 'Critical',
+        impact: 'critical',
         count: 1,
     },
     {
-        impact: 'Serious',
+        impact: 'serious',
         count: 1,
     },
     {
-        impact: 'Moderate',
+        impact: 'moderate',
         count: 2,
     },
     {
-        impact: 'Minor',
+        impact: 'minor',
         count: 1,
     },
 ];
 
-export type IssueType = 'automatic' | 'guided' | 'needs review';
+export type FoundType = 'automatic' | 'guided' | 'needs review';
 
-export interface IssueTypeStats {
-    typeFound: IssueType;
+export interface FoundStatistics {
+    typeFound: FoundType;
     count: number;
 }
 
-export const issueTypeMockStats: IssueTypeStats[] = [
+export const issueTypeMockStats: FoundStatistics[] = [
     {
         typeFound: 'automatic',
         count: 4,

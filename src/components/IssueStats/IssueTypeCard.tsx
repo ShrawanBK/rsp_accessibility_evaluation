@@ -6,36 +6,36 @@ import {
     Text,
 } from '@chakra-ui/react';
 
-import { IssueTypeStats } from '../../views/ScanWebsite/data';
+import { FoundStatistics } from '../../views/ScanWebsite/data';
 
 export interface Props {
-    issueTypeStats: IssueTypeStats[] | undefined;
+    foundStatistics: FoundStatistics[] | undefined;
 }
 
 const getIssueTypeCount = (
-    type: IssueTypeStats['typeFound'],
-    list: IssueTypeStats[] | undefined,
+    type: FoundStatistics['typeFound'],
+    list: FoundStatistics[] | undefined,
 ) => list?.find((i) => i.typeFound === type)?.count ?? 'N/A';
 
 export default function IssueTypeCard(props: Props) {
     const {
-        issueTypeStats,
+        foundStatistics,
         ...rest
     } = props;
 
     const automatic = useMemo(
-        () => getIssueTypeCount('automatic', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('automatic', foundStatistics),
+        [foundStatistics],
     );
 
     const reviewable = useMemo(
-        () => getIssueTypeCount('needs review', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('needs review', foundStatistics),
+        [foundStatistics],
     );
 
     const guided = useMemo(
-        () => getIssueTypeCount('guided', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('guided', foundStatistics),
+        [foundStatistics],
     );
 
     return (

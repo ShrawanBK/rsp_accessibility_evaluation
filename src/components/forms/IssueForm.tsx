@@ -13,7 +13,7 @@ import SelectField from '../SelectField';
 
 interface ResultFormData {
     url: BasicData['url'];
-    scanTime: BasicData['timeDate'];
+    scanTime: BasicData['scanTime'];
     website: string;
     webpage: string;
     note?: string;

@@ -11,8 +11,8 @@ import {
 import { BasicData } from '../../views/ScanWebsite';
 
 export interface SaveResultFormData {
-    website: string;
-    webpage: string;
+    websiteName: string;
+    webpageName: string;
     note?: string;
 }
 interface Props {
@@ -30,18 +30,24 @@ function SaveResultForm(props: Props) {
         onCloseAction,
     } = props;
 
-    const [webpage, setWebpage] = useState<string>('');
-    const [website, setWebsite] = useState<string>('');
+    const [webpageName, setWebpageName] = useState<string>('');
+    const [websiteName, setWebsiteName] = useState<string>('');
     const [note, setNote] = useState<string>();
 
-    const handleWebpageChange = (e: ChangeEvent<HTMLInputElement>) => setWebpage(e.target.value);
-    const handleWebsiteChange = (e: ChangeEvent<HTMLInputElement>) => setWebsite(e.target.value);
+    const handleWebpageNameChange = (
+        e: ChangeEvent<HTMLInputElement>,
+    ) => setWebpageName(e.target.value);
+
+    const handleWebsiteNameChange = (
+        e: ChangeEvent<HTMLInputElement>,
+    ) => setWebsiteName(e.target.value);
+
     const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
 
     const onCancelSave = useCallback(
         () => {
-            setWebpage('');
-            setWebsite('');
+            setWebpageName('');
+            setWebsiteName('');
             setNote(undefined);
             if (onCloseAction) {
                 onCloseAction();
@@ -50,7 +56,7 @@ function SaveResultForm(props: Props) {
         [onCloseAction],
     );
 
-    const errored = !website || !webpage;
+    const errored = !websiteName || !webpageName;
 
     const handleSubmit = useCallback(
         (event) => {
@@ -59,8 +65,8 @@ function SaveResultForm(props: Props) {
                 return;
             }
             onSaveAction({
-                website,
-                webpage,
+                websiteName,
+                webpageName,
                 note,
             });
 
@@ -68,7 +74,7 @@ function SaveResultForm(props: Props) {
 
             // NOTE: Time out is the response time when url processed
         },
-        [basicData, errored, note, onCancelSave, onSaveAction, webpage, website],
+        [basicData, errored, note, onCancelSave, onSaveAction, webpageName, websiteName],
     );
 
     return (
@@ -104,14 +110,13 @@ function SaveResultForm(props: Props) {
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="webpage">
+                    <FormLabel htmlFor="webpageName">
                         Webpage *
                     </FormLabel>
                     <Input
-                        id="webpage"
-                        type="text"
-                        value={webpage}
-                        onChange={handleWebpageChange}
+                        id="webpageName"
+                        value={webpageName}
+                        onChange={handleWebpageNameChange}
                         placeholder="Enter webpage name (Example - Homepage)"
                         background="whiteAlpha.900"
                         tabIndex={-1}
@@ -119,14 +124,13 @@ function SaveResultForm(props: Props) {
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="website">
+                    <FormLabel htmlFor="websiteName">
                         Website *
                     </FormLabel>
                     <Input
-                        id="website"
-                        type="url"
-                        value={website}
-                        onChange={handleWebsiteChange}
+                        id="websiteName"
+                        value={websiteName}
+                        onChange={handleWebsiteNameChange}
                         placeholder="Enter website name (Example Website)"
                         background="whiteAlpha.900"
                         tabIndex={-1}

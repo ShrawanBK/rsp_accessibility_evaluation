@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
 import {
     Box,
     Button,
@@ -14,9 +14,7 @@ import {
     ModalHeader,
     ModalOverlay,
     Text,
-    ToastId,
     useBoolean,
-    useToast,
     VStack,
 } from '@chakra-ui/react';
 import axios from 'axios';
@@ -43,6 +41,14 @@ import apis from '../../utils/apis';
 import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
+const getBaseUrl = (url: string) => {
+    const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
+    if (!matchedUrl) {
+        return '';
+    }
+    return matchedUrl[0];
+};
+
 export interface BasicData {
     scanTime: string;
     url: string;
@@ -60,6 +66,11 @@ interface ScanWebsiteResponse {
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
+    const [webpageUrl, setWebpageUrl] = useState<string>('');
+    const handleUrlChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => setWebpageUrl(e.target.value), [],
+    );
+
     const [issues, setIssues] = useState<IssueObject[]>();
     const [impactStatistics, setImpactStatistics] = useState<ImpactStatistics[]>();
     const [foundStatistics, setFoundStatistics] = useState<FoundStatistics[]>();
@@ -113,12 +124,14 @@ function ScanWebsite() {
         }));
     }, [issues]);
 
-    const onScanWebsite = useCallback(
-        async (scanUrl: string) => {
+    const onScanWebpage = useCallback(
+        async () => {
             try {
                 setProcessingUrl.on();
-                const response = await axios.get(`http://localhost:8080/scan?url=${scanUrl}`);
+                setUrlInvalidStatus.off();
+                const response = await axios.get(`http://localhost:8080/scan?url=${webpageUrl}`);
                 const dataResponse: ScanWebsiteResponse = response.data;
+                console.log({ dataResponse });
                 if (!dataResponse) {
                     setProcessingUrl.off();
                     return;
@@ -136,10 +149,11 @@ function ScanWebsite() {
                 setAllIdsSelected.off();
                 setProcessingUrl.off();
             } catch (error) {
-                console.warn({ error });
+                setProcessingUrl.off();
+                setUrlInvalidStatus.on();
             }
         },
-        [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus],
+        [setAllIdsSelected, setProcessingUrl, setUrlInvalidStatus, webpageUrl],
     );
 
     const onSelectFilterableImpactLevel = useCallback(
@@ -295,17 +309,18 @@ function ScanWebsite() {
                 }
                 const requestBody = {
                     // TODO : Fix the name here
-                    name: formData.webpage,
+                    name: formData.webpageName,
                     url: basicData.url,
                     scanTime: basicData.scanTime,
                     note: formData.note,
                     website: {
-                        name: formData.webpage,
-                        url: formData.website,
+                        name: formData.websiteName,
+                        url: getBaseUrl(basicData.url),
                     },
                     // NOte - should be Selected Issues
                     issues: filteredIssues,
                 };
+                console.log({ requestBody });
 
                 const response = await apis.post(
                     'webpage', requestBody,
@@ -321,7 +336,7 @@ function ScanWebsite() {
                     setUrlInvalidStatus.off();
                     setAllIdsSelected.off();
                     setProcessingUrl.off();
-
+                    setWebpageUrl('');
                     const successToastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
@@ -413,11 +428,13 @@ function ScanWebsite() {
             >
                 <ScanForm
                     processingUrl={processingUrl}
-                    onScanWebsite={onScanWebsite}
+                    onScanWebpage={onScanWebpage}
+                    handleUrlChange={handleUrlChange}
+                    url={webpageUrl}
                 />
             </Box>
             <Box width="60%">
-                {!processingUrl && !issues && (
+                {!processingUrl && !issues && !urlInvalidStatus && (
                     <Info
                         title="Scan & Audit Webpage"
                         message="Get accessibility test result of your webpage by inputting URL and scan it."
@@ -427,8 +444,8 @@ function ScanWebsite() {
                 {processingUrl && <Loading message="Waiting for Result" />}
                 {urlInvalidStatus && !processingUrl && (
                     <Info
-                        title="Invalid URL"
-                        message="There is something wrong with the webpage. Try again with different url."
+                        title="Something went wrong"
+                        message="There was something wrong while processing the webpage. Try again with different url."
                         icon={<InvalidUrlIcon />}
                     />
                 )}

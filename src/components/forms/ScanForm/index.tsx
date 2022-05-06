@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 import {
     Button,
     FormControl,
@@ -11,36 +11,33 @@ import './styles.css';
 
 interface Props {
     processingUrl: boolean;
-    onScanWebsite: (url: string) => void;
+    onScanWebpage: () => void;
     label?: string;
     buttonLabel?: string;
     placeholder?: string;
+    handleUrlChange: (e: ChangeEvent<HTMLInputElement>) => void;
+    url: string;
 }
 
 function ScanForm(props: Props) {
     const {
+        handleUrlChange,
+        url,
         processingUrl,
-        onScanWebsite,
+        onScanWebpage,
         label = 'URL',
         buttonLabel = 'SCAN',
-        placeholder = 'Enter website url (https://www.examplewebsite.example)',
+        placeholder = 'Enter webpageurl (https://www.examplewebsite.example)',
     } = props;
-    const [url, setUrl] = useState<string>();
-
-    const handleUrlChange = (e: ChangeEvent<HTMLInputElement>) => setUrl(e.target.value);
 
     const errored = !url;
 
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
-            if (!url) {
-                return;
-            }
-            onScanWebsite(url);
-            // NOTE: Time out is the response time when url processed
+            onScanWebpage();
         },
-        [onScanWebsite, url],
+        [onScanWebpage],
     );
 
     return (
@@ -59,7 +56,7 @@ function ScanForm(props: Props) {
                     <Input
                         id="url"
                         type="url"
-                        defaultValue={url}
+                        value={url}
                         onChange={handleUrlChange}
                         width="90%"
                         placeholder={placeholder}

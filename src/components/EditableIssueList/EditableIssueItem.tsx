@@ -212,7 +212,7 @@ function EditableIssueItem(props: IssueListProps) {
                                         tabIndex={-1}
                                         colorScheme="blue"
                                         background="blue.700"
-                                        onClick={() => console.warn('edit')}
+                                        onClick={() => console.warn('WIP - Edit')}
                                     >
                                         Edit
                                     </Button>

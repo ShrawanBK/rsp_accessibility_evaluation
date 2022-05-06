@@ -31,12 +31,12 @@ const sortByOptions = [
         value: 'name',
     },
     {
-        label: 'Date',
-        value: 'date',
+        label: 'Scanned Date',
+        value: 'scannedDate',
     },
     {
-        label: 'Type',
-        value: 'type',
+        label: 'URL',
+        value: 'url',
     },
 ];
 
@@ -220,6 +220,7 @@ function SavedScan() {
                         <SelectField
                             options={sortByOptions}
                             label="Sort By"
+                            // date, url, scannedDate
                             onSelectOption={onSelectSortBy}
                         />
                     </Box>

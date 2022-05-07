@@ -11,6 +11,13 @@ export interface SavedScanItem {
     scanTime: string;
 }
 
+export interface GetSavedScanResponse {
+    data: SavedScanItem[];
+    lastPage: number;
+    page: number;
+    totalCount: number;
+}
+
 export const savedScanItemColumn: Column[] = [
     {
         description: 'webpage',

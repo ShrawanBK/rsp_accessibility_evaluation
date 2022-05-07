@@ -33,12 +33,14 @@ interface IssueListProps {
     // Make this compulsory
     issue: IssueObject;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
+    onSetEditableIssue: (issueItem: IssueObject) => void;
 }
 
 function EditableIssueItem(props: IssueListProps) {
     const {
         issue,
         setDeletableOccurenceData,
+        onSetEditableIssue,
     } = props;
 
     const [isExpanded, setIsExpanded] = useBoolean();
@@ -48,12 +50,12 @@ function EditableIssueItem(props: IssueListProps) {
     const currentOccurence = issue.occurences[currentOccurenceIndex];
 
     const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
+        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
     const tags = useMemo(
-        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
+        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
@@ -63,6 +65,7 @@ function EditableIssueItem(props: IssueListProps) {
                 occurenceId: currentOccurence.occurenceId,
                 issueId: issue.issueId,
                 issueName: issue.name,
+                issueDeletable: issue.occurences.length === 1,
             });
         },
         [
@@ -70,7 +73,15 @@ function EditableIssueItem(props: IssueListProps) {
             issue.issueId,
             issue.name,
             setDeletableOccurenceData,
+            issue.occurences,
         ],
+    );
+
+    const onClickEdit = useCallback(
+        () => {
+            onSetEditableIssue(issue);
+        },
+        [onSetEditableIssue, issue],
     );
 
     return (
@@ -212,7 +223,7 @@ function EditableIssueItem(props: IssueListProps) {
                                         tabIndex={-1}
                                         colorScheme="blue"
                                         background="blue.700"
-                                        onClick={() => console.warn('WIP - Edit')}
+                                        onClick={onClickEdit}
                                     >
                                         Edit
                                     </Button>
@@ -248,74 +259,82 @@ function EditableIssueItem(props: IssueListProps) {
                                 {currentOccurence.description}
                             </Text>
                         </VStack>
-                        <VStack
-                            spacing={2}
-                            alignItems="baseline"
-                        >
-                            <Heading
-                                fontWeight="semibold"
-                                letterSpacing="wide"
-                                fontSize="md"
-                                as="h3"
+                        {currentOccurence.location && (
+                            <VStack
+                                spacing={2}
+                                alignItems="baseline"
                             >
-                                Issue Description
-                            </Heading>
-                            <Text>
-                                {currentOccurence.description}
-                            </Text>
-                        </VStack>
-                        <VStack
-                            spacing={2}
-                            alignItems="baseline"
-                        >
-                            <Heading
-                                fontWeight="semibold"
-                                letterSpacing="wide"
-                                fontSize="md"
-                                ml={1}
-                                as="h4"
+                                <Heading
+                                    fontWeight="semibold"
+                                    letterSpacing="wide"
+                                    fontSize="md"
+                                    ml={1}
+                                    as="h4"
+                                >
+                                    • Element Location
+                                </Heading>
+                                <Text>
+                                    {currentOccurence.location}
+                                </Text>
+                            </VStack>
+                        )}
+                        {currentOccurence.source && (
+                            <VStack
+                                align="stretch"
+                                alignItems="baseline"
+                                marginLeft="10px"
+                                spacing={2}
                             >
-                                • Element Location
-                            </Heading>
-                            <Text>
-                                {currentOccurence.location}
-                            </Text>
-                        </VStack>
-                        <VStack
-                            align="stretch"
-                            alignItems="baseline"
-                            marginLeft="10px"
-                            spacing={2}
-                        >
-                            <Heading
-                                fontWeight="semibold"
-                                letterSpacing="wide"
-                                fontSize="md"
-                                ml={1}
-                                as="h4"
+                                <Heading
+                                    fontWeight="semibold"
+                                    letterSpacing="wide"
+                                    fontSize="md"
+                                    ml={1}
+                                    as="h4"
+                                >
+                                    • Element Source
+                                </Heading>
+                                <Code ml={1} p={4}>
+                                    {currentOccurence.source}
+                                </Code>
+                            </VStack>
+                        )}
+                        {currentOccurence.fix && (
+                            <VStack
+                                alignItems="baseline"
+                                spacing={2}
                             >
-                                • Element Source
-                            </Heading>
-                            <Code ml={1} p={4}>
-                                {currentOccurence.source}
-                            </Code>
-                        </VStack>
-                        <VStack
-                            alignItems="baseline"
-                            spacing={2}
-                        >
-                            <Heading
-                                fontWeight="semibold"
-                                letterSpacing="wide"
-                                fontSize="md"
-                                as="h3"
+                                <Heading
+                                    fontWeight="semibold"
+                                    letterSpacing="wide"
+                                    fontSize="md"
+                                    as="h3"
+                                >
+                                    How to Fix?
+                                </Heading>
+                                <Text>
+                                    {currentOccurence.fix}
+                                </Text>
+                            </VStack>
+                        )}
+                        {currentOccurence.note && (
+                            <VStack
+                                alignItems="baseline"
+                                spacing={2}
                             >
-                                How to Fix?
-                            </Heading>
-                            <Text>
-                                {currentOccurence.fix}
-                            </Text>
-                        </VStack>
+                                <Heading
+                                    fontWeight="semibold"
+                                    letterSpacing="wide"
+                                    fontSize="md"
+                                    as="h3"
+                                >
+                                    Note
+                                </Heading>
+                                <Text>
+                                    {currentOccurence.note}
+                                </Text>
+                            </VStack>
+                        )}
                     </VStack>
                 </AccordionPanel>
             </AccordionItem>

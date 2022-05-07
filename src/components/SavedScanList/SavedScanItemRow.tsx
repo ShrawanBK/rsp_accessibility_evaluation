@@ -6,7 +6,7 @@ import {
     Td,
     Tr,
 } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { SavedScanItem } from '../../views/SavedScans/data';
 
@@ -21,9 +21,10 @@ function SavedScansItemRow(props: Props) {
         setDeletableId,
     } = props;
 
+    const navigate = useNavigate();
     const onViewButtonClicked = useCallback(
-        () => console.warn('item--', item),
-        [item],
+        () => navigate(`/saved_scans/${item.id}`),
+        [item.id, navigate],
     );
 
     const onDeleteButtonClicked = useCallback(
@@ -39,22 +40,17 @@ function SavedScansItemRow(props: Props) {
             <Td>{item.scanTime}</Td>
             <Td>
                 <HStack spacing={2}>
-                    <Link
-                        to={`/saved_scans/${item.id}`}
-                        aria-label={`opening /saved_scans/${item.id}`}
+                    <Button
+                        type="button"
+                        h={10}
+                        letterSpacing={1}
+                        tabIndex={-1}
+                        colorScheme="blue"
+                        background="blue.700"
+                        onClick={onViewButtonClicked}
                     >
-                        <Button
-                            type="button"
-                            h={10}
-                            letterSpacing={1}
-                            tabIndex={-1}
-                            colorScheme="blue"
-                            background="blue.700"
-                            onClick={onViewButtonClicked}
-                        >
-                            View
-                        </Button>
-                    </Link>
+                        View
+                    </Button>
                     <Button
                         type="button"
                         h={10}

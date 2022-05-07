@@ -4,6 +4,7 @@ import {
     Box,
     Heading,
     Text,
+    Spacer,
 } from '@chakra-ui/react';
 
 import { FoundStatistics } from '../../views/ScanWebsite/data';
@@ -13,9 +14,9 @@ export interface Props {
 }
 
 const getIssueTypeCount = (
-    type: FoundStatistics['typeFound'],
+    type: FoundStatistics['found'],
     list: FoundStatistics[] | undefined,
-) => list?.find((i) => i.typeFound === type)?.count ?? 'N/A';
+) => list?.find((i) => i.found === type)?.count ?? 'N/A';
 
 export default function IssueTypeCard(props: Props) {
     const {
@@ -29,7 +30,7 @@ export default function IssueTypeCard(props: Props) {
     );
 
     const reviewable = useMemo(
-        () => getIssueTypeCount('needs review', foundStatistics),
+        () => getIssueTypeCount('needsReview', foundStatistics),
         [foundStatistics],
     );
 
@@ -38,6 +39,12 @@ export default function IssueTypeCard(props: Props) {
         [foundStatistics],
     );
 
+    const manual = useMemo(
+        () => getIssueTypeCount('manual', foundStatistics),
+        [foundStatistics],
+    );
+
+    const manualShown = manual > 0 && manual !== 'N/A';
     return (
         <VStack
             p={2}
@@ -65,26 +72,52 @@ export default function IssueTypeCard(props: Props) {
                     {`${automatic} issues (${reviewable} need reviews)`}
                 </Text>
             </Box>
-            <Box p={2}>
-                <Heading
-                    fontSize="small"
-                    textTransform="uppercase"
-                    fontWeight="semibold"
-                    letterSpacing={2}
-                    as="h3"
-                >
-                    guided
-                </Heading>
-                <Text
-                    mt={1}
-                    fontSize="xl"
-                    fontWeight="bold"
-                >
-                    {guided}
-                    {' '}
-                    Issues
-                </Text>
+            <Box p={2} display="flex">
+                <VStack alignItems="flex-start">
+                    <Heading
+                        fontSize="small"
+                        textTransform="uppercase"
+                        fontWeight="semibold"
+                        letterSpacing={2}
+                        as="h3"
+                    >
+                        guided
+                    </Heading>
+                    <Text
+                        mt={1}
+                        fontSize="xl"
+                        fontWeight="bold"
+                    >
+                        {guided}
+                        {' '}
+                        Issues
+                    </Text>
+                </VStack>
+                <Spacer maxWidth="md" />
+                {manualShown && (
+                    <VStack alignItems="flex-start">
+                        <Heading
+                            fontSize="small"
+                            textTransform="uppercase"
+                            fontWeight="semibold"
+                            letterSpacing={2}
+                            as="h3"
+                        >
+                            manual
+                        </Heading>
+                        <Text
+                            mt={1}
+                            fontSize="xl"
+                            fontWeight="bold"
+                        >
+                            {manual}
+                            {' '}
+                            Issues
+                        </Text>
+                    </VStack>
+                )}
             </Box>
+
         </VStack>
     );
 }

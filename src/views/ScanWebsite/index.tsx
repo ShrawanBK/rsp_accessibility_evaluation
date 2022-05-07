@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useContext, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Button,
@@ -120,7 +120,7 @@ function ScanWebsite() {
         });
         return filteredCriteria.map((item) => ({
             label: item.name,
-            value: item.name,
+            value: item.criteriaId,
         }));
     }, [issues]);
 
@@ -131,7 +131,6 @@ function ScanWebsite() {
                 setUrlInvalidStatus.off();
                 const response = await axios.get(`http://localhost:8080/scan?url=${webpageUrl}`);
                 const dataResponse: ScanWebsiteResponse = response.data;
-                console.log({ dataResponse });
                 if (!dataResponse) {
                     setProcessingUrl.off();
                     return;
@@ -320,7 +319,6 @@ function ScanWebsite() {
                     // NOte - should be Selected Issues
                     issues: filteredIssues,
                 };
-                console.log({ requestBody });
 
                 const response = await apis.post(
                     'webpage', requestBody,
@@ -389,7 +387,6 @@ function ScanWebsite() {
                 });
 
                 showToast(failureToastComponent);
-                console.log('error bho yaar --', error);
             }
         },
         [

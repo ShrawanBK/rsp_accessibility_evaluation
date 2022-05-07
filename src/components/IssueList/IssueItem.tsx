@@ -23,7 +23,6 @@ import { IssueObject } from '../../views/ScanWebsite/data';
 import Paginator from '../Paginator';
 
 interface IssueListProps {
-    // Make this compulsory
     issue: IssueObject;
     selectedIssues: IssueObject['name'][] | undefined;
     onUpdateSelectedIssue: (id: IssueObject['name']) => void;
@@ -61,12 +60,12 @@ function IssueItem(props: IssueListProps) {
     );
 
     const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
+        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
     const tags = useMemo(
-        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
+        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
         [issue.criteria],
     );
 
@@ -213,22 +212,6 @@ function IssueItem(props: IssueListProps) {
                             />
                         </Box>
                         <Divider />
-                        <VStack
-                            spacing={2}
-                            alignItems="baseline"
-                        >
-                            <Heading
-                                fontWeight="semibold"
-                                letterSpacing="wide"
-                                fontSize="md"
-                                as="h3"
-                            >
-                                Issue Description
-                            </Heading>
-                            <Text>
-                                {currentOccurence.description}
-                            </Text>
-                        </VStack>
                         <VStack
                             spacing={2}
                             alignItems="baseline"

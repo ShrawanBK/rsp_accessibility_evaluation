@@ -8,7 +8,7 @@ import {
 
 type OptionValue = number | string;
 
-type Option<Type extends OptionValue> = {
+export type Option<Type extends OptionValue> = {
     value: Type;
     label: string;
 };
@@ -21,6 +21,7 @@ export interface SelectFieldProps<Type extends OptionValue> {
     placeholder?: string;
     variant?: variant;
     onSelectOption: (value: string) => void;
+    value?: string | number | readonly string[] | undefined
 }
 
 function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
@@ -30,6 +31,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
         placeholder,
         variant = 'outline',
         onSelectOption,
+        value,
     } = props;
 
     const onChange = useCallback(
@@ -60,6 +62,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 onChange={onChange}
                 tabIndex={-1}
                 background="white"
+                value={value}
             >
                 {options.map((option) => (
                     <option

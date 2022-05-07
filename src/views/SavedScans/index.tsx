@@ -8,8 +8,6 @@ import {
     Spacer,
     Text,
     VStack,
-    useToast,
-    ToastId,
     Button,
     Center,
 } from '@chakra-ui/react';
@@ -18,7 +16,7 @@ import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import Info from '../../components/Info';
 import Paginator from '../../components/Paginator';
 import SavedScanList from '../../components/SavedScanList';
-import { SavedScanItem, savedScanItemColumn } from './data';
+import { GetSavedScanResponse, SavedScanItem, savedScanItemColumn } from './data';
 import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
 import SearchScans from '../../components/forms/SearchScans';
@@ -27,12 +25,16 @@ import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 const sortByOptions = [
     {
-        label: 'Name',
+        label: 'Scan Time',
+        value: 'scanTime',
+    },
+    {
+        label: 'Webpage',
         value: 'name',
     },
     {
-        label: 'Scanned Date',
-        value: 'scannedDate',
+        label: 'Website',
+        value: 'website',
     },
     {
         label: 'URL',
@@ -47,19 +49,22 @@ function SavedScan() {
         (e: ChangeEvent<HTMLInputElement>) => setSearchField(e.target.value), [],
     );
 
-    const [sortBy, setSortBy] = useState<string>('name');
+    const [sortBy, setSortBy] = useState<string>('scanTime');
     const [totalPages, setTotalPages] = useState<number>(1);
     const getInitialSavedScanList = async () => {
         try {
-            const apiUrl = '/webpage?sortby=name&orderby=desc&pageNum=1&pageSize=10';
+            const apiUrl = '/webpage';
             const response = await apis.get(apiUrl);
-            const dataResponse: SavedScanItem[] = await response.data;
-            if (!dataResponse || dataResponse.length <= 0) {
+            const dataResponse: GetSavedScanResponse = await response.data;
+
+            const scanListResponse = dataResponse.data;
+            if (!scanListResponse || scanListResponse.length <= 0) {
                 setSavedScanList(undefined);
                 return;
             }
-            setTotalPages(1);
-            setSavedScanList(dataResponse);
+            // fix - TOTAL COUNT IS NOT TOTAL PAGES
+            setTotalPages(dataResponse.totalCount);
+            setSavedScanList(scanListResponse);
         } catch (error) {
             console.warn({ error });
         }
@@ -79,16 +84,17 @@ function SavedScan() {
     const getSavedScanList = useCallback(
         async () => {
             try {
-                const apiUrl = `/webpage?sortby=${sortBy}&searchField=${searchField}&orderby=desc&pageNum=1&pageSize=10`;
+                const apiUrl = `/webpage?sortBy=${sortBy}&searchField=${searchField}&orderBy=desc&pageNum=1&pageSize=10`;
                 const response = await apis.get(apiUrl);
-                const dataResponse: SavedScanItem[] = await response.data;
-                if (!dataResponse || dataResponse.length <= 0) {
+                const dataResponse: GetSavedScanResponse = await response.data;
+                const scanListResponse = dataResponse.data;
+                if (!scanListResponse || scanListResponse.length <= 0) {
                     setSavedScanList(undefined);
                     return;
                 }
-                setSavedScanList(dataResponse);
-                // NOTE - Upate this
-                setTotalPages(1);
+                // fix - TOTAL COUNT IS NOT TOTAL PAGES
+                setTotalPages(dataResponse.totalCount);
+                setSavedScanList(scanListResponse);
             } catch (error) {
                 console.warn({ error });
             }
@@ -98,6 +104,7 @@ function SavedScan() {
 
     const onSelectSortBy = useCallback(
         (value: string) => {
+            // Note - This is not working
             setSortBy(value);
             getSavedScanList();
         },
@@ -220,7 +227,6 @@ function SavedScan() {
                         <SelectField
                             options={sortByOptions}
                             label="Sort By"
-                            // date, url, scannedDate
                             onSelectOption={onSelectSortBy}
                         />
                     </Box>
@@ -271,7 +277,6 @@ function SavedScan() {
                         </HStack>
                     </VStack>
                 )}
-
             </Box>
         </VStack>
     );

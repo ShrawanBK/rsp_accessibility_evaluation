@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
@@ -14,9 +13,7 @@ import {
     ModalOverlay,
     Spacer,
     Text,
-    ToastId,
     useBoolean,
-    useToast,
     VStack,
 } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
@@ -25,16 +22,13 @@ import IssueStats from '../../components/IssueStats';
 import SelectField from '../../components/SelectField';
 
 import {
-    issuesMockData,
     IssueObject,
     ImpactStatistics,
-    impactStatsMockData,
     FoundStatistics,
-    issueTypeMockStats,
     Criteria,
     Impact,
 } from './data';
-import IssueForm from '../../components/forms/IssueForm';
+import IssueForm, { IssueFormData } from '../../components/forms/IssueForm';
 import EditableIssueList from '../../components/EditableIssueList';
 import NextArrowIcon from '../../components/icons/NextArrow';
 import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
@@ -52,6 +46,7 @@ export interface DeletableOccurenceData {
     occurenceId: string;
     issueId: string;
     issueName: string;
+    issueDeletable: boolean;
 }
 
 interface ScannedWebsiteDetailResponse {
@@ -67,9 +62,9 @@ function ScannedWebsiteDetail() {
     const { id } = useParams();
 
     const [processingUrl, setProcessingUrl] = useBoolean();
-    const [issues, setIssues] = useState<IssueObject[]>(issuesMockData);
-    const [impactStatistics, setImpactStatistics] = useState<ImpactStatistics[]>(impactStatsMockData);
-    const [foundStatistics, setFoundStatistics] = useState<FoundStatistics[]>(issueTypeMockStats);
+    const [issues, setIssues] = useState<IssueObject[]>();
+    const [impactStatistics, setImpactStatistics] = useState<ImpactStatistics[]>();
+    const [foundStatistics, setFoundStatistics] = useState<FoundStatistics[]>();
 
     const [modalOpened, setModalOpened] = useBoolean();
 
@@ -96,6 +91,7 @@ function ScannedWebsiteDetail() {
         });
     }, [issues]);
 
+    //  Fix - some criteria have different ids but same name
     const criteriaOptions = useMemo(() => {
         if (!issues || issues.length <= 0) {
             return [];
@@ -141,6 +137,23 @@ function ScannedWebsiteDetail() {
         };
         getWebpageDetail();
     }, [id, setProcessingUrl]);
+
+    const [criteriaListForForm, setCriteriaListForForm] = useState<Criteria[]>();
+
+    useEffect(() => {
+        const getCriteria = async () => {
+            try {
+                const response = await apis.get('/criteria');
+                if (response.status === 200) {
+                    const criteriaList: Criteria[] = await response.data;
+                    setCriteriaListForForm(criteriaList);
+                }
+            } catch (error) {
+                console.warn({ error });
+            }
+        };
+        getCriteria();
+    }, []);
 
     const onSelectFilterableImpactLevel = useCallback(
         (value: string) => {
@@ -243,29 +256,20 @@ function ScannedWebsiteDetail() {
                     return;
                 }
 
-                const apiUrl = `/issue?webpageId=${id}&issueId=${deletableOccurenceData.issueId}`;
-                const response = await apis.delete(apiUrl);
-
-                if (response.data === 'successfully deleted') {
-                    // TODO: Confirm and fix this
-                    setIssues((prevIssues) => [...prevIssues].filter((issue) => issue.issueId !== deletableOccurenceData.issueId));
-                    // Was for occurence delete
-                    // setIssues((prevIssues) => {
-                    //     const tmpIssueList = [...prevIssues];
-                    //     const updatedIssueList = tmpIssueList.map((issueItem) => {
-                    //         if (issueItem.issueId !== deletableOccurenceData.issueId) {
-                    //             return issueItem;
-                    //         }
-                    //         return {
-                    //             ...issueItem,
-                    //             occurence: issueItem.occurences.filter(
-                    //                 (oItem) => oItem.occurenceId !== deletableOccurenceData.occurenceId,
-                    //             ),
-                    //         };
-                    //     });
-                    //     return updatedIssueList;
-                    // });
-
+                if (deletableOccurenceData.issueDeletable) {
+                    // NOTE - Delete the issue as well.
+                    const apiUrl = `/issue?issueId=${deletableOccurenceData.issueId}&webpageId=${id}`;
+                    const response = await apis.delete(apiUrl);
+                    if (response.data === 'successfully deleted') {
+                        setIssues((prevIssues) => {
+                            if (!prevIssues) {
+                                return undefined;
+                            }
+                            return [...prevIssues].filter(
+                                (issue) => issue.issueId !== deletableOccurenceData.issueId,
+                            );
+                        });
+                    }
                     const toastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
@@ -284,6 +288,48 @@ function ScannedWebsiteDetail() {
                     });
                     showToast(toastComponent);
                     setDeletableOccurenceData(undefined);
+                } else {
+                    const apiUrl = `/occurence?issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}&webpageId=${id}`;
+                    const response = await apis.delete(apiUrl);
+                    if (response.data === 'successfully deleted') {
+                        setIssues((prevIssues) => {
+                            if (!prevIssues || prevIssues.length <= 0) {
+                                return undefined;
+                            }
+                            const tmpIssueList = [...prevIssues];
+                            const updatedIssueList = tmpIssueList.map((issueItem) => {
+                                if (issueItem.issueId !== deletableOccurenceData.issueId) {
+                                    return issueItem;
+                                }
+                                return {
+                                    ...issueItem,
+                                    occurence: issueItem.occurences.filter(
+                                        (o) => o.occurenceId !== deletableOccurenceData.occurenceId,
+                                    ),
+                                } as IssueObject;
+                            });
+                            return updatedIssueList;
+                        });
+
+                        const toastComponent = toast && toast({
+                            status: 'success',
+                            isClosable: true,
+                            variant: 'subtle',
+                            id: deletableOccurenceData.occurenceId,
+                            duration: null,
+                            position: 'top',
+                            render: () => (
+                                <ToastBox
+                                    onCloseToast={onCloseToast}
+                                    title="Delete Success"
+                                    description={`Issue - ${deletableOccurenceData.issueName} deleted successfully`}
+                                    status="success"
+                                />
+                            ),
+                        });
+                        showToast(toastComponent);
+                        setDeletableOccurenceData(undefined);
+                    }
                 }
             } catch (onDeleteOccurenceError) {
                 console.warn({ onDeleteOccurenceError });
@@ -294,6 +340,158 @@ function ScannedWebsiteDetail() {
 
     const openDeleteOccurenceDialog = !!deletableOccurenceData;
 
+    const [editableIssue, setEditableIssue] = useState<IssueObject>();
+
+    const onSetEditableIssue = useCallback(
+        (issueItem: IssueObject) => {
+            setEditableIssue(issueItem);
+            setModalOpened.on();
+        },
+        [setModalOpened],
+    );
+
+    const onResetEditableIssue = useCallback(
+        () => {
+            setEditableIssue(undefined);
+            setModalOpened.off();
+        },
+        [setModalOpened],
+    );
+
+    const onSaveIssue = useCallback(
+        async (formData: IssueFormData) => {
+            try {
+                const requestBody = formData;
+                const apiUrl = `issue?webpageId=${id}`;
+                const response = await apis.post(apiUrl, requestBody);
+
+                if (response.status === 200) {
+                    const issueData: IssueObject = response.data;
+                    setIssues((prevIssues) => {
+                        if (!prevIssues || prevIssues.length <= 0) {
+                            return [issueData];
+                        }
+                        return [...prevIssues, issueData];
+                    });
+                    setModalOpened.off();
+
+                    const successToastComponent = toast && toast({
+                        status: 'success',
+                        isClosable: true,
+                        variant: 'subtle',
+                        id: undefined,
+                        duration: null,
+                        position: 'top',
+                        render: () => (
+                            <ToastBox
+                                onCloseToast={onCloseToast}
+                                title="Issue added successfully"
+                                description="Your issue has been added successfully"
+                                status="success"
+                            />
+                        ),
+                    });
+                    showToast(successToastComponent);
+                }
+            } catch (error) {
+                const failureToastComponent = toast && toast({
+                    status: 'error',
+                    isClosable: true,
+                    variant: 'subtle',
+                    id: undefined,
+                    duration: null,
+                    position: 'top',
+                    render: () => (
+                        <ToastBox
+                            onCloseToast={onCloseToast}
+                            title="Error adding"
+                            description="Could not add. Try again"
+                            status="error"
+                        />
+                    ),
+                });
+
+                showToast(failureToastComponent);
+            }
+        },
+        [id, setModalOpened, toast, showToast, onCloseToast],
+    );
+
+    const onUpdateIssue = useCallback(
+        async (formData: IssueFormData) => {
+            try {
+                if (!editableIssue) {
+                    return;
+                }
+                // FIXME - pass only data that was modified
+                const requestBody = formData;
+                const apiUrl = `issue?webpageId=${id}&issueId=${editableIssue.issueId}`;
+                const updateResponse = await apis.put(apiUrl, requestBody);
+
+                if (updateResponse.status === 200) {
+                    const updatedIssueData: IssueObject = updateResponse.data;
+                    setIssues((prevIssues) => {
+                        if (!prevIssues || prevIssues.length <= 0) {
+                            return [updatedIssueData];
+                        }
+                        const tmpIssueList = [...prevIssues];
+                        const updatedIssueList = tmpIssueList.map(
+                            (issueItem) => (issueItem.issueId === updatedIssueData.issueId
+                                ? updatedIssueData : issueItem),
+                        );
+                        return updatedIssueList;
+                    });
+                    setModalOpened.off();
+                    setEditableIssue(undefined);
+                    const successToastComponent = toast && toast({
+                        status: 'success',
+                        isClosable: true,
+                        variant: 'subtle',
+                        id: undefined,
+                        duration: null,
+                        position: 'top',
+                        render: () => (
+                            <ToastBox
+                                onCloseToast={onCloseToast}
+                                title="Issue updated successfully"
+                                description="Your issue has been updated successfully"
+                                status="success"
+                            />
+                        ),
+                    });
+                    showToast(successToastComponent);
+                    // setEditableIssue(undefined);
+                }
+            } catch (error) {
+                const failureToastComponent = toast && toast({
+                    status: 'error',
+                    isClosable: true,
+                    variant: 'subtle',
+                    id: undefined,
+                    duration: null,
+                    position: 'top',
+                    render: () => (
+                        <ToastBox
+                            onCloseToast={onCloseToast}
+                            title="Error adding"
+                            description="Could not add. Try again"
+                            status="error"
+                        />
+                    ),
+                });
+
+                showToast(failureToastComponent);
+            }
+        },
+        [editableIssue, id, setModalOpened, toast, showToast, onCloseToast],
+    );
+
+    const onSaveAction = useMemo(
+        () => (editableIssue ? onUpdateIssue : onSaveIssue),
+        [editableIssue, onSaveIssue, onUpdateIssue],
+    );
+
+    const areYouSureMsg = `Are you sure you want to delete the occurence?${deletableOccurenceData?.issueDeletable ? 'This will delete the issue as well' : ''}`;
     return (
         <VStack
             align="stretch"
@@ -307,7 +505,7 @@ function ScannedWebsiteDetail() {
                 deletableItemId={deletableOccurenceData?.occurenceId}
                 onDelete={onDeleteOccurence}
                 header="Delete Issue"
-                areYouSureMsg="Are you sure you want to delete following issue?"
+                areYouSureMsg={areYouSureMsg}
                 dialogBody={(
                     <>
                         <br />
@@ -401,6 +599,7 @@ function ScannedWebsiteDetail() {
                             role="main"
                             tabIndex={-1}
                             py={2}
+                            minW="xl"
                         >
                             <ModalHeader
                                 tabIndex={-1}
@@ -415,10 +614,11 @@ function ScannedWebsiteDetail() {
                             <ModalCloseButton tabIndex={-1} />
                             <ModalBody tabIndex={-1}>
                                 <IssueForm
-                                    onSaveAction={() => console.warn('save issue')}
-                                    basicData={basicData}
+                                    onSaveAction={onSaveAction}
                                     onCloseAction={setModalOpened.off}
-                                    issueId={undefined}
+                                    editableIssue={editableIssue}
+                                    onResetEditableIssue={onResetEditableIssue}
+                                    criteriaListForForm={criteriaListForForm}
                                 />
                             </ModalBody>
                         </ModalContent>
@@ -456,6 +656,7 @@ function ScannedWebsiteDetail() {
                         <EditableIssueList
                             issueList={filteredIssues}
                             setDeletableOccurenceData={setDeletableOccurenceData}
+                            onSetEditableIssue={onSetEditableIssue}
                         />
                     </Box>
                 </Box>

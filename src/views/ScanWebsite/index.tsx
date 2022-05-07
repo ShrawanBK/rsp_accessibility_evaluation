@@ -40,6 +40,7 @@ import SaveResultForm, { SaveResultFormData } from '../../components/forms/SaveR
 import apis from '../../utils/apis';
 import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
+import { formatDateTime } from '../SavedScans/data';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -402,6 +403,16 @@ function ScanWebsite() {
         ],
     );
 
+    const scannedTime = useMemo(
+        () => {
+            if (!basicData) {
+                return formatDateTime(new Date().toISOString());
+            }
+            return formatDateTime(basicData.scanTime);
+        },
+        [basicData],
+    );
+
     return (
         <VStack
             align="stretch"
@@ -470,7 +481,7 @@ function ScanWebsite() {
                                 Result
                             </Heading>
                             <Text>
-                                {`Scanned on ${basicData?.scanTime}`}
+                                {`Scanned on ${scannedTime}`}
                             </Text>
                         </VStack>
                         <Button

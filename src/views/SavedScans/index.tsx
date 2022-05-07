@@ -10,6 +10,7 @@ import {
     VStack,
     Button,
     Center,
+    useBoolean,
 } from '@chakra-ui/react';
 
 import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
@@ -22,6 +23,7 @@ import apis from '../../utils/apis';
 import SearchScans from '../../components/forms/SearchScans';
 import SelectField from '../../components/SelectField';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
+import Loading from '../../components/Loading';
 
 const sortByOptions = [
     {
@@ -44,71 +46,59 @@ const sortByOptions = [
 
 function SavedScan() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
+    const [searchFormText, setSearchFormText] = useState('');
+
     const [searchField, setSearchField] = useState<string>('');
-    const handleSearchFieldChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => setSearchField(e.target.value), [],
-    );
+    const [loadingScanList, setLoadingScanList] = useBoolean();
 
     const [sortBy, setSortBy] = useState<string>('scanTime');
     const [totalPages, setTotalPages] = useState<number>(1);
-    const getInitialSavedScanList = async () => {
-        try {
-            const apiUrl = '/webpage';
-            const response = await apis.get(apiUrl);
-            const dataResponse: GetSavedScanResponse = await response.data;
-
-            const scanListResponse = dataResponse.data;
-            if (!scanListResponse || scanListResponse.length <= 0) {
-                setSavedScanList(undefined);
-                return;
-            }
-            // fix - TOTAL COUNT IS NOT TOTAL PAGES
-            setTotalPages(dataResponse.totalCount);
-            setSavedScanList(scanListResponse);
-        } catch (error) {
-            console.warn({ error });
-        }
-    };
-    useEffect(() => {
-        getInitialSavedScanList();
-    }, []);
-
-    const onResetSearchList = useCallback(
-        () => {
-            setSearchField('');
-            getInitialSavedScanList();
-        },
-        [setSearchField],
-    );
-
     const getSavedScanList = useCallback(
         async () => {
             try {
+                // TODO - Manage api calls and response properly
+                setLoadingScanList.on();
                 const apiUrl = `/webpage?sortBy=${sortBy}&searchField=${searchField}&orderBy=desc&pageNum=1&pageSize=10`;
+                console.log({ apiUrl });
                 const response = await apis.get(apiUrl);
                 const dataResponse: GetSavedScanResponse = await response.data;
+
                 const scanListResponse = dataResponse.data;
                 if (!scanListResponse || scanListResponse.length <= 0) {
                     setSavedScanList(undefined);
+                    setLoadingScanList.off();
                     return;
                 }
                 // fix - TOTAL COUNT IS NOT TOTAL PAGES
                 setTotalPages(dataResponse.totalCount);
                 setSavedScanList(scanListResponse);
+                setLoadingScanList.off();
             } catch (error) {
                 console.warn({ error });
             }
         },
-        [searchField, sortBy],
+        [searchField, setLoadingScanList, sortBy],
+    );
+
+    useEffect(() => {
+        getSavedScanList();
+    }, [getSavedScanList]);
+
+    const onResetSearchList = useCallback(
+        () => {
+            setSearchFormText('');
+            setSearchField('');
+        },
+        [],
     );
 
     const onSelectSortBy = useCallback(
         (value: string) => {
             // Note - This is not working
             setSortBy(value);
-            getSavedScanList();
+            // getSavedScanList();
         },
-        [getSavedScanList],
+        [],
     );
 
     const [deletableId, setDeletableId] = useState<string>();
@@ -217,9 +207,9 @@ function SavedScan() {
                 <Flex alignItems="center">
                     <Box width="70%">
                         <SearchScans
-                            searchField={searchField}
-                            handleSearchFieldChange={handleSearchFieldChange}
-                            onSearch={getSavedScanList}
+                            onSubmitSearch={setSearchField}
+                            searchFormText={searchFormText}
+                            setSearchFormText={setSearchFormText}
                         />
                     </Box>
                     <Spacer />
@@ -233,7 +223,10 @@ function SavedScan() {
                 </Flex>
             </Box>
             <Box background="white" p={8} borderWidth="1px" borderRadius="md">
-                {(!savedScanList || savedScanList.length <= 0) && (
+                {loadingScanList && (
+                    <Loading message="Waiting for Result" />
+                )}
+                {!loadingScanList && (!savedScanList || savedScanList.length <= 0) && (
                     <Info
                         title="No Saved Scan"
                         message="Currently there is no saved scan of websites. Click here to start scan."

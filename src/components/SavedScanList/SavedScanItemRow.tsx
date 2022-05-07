@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import {
     Button,
@@ -8,7 +8,7 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
-import { SavedScanItem } from '../../views/SavedScans/data';
+import { formatDateTime, SavedScanItem } from '../../views/SavedScans/data';
 
 export interface Props {
     setDeletableId: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -32,12 +32,17 @@ function SavedScansItemRow(props: Props) {
         [item.id, setDeletableId],
     );
 
+    const scannedTime = useMemo(
+        () => formatDateTime(item.scanTime),
+        [item.scanTime],
+    );
+
     return (
         <Tr>
             <Td>{item.name}</Td>
             <Td>{item.url}</Td>
             <Td>{item.website}</Td>
-            <Td>{item.scanTime}</Td>
+            <Td>{scannedTime}</Td>
             <Td>
                 <HStack spacing={2}>
                     <Button

@@ -8,24 +8,28 @@ import {
 import React, { ChangeEvent, useCallback } from 'react';
 
 interface Props {
-    searchField: string;
-    handleSearchFieldChange: (e: ChangeEvent<HTMLInputElement>) => void;
-    onSearch: () => void;
+    onSubmitSearch: React.Dispatch<React.SetStateAction<string>>;
+    searchFormText: string;
+    setSearchFormText: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function SearchScans(props: Props) {
     const {
-        onSearch,
-        searchField,
-        handleSearchFieldChange,
+        onSubmitSearch,
+        searchFormText,
+        setSearchFormText,
     } = props;
+
+    const onSearchValueChange = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => setSearchFormText(e.target.value), [],
+    );
 
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
-            onSearch();
+            onSubmitSearch(searchFormText);
         },
-        [onSearch],
+        [onSubmitSearch, searchFormText],
     );
 
     return (
@@ -35,13 +39,13 @@ function SearchScans(props: Props) {
                 <HStack spacing={0}>
                     <Input
                         id="searchField"
-                        onChange={handleSearchFieldChange}
+                        onChange={onSearchValueChange}
                         width="80%"
-                        placeholder="Enter atleast 2 characters"
+                        placeholder="Enter webpage or website name"
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
-                        value={searchField}
+                        value={searchFormText}
                     />
                     <Button
                         type="submit"

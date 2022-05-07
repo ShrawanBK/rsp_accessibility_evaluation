@@ -35,6 +35,8 @@ import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog'
 import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
+import Loading from '../../components/Loading';
+import { formatDateTime } from '../SavedScans/data';
 
 export interface BasicData {
     scanTime: string;
@@ -490,6 +492,15 @@ function ScannedWebsiteDetail() {
         () => (editableIssue ? onUpdateIssue : onSaveIssue),
         [editableIssue, onSaveIssue, onUpdateIssue],
     );
+    const scannedTime = useMemo(
+        () => {
+            if (!basicData) {
+                return undefined;
+            }
+            return formatDateTime(basicData.scanTime);
+        },
+        [basicData],
+    );
 
     const areYouSureMsg = `Are you sure you want to delete the occurence?${deletableOccurenceData?.issueDeletable ? 'This will delete the issue as well' : ''}`;
     return (
@@ -513,6 +524,7 @@ function ScannedWebsiteDetail() {
                     </>
                 )}
             />
+
             <HStack spacing={0}>
                 <Link to="/saved_scans">
                     <Text
@@ -538,10 +550,14 @@ function ScannedWebsiteDetail() {
                 role="heading"
             >
                 {basicData?.name}
-                {' '}
-                - Scan Detail
+                {basicData?.name && ' - '}
+                Scan Detail
                 <Divider />
             </Heading>
+
+            {processingUrl && !issuesShown && (
+                <Loading message="Waiting for data to load" />
+            )}
 
             {issuesShown && (
                 <Box
@@ -567,9 +583,14 @@ function ScannedWebsiteDetail() {
                                 {basicData?.url}
                             </Heading>
                             <Text>
-                                Website: Facebook |
+                                {/* FIXME: basicdata.name is not website name */}
+                                Website:
                                 {' '}
-                                {`Scanned on ${basicData?.scanTime}`}
+                                {basicData?.name}
+                                {' '}
+                                |
+                                {' '}
+                                {`Scanned on ${scannedTime}`}
                             </Text>
                         </VStack>
                         <Button

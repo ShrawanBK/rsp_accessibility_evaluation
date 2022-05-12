@@ -41,6 +41,7 @@ import apis from '../../utils/apis';
 import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import { formatDateTime } from '../SavedScans/data';
+import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -64,6 +65,8 @@ interface ScanWebsiteResponse {
     impactStatistics: ImpactStatistics[];
     foundStatistics: FoundStatistics[];
 }
+
+const scanBaseUrl = 'https://axe-playwright-nodejs.herokuapp.com';
 
 function ScanWebsite() {
     const [processingUrl, setProcessingUrl] = useBoolean();
@@ -90,47 +93,22 @@ function ScanWebsite() {
 
     const issuesShown = !urlInvalidStatus && issues && !processingUrl;
 
-    const impactLevelOptions = useMemo(() => {
-        if (!issues || issues.length <= 0) {
-            return [];
-        }
-        const possibleImpact: Impact[] = ['critical', 'minor', 'moderate', 'serious'];
-        const tmpImpact = [...issues].map((issue) => issue.impact);
+    const impactLevelOptions = useMemo(
+        () => getImpactLevelOptions(issues),
+        [issues],
+    );
 
-        return possibleImpact.map((impact) => {
-            const countImpact = tmpImpact.filter((tmp) => tmp === impact).length;
-            return {
-                label: `${impact} (${countImpact})`,
-                value: impact,
-            };
-        });
-    }, [issues]);
-
-    const criteriaOptions = useMemo(() => {
-        if (!issues || issues.length <= 0) {
-            return [];
-        }
-        const seen = new Set();
-
-        const tmpCriteria = [...issues].map((issue) => issue.criteria);
-        const flatTmpCriteria = tmpCriteria.flat();
-        const filteredCriteria = flatTmpCriteria.filter((c) => {
-            const duplicate = seen.has(c.name);
-            seen.add(c.name);
-            return !duplicate;
-        });
-        return filteredCriteria.map((item) => ({
-            label: item.name,
-            value: item.criteriaId,
-        }));
-    }, [issues]);
+    const criteriaOptions = useMemo(
+        () => getCriteriaOptions(issues),
+        [issues],
+    );
 
     const onScanWebpage = useCallback(
         async () => {
             try {
                 setProcessingUrl.on();
                 setUrlInvalidStatus.off();
-                const response = await axios.get(`http://localhost:8080/scan?url=${webpageUrl}`);
+                const response = await axios.get(`${scanBaseUrl}/scan?url=${webpageUrl}`);
                 const dataResponse: ScanWebsiteResponse = response.data;
                 if (!dataResponse) {
                     setProcessingUrl.off();

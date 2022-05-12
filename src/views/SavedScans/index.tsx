@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Divider,
@@ -24,6 +24,7 @@ import SearchScans from '../../components/forms/SearchScans';
 import SelectField from '../../components/SelectField';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
+import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
 
 const sortByOptions = [
     {
@@ -44,6 +45,17 @@ const sortByOptions = [
     },
 ];
 
+const orderOptions = [
+    {
+        label: 'Descending',
+        value: 'desc',
+    },
+    {
+        label: 'Ascending',
+        value: 'asc',
+    },
+];
+
 function SavedScan() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
     const [searchFormText, setSearchFormText] = useState('');
@@ -52,32 +64,38 @@ function SavedScan() {
     const [loadingScanList, setLoadingScanList] = useBoolean();
 
     const [sortBy, setSortBy] = useState<string>('scanTime');
+    const [order, setOrder] = useState<string>('desc');
     const [totalPages, setTotalPages] = useState<number>(1);
+    const [totalDataCount, setTotalDataCount] = useState<number>(0);
+
+    const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
     const getSavedScanList = useCallback(
         async () => {
             try {
+                const pageNumber = currentPageIndex + 1;
                 // TODO - Manage api calls and response properly
                 setLoadingScanList.on();
-                const apiUrl = `/webpage?sortBy=${sortBy}&searchField=${searchField}&orderBy=desc&pageNum=1&pageSize=10`;
-                console.log({ apiUrl });
+                const apiUrl = `/webpage?sortBy=${sortBy}&searchField=${searchField}&orderBy=${order}&pageNum=${pageNumber}&pageSize=10`;
                 const response = await apis.get(apiUrl);
                 const dataResponse: GetSavedScanResponse = await response.data;
 
                 const scanListResponse = dataResponse.data;
+
                 if (!scanListResponse || scanListResponse.length <= 0) {
                     setSavedScanList(undefined);
                     setLoadingScanList.off();
                     return;
                 }
-                // fix - TOTAL COUNT IS NOT TOTAL PAGES
-                setTotalPages(dataResponse.totalCount);
+                setTotalPages(dataResponse.lastPage);
+                setTotalDataCount(dataResponse.totalCount);
                 setSavedScanList(scanListResponse);
                 setLoadingScanList.off();
             } catch (error) {
                 console.warn({ error });
             }
         },
-        [searchField, setLoadingScanList, sortBy],
+        [searchField, setLoadingScanList, sortBy, order, currentPageIndex],
     );
 
     useEffect(() => {
@@ -101,8 +119,16 @@ function SavedScan() {
         [],
     );
 
+    const onSelectOrder = useCallback(
+        (value: string) => {
+            // Note - This is not working
+            setOrder(value);
+            // getSavedScanList();
+        },
+        [],
+    );
+
     const [deletableId, setDeletableId] = useState<string>();
-    const [currentPageIndex, setCurrentPageIndex] = useState(0);
 
     const resetButtonShown = searchField && (!savedScanList || savedScanList.length <= 0);
 
@@ -111,6 +137,26 @@ function SavedScan() {
         showToast,
         onCloseToast,
     } = useContext(ToastBoxContext);
+
+    useEffect(
+        () => {
+            if (toast) {
+                onCloseToast();
+            }
+        },
+        [onCloseToast, toast],
+    );
+
+    // NOTE - To show on pagination
+    const [listCountStart, listCountEnd] = useMemo(
+        () => {
+            const startCount = currentPageIndex * 10 + 1;
+            // eslint-disable-next-line max-len
+            const endCount = savedScanList ? savedScanList.length + currentPageIndex * 10 : startCount;
+            return [startCount, endCount];
+        },
+        [currentPageIndex, savedScanList],
+    );
 
     const onDeleteItem = useCallback(
         async () => {
@@ -122,9 +168,9 @@ function SavedScan() {
                 const deleteDataResponse: string = await response.data;
                 // FIX - Get appropriate response status from BE
                 if (deleteDataResponse === 'sucessfully deleted') {
-                    setSavedScanList((currentList) => (
-                        currentList?.filter((item) => item.id !== deletableId)
-                    ));
+                    // setSavedScanList((currentList) => (
+                    //     currentList?.filter((item) => item.id !== deletableId)
+                    // ));
 
                     // NOTE - MAKE IT ACCESSIBLE
                     const toastComponent = toast && toast({
@@ -146,6 +192,8 @@ function SavedScan() {
                     showToast(toastComponent);
 
                     setDeletableId(undefined);
+
+                    getSavedScanList();
                 } else {
                     // NOTE MAKE IT ACCESSIBLE
                     const toastComponent = toast && toast({
@@ -189,8 +237,25 @@ function SavedScan() {
                 showToast(toastComponent);
             }
         },
-        [deletableId, onCloseToast, showToast, toast],
+        [deletableId, onCloseToast, showToast, toast, getSavedScanList],
     );
+
+    const openDeleteRecordDialog = !!deletableId;
+
+    const onCloseDeleteRecordDialog = useCallback(
+        () => setDeletableId(undefined),
+        [setDeletableId],
+    );
+
+    const deletableItem = useMemo(() => {
+        if (!deletableId || !savedScanList) {
+            return undefined;
+        }
+        const item = [...savedScanList].find(
+            (scanItem) => scanItem.id === deletableId,
+        );
+        return item;
+    }, [savedScanList, deletableId]);
 
     return (
         <VStack
@@ -223,6 +288,19 @@ function SavedScan() {
                 </Flex>
             </Box>
             <Box background="white" p={8} borderWidth="1px" borderRadius="md">
+                <HStack mb={4} spacing={8}>
+                    <Heading as="h2" size="md">
+                        {`${savedScanList ? SavedScanList.length : ''} Result(s)`}
+                    </Heading>
+                    <Spacer />
+                    <Box minW="19%">
+                        <SelectField
+                            options={orderOptions}
+                            label="Order"
+                            onSelectOption={onSelectOrder}
+                        />
+                    </Box>
+                </HStack>
                 {loadingScanList && (
                     <Loading message="Waiting for Result" />
                 )}
@@ -233,35 +311,36 @@ function SavedScan() {
                         icon={<ScanAndAuditIcon />}
                     />
                 )}
-                {resetButtonShown && (
-                    <Center>
-                        <Button
-                            colorScheme="red"
-                            onClick={onResetSearchList}
-                            background="red.700"
-                            alignSelf="center"
-                            justifySelf="center"
-                        >
-                            Reset Search
-                        </Button>
-                    </Center>
-                )}
                 {savedScanList && savedScanList.length > 0 && (
                     <VStack align="stretch">
+                        {resetButtonShown && (
+                            <Center>
+                                <Button
+                                    colorScheme="red"
+                                    onClick={onResetSearchList}
+                                    background="red.700"
+                                    alignSelf="center"
+                                    justifySelf="center"
+                                >
+                                    Reset Search
+                                </Button>
+                            </Center>
+                        )}
                         <SavedScanList
                             columns={savedScanItemColumn}
                             data={savedScanList}
-                            numberOfRecords={savedScanList.length}
-                            deletableId={deletableId}
                             setDeletableId={setDeletableId}
-                            onDeleteItem={onDeleteItem}
                         />
                         <HStack justifyContent="flex-end">
-                            <Text>
-                                1 - 10 out of
-                                {' '}
-                                {savedScanList.length}
-                            </Text>
+                            {loadingScanList ? (
+                                <Text>
+                                    Loading Count..
+                                </Text>
+                            ) : (
+                                <Text>
+                                    {`${listCountStart} - ${listCountEnd} out of ${totalDataCount}`}
+                                </Text>
+                            )}
                             <Paginator
                                 pageIndex={currentPageIndex}
                                 totalPages={totalPages}
@@ -270,6 +349,27 @@ function SavedScan() {
                         </HStack>
                     </VStack>
                 )}
+
+                <DeleteConfirmationDialog
+                    open={openDeleteRecordDialog}
+                    onCancelDelete={onCloseDeleteRecordDialog}
+                    deletableItemId={deletableItem?.id}
+                    onDelete={onDeleteItem}
+                    header="Delete webpage"
+                    areYouSureMsg="Are you sure you want to delete the following webpage?"
+                    dialogBody={(
+                        <>
+                            <br />
+                            Webpage:
+                            {' '}
+                            {deletableItem?.name}
+                            <br />
+                            Website:
+                            {' '}
+                            {deletableItem?.website}
+                        </>
+                    )}
+                />
             </Box>
         </VStack>
     );

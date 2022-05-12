@@ -37,6 +37,7 @@ import apis from '../../utils/apis';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
 import { formatDateTime } from '../SavedScans/data';
+import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 
 export interface BasicData {
     scanTime: string;
@@ -77,41 +78,15 @@ function ScannedWebsiteDetail() {
 
     const issuesShown = issues && !processingUrl;
 
-    const impactLevelOptions = useMemo(() => {
-        if (!issues || issues.length <= 0) {
-            return [];
-        }
-        const possibleImpact: Impact[] = ['critical', 'minor', 'moderate', 'serious'];
-        const tmpImpact = [...issues].map((issue) => issue.impact);
+    const impactLevelOptions = useMemo(
+        () => getImpactLevelOptions(issues),
+        [issues],
+    );
 
-        return possibleImpact.map((impact) => {
-            const countImpact = tmpImpact.filter((tmp) => tmp === impact).length;
-            return {
-                label: `${impact} (${countImpact})`,
-                value: impact,
-            };
-        });
-    }, [issues]);
-
-    //  Fix - some criteria have different ids but same name
-    const criteriaOptions = useMemo(() => {
-        if (!issues || issues.length <= 0) {
-            return [];
-        }
-        const seen = new Set();
-
-        const tmpCriteria = [...issues].map((issue) => issue.criteria);
-        const flatTmpCriteria = tmpCriteria.flat();
-        const filteredCriteria = flatTmpCriteria.filter((c) => {
-            const duplicate = seen.has(c.criteriaId);
-            seen.add(c.criteriaId);
-            return !duplicate;
-        });
-        return filteredCriteria.map((item) => ({
-            label: item.name,
-            value: item.criteriaId,
-        }));
-    }, [issues]);
+    const criteriaOptions = useMemo(
+        () => getCriteriaOptions(issues),
+        [issues],
+    );
 
     useEffect(() => {
         const getWebpageDetail = async () => {
@@ -262,7 +237,9 @@ function ScannedWebsiteDetail() {
                     // NOTE - Delete the issue as well.
                     const apiUrl = `/issue?issueId=${deletableOccurenceData.issueId}&webpageId=${id}`;
                     const response = await apis.delete(apiUrl);
-                    if (response.data === 'successfully deleted') {
+                    const deleteResponse = await response.data;
+
+                    if (deleteResponse === 'successfully deleted') {
                         setIssues((prevIssues) => {
                             if (!prevIssues) {
                                 return undefined;
@@ -291,9 +268,11 @@ function ScannedWebsiteDetail() {
                     showToast(toastComponent);
                     setDeletableOccurenceData(undefined);
                 } else {
-                    const apiUrl = `/occurence?issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}&webpageId=${id}`;
+                    const apiUrl = `/occurence?webpageId=${id}&issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}`;
                     const response = await apis.delete(apiUrl);
-                    if (response.data === 'successfully deleted') {
+                    const deleteResponse = await response.data;
+                    console.log({ response });
+                    if (deleteResponse === 'successfully deleted') {
                         setIssues((prevIssues) => {
                             if (!prevIssues || prevIssues.length <= 0) {
                                 return undefined;
@@ -360,6 +339,8 @@ function ScannedWebsiteDetail() {
         [setModalOpened],
     );
 
+    console.log({ deletableOccurenceData });
+
     const onSaveIssue = useCallback(
         async (formData: IssueFormData) => {
             try {
@@ -376,6 +357,22 @@ function ScannedWebsiteDetail() {
                         return [...prevIssues, issueData];
                     });
                     setModalOpened.off();
+
+                    // NOTE - Update the manual count
+                    setFoundStatistics((prevStat) => {
+                        if (!prevStat) {
+                            return undefined;
+                        }
+                        return prevStat.map((stat) => {
+                            if (stat.found !== 'manual') {
+                                return stat;
+                            }
+                            return {
+                                ...stat,
+                                count: stat.count + 1,
+                            };
+                        });
+                    });
 
                     const successToastComponent = toast && toast({
                         status: 'success',
@@ -444,6 +441,7 @@ function ScannedWebsiteDetail() {
                         return updatedIssueList;
                     });
                     setModalOpened.off();
+
                     setEditableIssue(undefined);
                     const successToastComponent = toast && toast({
                         status: 'success',

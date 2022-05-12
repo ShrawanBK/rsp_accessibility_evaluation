@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CloseButton, HStack, VStack, Text, ToastOptions } from '@chakra-ui/react';
+import { CloseButton, HStack, VStack, Text, ToastOptions, Spacer } from '@chakra-ui/react';
 
 interface Props {
     onCloseToast: () => void;
@@ -13,9 +13,9 @@ interface Props {
 const backgroundColorOption = {
     default: 'white',
     success: 'green.600',
-    info: 'green.100',
-    error: 'red',
-    warning: 'blue',
+    info: 'cyan.900',
+    error: 'red.700',
+    warning: 'orange.500',
 };
 
 function ToastBox(props: Props) {
@@ -28,6 +28,8 @@ function ToastBox(props: Props) {
     } = props;
 
     const bgColor = backgroundColorOption[status];
+
+    const textColor = status === 'warning' ? 'black' : 'white';
 
     return (
         <HStack
@@ -44,16 +46,17 @@ function ToastBox(props: Props) {
         >
             <VStack alignItems="flex-start">
                 <Text
-                    color="white"
+                    color={textColor}
                     fontWeight="bold"
                 >
                     {title}
                 </Text>
-                <Text color="white">
+                <Text color={textColor}>
                     {description}
                 </Text>
                 {actionableView}
             </VStack>
+            <Spacer />
             <CloseButton
                 size="sm"
                 onClick={onCloseToast}

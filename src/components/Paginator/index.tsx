@@ -53,6 +53,7 @@ function Paginator(props: Props) {
         <Flex
             justifyContent="space-between"
             alignItems="center"
+            aria-hidden="true"
         >
             <IconButton
                 onClick={onResetPage}
@@ -60,6 +61,7 @@ function Paginator(props: Props) {
                 icon={<DoublePreviousArrowIcon />}
                 variant="outline"
                 disabled={previousArrowDisabled}
+                tabIndex={-1}
             />
             <IconButton
                 onClick={onDecrementPage}
@@ -67,6 +69,7 @@ function Paginator(props: Props) {
                 icon={<PreviousArrowIcon />}
                 variant="outline"
                 disabled={previousArrowDisabled}
+                tabIndex={-1}
             />
             <Box
                 as="span"
@@ -84,6 +87,7 @@ function Paginator(props: Props) {
                 icon={<NextArrowIcon />}
                 variant="outline"
                 disabled={nextArrowDisabled}
+                tabIndex={-1}
             />
             <IconButton
                 onClick={onSetMaxPage}
@@ -91,6 +95,7 @@ function Paginator(props: Props) {
                 icon={<DoubleNextArrowIcon />}
                 variant="outline"
                 disabled={nextArrowDisabled}
+                tabIndex={-1}
             />
         </Flex>
     );

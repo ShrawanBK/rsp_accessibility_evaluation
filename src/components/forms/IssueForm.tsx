@@ -238,7 +238,7 @@ function IssueForm(props: Props) {
                 />
                 <FormControl>
                     <FormLabel htmlFor="description">
-                        description *
+                        Description *
                     </FormLabel>
                     <Textarea
                         id="description"

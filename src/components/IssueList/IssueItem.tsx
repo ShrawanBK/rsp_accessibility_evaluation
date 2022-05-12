@@ -18,7 +18,7 @@ import {
     useBoolean,
 } from '@chakra-ui/react';
 
-import { IssueObject } from '../../views/ScanWebsite/data';
+import { IssueObject } from '../../typings/webpage';
 
 import Paginator from '../Paginator';
 

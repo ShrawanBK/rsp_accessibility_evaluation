@@ -27,8 +27,14 @@ import {
     FoundStatistics,
     Criteria,
     Impact,
-} from './data';
-import IssueForm, { IssueFormData } from '../../components/forms/IssueForm';
+    BasicData,
+    DeletableOccurenceData,
+    ScanWebsiteResponse,
+} from '../../typings/webpage';
+
+import IssueForm from '../../components/forms/IssueForm';
+import { IssueFormData } from '../../typings/forms';
+
 import EditableIssueList from '../../components/EditableIssueList';
 import NextArrowIcon from '../../components/icons/NextArrow';
 import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
@@ -36,30 +42,8 @@ import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
-import { formatDateTime } from '../SavedScans/data';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
-
-export interface BasicData {
-    scanTime: string;
-    url: string;
-    name: string;
-}
-
-export interface DeletableOccurenceData {
-    occurenceId: string;
-    issueId: string;
-    issueName: string;
-    issueDeletable: boolean;
-}
-
-interface ScannedWebsiteDetailResponse {
-    name: string;
-    url: string;
-    scanTime: string;
-    issues: IssueObject[];
-    impactStatistics: ImpactStatistics[];
-    foundStatistics: FoundStatistics[];
-}
+import { formatDateTime } from '../../utils/common';
 
 function ScannedWebsiteDetail() {
     const { id } = useParams();
@@ -93,7 +77,7 @@ function ScannedWebsiteDetail() {
             try {
                 setProcessingUrl.on();
                 const response = await apis.get(`/webpage/${id}`);
-                const dataResponse: ScannedWebsiteDetailResponse = response.data;
+                const dataResponse: ScanWebsiteResponse = response.data;
                 if (!dataResponse) {
                     setProcessingUrl.off();
                     return;
@@ -103,7 +87,7 @@ function ScannedWebsiteDetail() {
                 setFoundStatistics(dataResponse.foundStatistics);
                 // setSelectedIssueIds(undefined);
                 setBasicData({
-                    scanTime: dataResponse.scanTime,
+                    scantime: dataResponse.scanTime,
                     url: dataResponse.url,
                     name: dataResponse.name,
                 });
@@ -271,7 +255,6 @@ function ScannedWebsiteDetail() {
                     const apiUrl = `/occurence?webpageId=${id}&issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}`;
                     const response = await apis.delete(apiUrl);
                     const deleteResponse = await response.data;
-                    console.log({ response });
                     if (deleteResponse === 'successfully deleted') {
                         setIssues((prevIssues) => {
                             if (!prevIssues || prevIssues.length <= 0) {
@@ -338,8 +321,6 @@ function ScannedWebsiteDetail() {
         },
         [setModalOpened],
     );
-
-    console.log({ deletableOccurenceData });
 
     const onSaveIssue = useCallback(
         async (formData: IssueFormData) => {
@@ -495,7 +476,7 @@ function ScannedWebsiteDetail() {
             if (!basicData) {
                 return undefined;
             }
-            return formatDateTime(basicData.scanTime);
+            return formatDateTime(basicData.scantime);
         },
         [basicData],
     );

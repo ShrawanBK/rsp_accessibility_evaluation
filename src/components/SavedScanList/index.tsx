@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react';
 
 import SavedScansItemRow from './SavedScanItemRow';
-import { Column, SavedScanItem } from '../../views/SavedScans/data';
+import { Column, SavedScanItem } from '../../typings/savedscans';
 
 interface Props {
     columns: Column[];

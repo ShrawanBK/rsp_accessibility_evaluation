@@ -3,9 +3,8 @@ import React, { Dispatch, SetStateAction } from 'react';
 import { Box } from '@chakra-ui/react';
 
 import EditableIssueItem from './EditableIssueItem';
-import { IssueObject } from '../../views/ScanWebsite/data';
+import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
 import Placeholder from '../Placeholder';
-import { DeletableOccurenceData } from '../../views/ScannedWebsiteDetail';
 
 interface IssueListProps {
     issueList: IssueObject[] | undefined;

@@ -8,13 +8,9 @@ import {
     VStack,
     Textarea,
 } from '@chakra-ui/react';
-import { BasicData } from '../../views/ScanWebsite';
+import { BasicData } from '../../typings/webpage';
+import { SaveResultFormData } from '../../typings/forms';
 
-export interface SaveResultFormData {
-    websiteName: string;
-    webpageName: string;
-    note?: string;
-}
 interface Props {
     isLoading?: boolean;
     onSaveAction: (data: SaveResultFormData) => void;
@@ -96,13 +92,13 @@ function SaveResultForm(props: Props) {
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="scanTime">
+                    <FormLabel htmlFor="scantime">
                         Scan Time
                     </FormLabel>
                     <Input
-                        id="scanTime"
+                        id="scantime"
                         type="text"
-                        value={basicData?.scanTime ?? ''}
+                        value={basicData?.scantime ?? ''}
                         placeholder="Scan Time"
                         background="blackAlpha.300"
                         tabIndex={-1}

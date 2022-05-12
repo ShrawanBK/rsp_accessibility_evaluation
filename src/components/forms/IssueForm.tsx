@@ -12,22 +12,10 @@ import {
 import { MultiValue, OptionBase, Select } from 'chakra-react-select';
 
 import SelectField from '../SelectField';
-import { Criteria, Impact, IssueObject } from '../../views/ScannedWebsiteDetail/data';
-import { FoundType } from '../../views/ScanWebsite/data';
-
-export interface IssueFormData {
-    name: string;
-    impact: Impact;
-    found: FoundType;
-    note?: string;
-    occurences: {
-        description: string;
-    }[];
-    criteria: Criteria[];
-}
+import { Criteria, Impact, IssueObject, FoundType } from '../../typings/webpage';
+import { IssueFormData } from '../../typings/forms';
 
 interface Props {
-    isLoading?: boolean;
     onSaveAction: (formData: IssueFormData) => void;
     onCloseAction: (() => void) | undefined;
     editableIssue: IssueObject | undefined;
@@ -52,7 +40,6 @@ interface MultiCriteriaOption extends OptionBase {
 
 function IssueForm(props: Props) {
     const {
-        isLoading,
         onSaveAction,
         onCloseAction,
         editableIssue,

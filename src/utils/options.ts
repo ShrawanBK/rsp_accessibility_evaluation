@@ -1,5 +1,4 @@
-import { IssueObject } from '../views/ScannedWebsiteDetail/data';
-import { Impact } from '../views/ScanWebsite/data';
+import { IssueObject, Impact } from '../typings/webpage';
 
 export const getCriteriaOptions = (issues: IssueObject[] | undefined) => {
     if (!issues || issues.length <= 0) {
@@ -25,12 +24,21 @@ export const getImpactLevelOptions = (issues: IssueObject[] | undefined) => {
         return [];
     }
     const possibleImpact: Impact[] = ['critical', 'minor', 'moderate', 'serious'];
-    const tmpImpact = [...issues].map((issue) => issue.impact);
-
+    const tmpImpact = [...issues].map((issue) => ({
+        impact: issue.impact,
+        count: issue.occurences.length,
+    }));
     return possibleImpact.map((impact) => {
-        const countImpact = tmpImpact.filter((tmp) => tmp === impact).length;
+        // const countImpact = tmpImpact.filter((tmp) => tmp.impact === impact).length;
+        const indImpacts = tmpImpact.filter((tmp) => tmp.impact === impact);
+        const countIndImpact = 0;
+        const sumCount = indImpacts.reduce(
+            (prevValue, currentValue) => prevValue + currentValue.count,
+            countIndImpact,
+        );
         return {
-            label: `${impact} (${countImpact})`,
+            // Capitalize first letter of impact
+            label: `${impact.charAt(0).toUpperCase() + impact.slice(1)} (${sumCount})`,
             value: impact,
         };
     });

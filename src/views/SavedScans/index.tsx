@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
     Box,
     Divider,
@@ -17,7 +17,7 @@ import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import Info from '../../components/Info';
 import Paginator from '../../components/Paginator';
 import SavedScanList from '../../components/SavedScanList';
-import { GetSavedScanResponse, SavedScanItem, savedScanItemColumn } from './data';
+import { savedScanItemColumn, sortByOptions, orderOptions } from './constant';
 import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
 import SearchScans from '../../components/forms/SearchScans';
@@ -25,45 +25,16 @@ import SelectField from '../../components/SelectField';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
 import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
+import { GetSavedScanResponse, SavedScanItem } from '../../typings/savedscans';
 
-const sortByOptions = [
-    {
-        label: 'Scan Time',
-        value: 'scanTime',
-    },
-    {
-        label: 'Webpage',
-        value: 'name',
-    },
-    {
-        label: 'Website',
-        value: 'website',
-    },
-    {
-        label: 'URL',
-        value: 'url',
-    },
-];
-
-const orderOptions = [
-    {
-        label: 'Descending',
-        value: 'desc',
-    },
-    {
-        label: 'Ascending',
-        value: 'asc',
-    },
-];
-
-function SavedScan() {
+function SavedScans() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
     const [searchFormText, setSearchFormText] = useState('');
 
     const [searchField, setSearchField] = useState<string>('');
     const [loadingScanList, setLoadingScanList] = useBoolean();
 
-    const [sortBy, setSortBy] = useState<string>('scanTime');
+    const [sortBy, setSortBy] = useState<string>('scantime');
     const [order, setOrder] = useState<string>('desc');
     const [totalPages, setTotalPages] = useState<number>(1);
     const [totalDataCount, setTotalDataCount] = useState<number>(0);
@@ -375,4 +346,4 @@ function SavedScan() {
     );
 }
 
-export default SavedScan;
+export default SavedScans;

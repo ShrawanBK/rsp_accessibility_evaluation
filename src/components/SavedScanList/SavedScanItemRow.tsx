@@ -8,7 +8,8 @@ import {
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 
-import { formatDateTime, SavedScanItem } from '../../views/SavedScans/data';
+import { formatDateTime } from '../../utils/common';
+import { SavedScanItem } from '../../typings/savedscans';
 
 export interface Props {
     setDeletableId: React.Dispatch<React.SetStateAction<string | undefined>>;

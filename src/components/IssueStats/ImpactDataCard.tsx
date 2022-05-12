@@ -10,7 +10,7 @@ import Placeholder from '../Placeholder';
 
 import {
     ImpactStatistics,
-} from '../../views/ScanWebsite/data';
+} from '../../typings/webpage';
 
 export interface Props {
     impactStatistics: ImpactStatistics[] | undefined;

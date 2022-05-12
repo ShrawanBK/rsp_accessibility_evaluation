@@ -1,4 +1,11 @@
-import React, { ChangeEvent, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+    ChangeEvent,
+    useCallback,
+    useContext,
+    useMemo,
+    useState,
+} from 'react';
+
 import {
     Box,
     Button,
@@ -35,13 +42,18 @@ import {
     FoundStatistics,
     Criteria,
     Impact,
-} from './data';
-import SaveResultForm, { SaveResultFormData } from '../../components/forms/SaveResult';
+    BasicData,
+    ScanWebsiteResponse,
+} from '../../typings/webpage';
+
+import SaveResultForm from '../../components/forms/SaveResult';
+import { SaveResultFormData } from '../../typings/forms';
+
 import apis from '../../utils/apis';
 import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
-import { formatDateTime } from '../SavedScans/data';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
+import { formatDateTime } from '../../utils/common';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -50,21 +62,6 @@ const getBaseUrl = (url: string) => {
     }
     return matchedUrl[0];
 };
-
-export interface BasicData {
-    scanTime: string;
-    url: string;
-    name: string;
-}
-
-interface ScanWebsiteResponse {
-    name: string;
-    url: string;
-    scanTime: string;
-    issues: IssueObject[];
-    impactStatistics: ImpactStatistics[];
-    foundStatistics: FoundStatistics[];
-}
 
 const scanBaseUrl = 'https://axe-playwright-nodejs.herokuapp.com';
 
@@ -114,12 +111,13 @@ function ScanWebsite() {
                     setProcessingUrl.off();
                     return;
                 }
+
                 setIssues(dataResponse.issues);
                 setImpactStatistics(dataResponse.impactStatistics);
                 setFoundStatistics(dataResponse.foundStatistics);
                 setSelectedIssueIds(undefined);
                 setBasicData({
-                    scanTime: dataResponse.scanTime,
+                    scantime: dataResponse.scanTime,
                     url: dataResponse.url,
                     name: dataResponse.name,
                 });
@@ -289,7 +287,7 @@ function ScanWebsite() {
                     // TODO : Fix the name here
                     name: formData.webpageName,
                     url: basicData.url,
-                    scanTime: basicData.scanTime,
+                    scantime: basicData.scantime,
                     note: formData.note,
                     website: {
                         name: formData.websiteName,
@@ -386,7 +384,7 @@ function ScanWebsite() {
             if (!basicData) {
                 return formatDateTime(new Date().toISOString());
             }
-            return formatDateTime(basicData.scanTime);
+            return formatDateTime(basicData.scantime);
         },
         [basicData],
     );

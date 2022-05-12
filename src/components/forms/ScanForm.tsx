@@ -7,8 +7,6 @@ import {
     HStack,
 } from '@chakra-ui/react';
 
-import './styles.css';
-
 interface Props {
     processingUrl: boolean;
     onScanWebpage: () => void;

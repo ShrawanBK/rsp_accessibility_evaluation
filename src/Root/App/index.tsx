@@ -4,10 +4,10 @@ import { Route, Routes } from 'react-router-dom';
 import { Box, ChakraProvider, Flex, extendTheme } from '@chakra-ui/react';
 
 import Sidebar from '../../components/Sidebar';
-import ScanWebsite from '../../views/ScanWebsite';
+import ScanWebpage from '../../views/ScanWebpage';
 import Fonts from './Fonts';
-import SavedScan from '../../views/SavedScans';
-import ScannedWebsiteDetail from '../../views/ScannedWebsiteDetail';
+import SavedScans from '../../views/SavedScans';
+import ScannedWebpageDetail from '../../views/ScannedWebpageDetail';
 import ToastBoxContextProvider from '../../contexts/ToastBoxContext';
 
 const theme = extendTheme({
@@ -42,9 +42,9 @@ function App() {
                     </Box>
                     <Box p={8} flex={1} background="#fbfcfd">
                         <Routes>
-                            <Route path="/" element={<ScanWebsite />} />
-                            <Route path="/saved_scans" element={<SavedScan />} />
-                            <Route path="/saved_scans/:id" element={<ScannedWebsiteDetail />} />
+                            <Route path="/" element={<ScanWebpage />} />
+                            <Route path="/saved_scans" element={<SavedScans />} />
+                            <Route path="/saved_scans/:id" element={<ScannedWebpageDetail />} />
                         </Routes>
                     </Box>
                 </Flex>

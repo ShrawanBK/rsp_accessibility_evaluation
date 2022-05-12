@@ -7,7 +7,7 @@ import {
     Spacer,
 } from '@chakra-ui/react';
 
-import { FoundStatistics } from '../../views/ScanWebsite/data';
+import { FoundStatistics } from '../../typings/webpage';
 
 export interface Props {
     foundStatistics: FoundStatistics[] | undefined;

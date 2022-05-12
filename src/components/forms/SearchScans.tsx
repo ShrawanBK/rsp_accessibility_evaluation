@@ -1,3 +1,5 @@
+import React, { ChangeEvent, useCallback } from 'react';
+
 import {
     Button,
     FormControl,
@@ -5,7 +7,6 @@ import {
     HStack,
     Input,
 } from '@chakra-ui/react';
-import React, { ChangeEvent, useCallback } from 'react';
 
 interface Props {
     onSubmitSearch: React.Dispatch<React.SetStateAction<string>>;
@@ -21,7 +22,8 @@ function SearchScans(props: Props) {
     } = props;
 
     const onSearchValueChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => setSearchFormText(e.target.value), [],
+        (e: ChangeEvent<HTMLInputElement>) => setSearchFormText(e.target.value),
+        [setSearchFormText],
     );
 
     const handleSubmit = useCallback(

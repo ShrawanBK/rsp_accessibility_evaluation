@@ -24,13 +24,11 @@ import {
     Button,
 } from '@chakra-ui/react';
 
-import { IssueObject } from '../../views/ScanWebsite/data';
-
 import Paginator from '../Paginator';
-import { DeletableOccurenceData } from '../../views/ScannedWebsiteDetail';
+
+import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
 
 interface IssueListProps {
-    // Make this compulsory
     issue: IssueObject;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
     onSetEditableIssue: (issueItem: IssueObject) => void;

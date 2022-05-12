@@ -14,7 +14,7 @@ import ImpactDataCard from './ImpactDataCard';
 import {
     FoundStatistics,
     ImpactStatistics,
-} from '../../views/ScanWebsite/data';
+} from '../../typings/webpage';
 
 export interface IssueStatsProps {
     impactStatistics: ImpactStatistics[] | undefined;

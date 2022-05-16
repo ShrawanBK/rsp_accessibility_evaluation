@@ -212,27 +212,33 @@ function ScannedWebsiteDetail() {
 
     const onDeleteOccurence = useCallback(
         async () => {
+            if (!deletableOccurenceData) {
+                return;
+            }
             try {
-                if (!deletableOccurenceData) {
-                    return;
-                }
-
-                if (deletableOccurenceData.issueDeletable) {
-                    // NOTE - Delete the issue as well.
-                    const apiUrl = `/issue?issueId=${deletableOccurenceData.issueId}&webpageId=${id}`;
-                    const response = await apis.delete(apiUrl);
-                    const deleteResponse = await response.data;
-
-                    if (deleteResponse === 'successfully deleted') {
-                        setIssues((prevIssues) => {
-                            if (!prevIssues) {
-                                return undefined;
+                const apiUrl = `/occurence?webpageId=${id}&issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}`;
+                const response = await apis.delete(apiUrl);
+                const deleteResponse = await response.data;
+                if (deleteResponse === 'successfully deleted') {
+                    setIssues((prevIssues) => {
+                        if (!prevIssues || prevIssues.length <= 0) {
+                            return undefined;
+                        }
+                        const tmpIssueList = [...prevIssues];
+                        const updatedIssueList = tmpIssueList.map((issueItem) => {
+                            if (issueItem.issueId !== deletableOccurenceData.issueId) {
+                                return issueItem;
                             }
-                            return [...prevIssues].filter(
-                                (issue) => issue.issueId !== deletableOccurenceData.issueId,
-                            );
+                            return {
+                                ...issueItem,
+                                occurences: issueItem.occurences.filter(
+                                    (o) => o.occurenceId !== deletableOccurenceData.occurenceId,
+                                ),
+                            };
                         });
-                    }
+                        return updatedIssueList;
+                    });
+
                     const toastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
@@ -251,50 +257,54 @@ function ScannedWebsiteDetail() {
                     });
                     showToast(toastComponent);
                     setDeletableOccurenceData(undefined);
-                } else {
-                    const apiUrl = `/occurence?webpageId=${id}&issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}`;
-                    const response = await apis.delete(apiUrl);
-                    const deleteResponse = await response.data;
-                    if (deleteResponse === 'successfully deleted') {
-                        setIssues((prevIssues) => {
-                            if (!prevIssues || prevIssues.length <= 0) {
-                                return undefined;
-                            }
-                            const tmpIssueList = [...prevIssues];
-                            const updatedIssueList = tmpIssueList.map((issueItem) => {
-                                if (issueItem.issueId !== deletableOccurenceData.issueId) {
-                                    return issueItem;
-                                }
-                                return {
-                                    ...issueItem,
-                                    occurence: issueItem.occurences.filter(
-                                        (o) => o.occurenceId !== deletableOccurenceData.occurenceId,
-                                    ),
-                                } as IssueObject;
-                            });
-                            return updatedIssueList;
-                        });
-
-                        const toastComponent = toast && toast({
-                            status: 'success',
-                            isClosable: true,
-                            variant: 'subtle',
-                            id: deletableOccurenceData.occurenceId,
-                            duration: null,
-                            position: 'top',
-                            render: () => (
-                                <ToastBox
-                                    onCloseToast={onCloseToast}
-                                    title="Delete Success"
-                                    description={`Issue - ${deletableOccurenceData.issueName} deleted successfully`}
-                                    status="success"
-                                />
-                            ),
-                        });
-                        showToast(toastComponent);
-                        setDeletableOccurenceData(undefined);
-                    }
                 }
+            } catch (onDeleteOccurenceError) {
+                console.warn({ onDeleteOccurenceError });
+            }
+        },
+        [deletableOccurenceData, id, onCloseToast, showToast, toast],
+    );
+
+    const onDeleteIssue = useCallback(
+        async () => {
+            try {
+                if (!deletableOccurenceData) {
+                    return;
+                }
+
+                // NOTE - Delete the issue as well.
+                const apiUrl = `/issue?issueId=${deletableOccurenceData.issueId}&webpageId=${id}`;
+                const response = await apis.delete(apiUrl);
+                const deleteResponse = await response.data;
+
+                if (deleteResponse === 'successfully deleted') {
+                    setIssues((prevIssues) => {
+                        if (!prevIssues) {
+                            return undefined;
+                        }
+                        return [...prevIssues].filter(
+                            (issue) => issue.issueId !== deletableOccurenceData.issueId,
+                        );
+                    });
+                }
+                const toastComponent = toast && toast({
+                    status: 'success',
+                    isClosable: true,
+                    variant: 'subtle',
+                    id: deletableOccurenceData.occurenceId,
+                    duration: null,
+                    position: 'top',
+                    render: () => (
+                        <ToastBox
+                            onCloseToast={onCloseToast}
+                            title="Delete Success"
+                            description={`Issue - ${deletableOccurenceData.issueName} deleted successfully`}
+                            status="success"
+                        />
+                    ),
+                });
+                showToast(toastComponent);
+                setDeletableOccurenceData(undefined);
             } catch (onDeleteOccurenceError) {
                 console.warn({ onDeleteOccurenceError });
             }
@@ -471,6 +481,7 @@ function ScannedWebsiteDetail() {
         () => (editableIssue ? onUpdateIssue : onSaveIssue),
         [editableIssue, onSaveIssue, onUpdateIssue],
     );
+
     const scannedTime = useMemo(
         () => {
             if (!basicData) {
@@ -493,7 +504,8 @@ function ScannedWebsiteDetail() {
                 open={openDeleteOccurenceDialog}
                 onCancelDelete={onCancelDeleteOccurence}
                 deletableItemId={deletableOccurenceData?.occurenceId}
-                onDelete={onDeleteOccurence}
+                onDelete={deletableOccurenceData?.issueDeletable
+                    ? onDeleteIssue : onDeleteOccurence}
                 header="Delete Issue"
                 areYouSureMsg={areYouSureMsg}
                 dialogBody={(
@@ -615,7 +627,7 @@ function ScannedWebsiteDetail() {
                             <ModalBody tabIndex={-1}>
                                 <IssueForm
                                     onSaveAction={onSaveAction}
-                                    onCloseAction={setModalOpened.off}
+                                    onCloseAction={onResetEditableIssue}
                                     editableIssue={editableIssue}
                                     onResetEditableIssue={onResetEditableIssue}
                                     criteriaListForForm={criteriaListForForm}

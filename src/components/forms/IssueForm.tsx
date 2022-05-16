@@ -80,6 +80,7 @@ function IssueForm(props: Props) {
                     ...criteria,
                     label: criteria.name,
                     value: criteria.criteriaId,
+                    isFixed: !!editableIssue,
                 }),
             );
             setSelectedCriteria(formMappedSelectedCriteria);
@@ -117,9 +118,10 @@ function IssueForm(props: Props) {
                 note: criteria.note,
                 criteriaId: criteria.criteriaId,
                 name: criteria.name,
+                isFixed: !!editableIssue,
             }));
         },
-        [criteriaListForForm],
+        [criteriaListForForm, editableIssue],
     );
 
     const formattedSelectedCriteria = useMemo(

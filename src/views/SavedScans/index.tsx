@@ -83,18 +83,14 @@ function SavedScans() {
 
     const onSelectSortBy = useCallback(
         (value: string) => {
-            // Note - This is not working
             setSortBy(value);
-            // getSavedScanList();
         },
         [],
     );
 
     const onSelectOrder = useCallback(
         (value: string) => {
-            // Note - This is not working
             setOrder(value);
-            // getSavedScanList();
         },
         [],
     );
@@ -109,6 +105,7 @@ function SavedScans() {
         onCloseToast,
     } = useContext(ToastBoxContext);
 
+    // close toast message if open
     useEffect(
         () => {
             if (toast) {

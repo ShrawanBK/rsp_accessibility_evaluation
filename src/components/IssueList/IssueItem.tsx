@@ -21,6 +21,7 @@ import {
 import { IssueObject } from '../../typings/webpage';
 
 import Paginator from '../Paginator';
+import { getWcagCriteriaAndTags } from '../../utils/issues';
 
 interface IssueListProps {
     issue: IssueObject;
@@ -59,14 +60,9 @@ function IssueItem(props: IssueListProps) {
         [issue.name, onUpdateSelectedIssue],
     );
 
-    const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
-        [issue.criteria],
-    );
-
-    const tags = useMemo(
-        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
-        [issue.criteria],
+    const [wcagCriteria, tags] = useMemo(
+        () => getWcagCriteriaAndTags(issue),
+        [issue],
     );
 
     if (!currentOccurence) {

@@ -2,6 +2,7 @@ import React, {
     ChangeEvent,
     useCallback,
     useContext,
+    useEffect,
     useMemo,
     useState,
 } from 'react';
@@ -54,6 +55,7 @@ import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 import { formatDateTime } from '../../utils/common';
+import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -133,79 +135,28 @@ function ScanWebsite() {
     );
 
     const onSelectFilterableImpactLevel = useCallback(
-        (value: string) => {
-            if (value === '') {
-                setFilterableImpactLevel(undefined);
-                return;
-            }
-            setFilterableImpactLevel(value as Impact);
-        },
+        (value: string) => setFilterableImpactLevel(
+            value === '' ? undefined : value as Impact,
+        ),
         [],
     );
 
     const onSelectFilterableCriteria = useCallback(
-        (value: string) => {
-            if (value === '') {
-                setFilterableCriteria(undefined);
-                return;
-            }
-            setFilterableCriteria(value);
-        },
+        (value: string) => setFilterableCriteria(value === '' ? undefined : value),
         [],
     );
 
-    const filteredIssues = useMemo(() => {
-        if (!issues || issues.length === 0) {
-            return issues;
-        }
-
-        const tmpIssues = [...issues];
-        if (!filterableImpactLevel && !filterableCriteria) {
-            return tmpIssues;
-        }
-        if (filterableImpactLevel && !filterableCriteria) {
-            const filteredIssueByImpact = tmpIssues.filter(
-                (issue) => issue.impact === filterableImpactLevel,
-            );
-            return filteredIssueByImpact;
-        }
-        if (!filterableImpactLevel && filterableCriteria) {
-            const filteredIssueByCriteria = tmpIssues.filter((issue) => {
-                const issueCriteriaIds = issue.criteria.map((c) => c.name);
-                const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
-
-                if (criteriaIndex < 0) {
-                    return undefined;
-                }
-
-                return issue;
-            });
-            return filteredIssueByCriteria.filter((issue) => !!issue);
-        }
-
-        const filteredIssueByImpact = tmpIssues.filter(
-            (issue) => issue.impact === filterableImpactLevel,
-        );
-        const filteredIssueByCriteria = filteredIssueByImpact.filter((issue) => {
-            const issueCriteriaIds = issue.criteria.map((c) => c.name);
-            const criteriaIndex = issueCriteriaIds.findIndex((id) => id === filterableCriteria);
-            if (criteriaIndex < 0) {
-                return undefined;
-            }
-            return issue;
-        });
-        return filteredIssueByCriteria.filter((issue) => !!issue);
-    }, [filterableCriteria, filterableImpactLevel, issues]);
+    const filteredIssues = useMemo(
+        () => getFilteredIssues(
+            issues,
+            filterableImpactLevel,
+            filterableCriteria,
+        ),
+        [issues, filterableCriteria, filterableImpactLevel],
+    );
 
     const totalIssuesCount = useMemo(
-        () => {
-            if (!impactStatistics) {
-                return undefined;
-            }
-            const countArray = [...impactStatistics].map((i) => i.count);
-            const sum = countArray.reduce((a, b) => a + b);
-            return sum;
-        },
+        () => getTotalIssuesCount(impactStatistics),
         [impactStatistics],
     );
 
@@ -266,6 +217,16 @@ function ScanWebsite() {
         showToast,
         onCloseToast,
     } = useContext(ToastBoxContext);
+
+    // close toast message if open
+    useEffect(
+        () => {
+            if (toast) {
+                onCloseToast();
+            }
+        },
+        [onCloseToast, toast],
+    );
 
     const navigate = useNavigate();
 
@@ -381,10 +342,8 @@ function ScanWebsite() {
 
     const scannedTime = useMemo(
         () => {
-            if (!basicData) {
-                return formatDateTime(new Date().toISOString());
-            }
-            return formatDateTime(basicData.scantime);
+            const dateString = basicData ? basicData.scantime : new Date().toISOString();
+            return formatDateTime(dateString);
         },
         [basicData],
     );

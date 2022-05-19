@@ -27,6 +27,7 @@ import {
 import Paginator from '../Paginator';
 
 import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
+import { getWcagCriteriaAndTags } from '../../utils/issues';
 
 interface IssueListProps {
     issue: IssueObject;
@@ -47,14 +48,9 @@ function EditableIssueItem(props: IssueListProps) {
 
     const currentOccurence = issue.occurences[currentOccurenceIndex];
 
-    const wcagCriteria = useMemo(
-        () => issue.criteria.filter((c) => c.criteriaId.toLowerCase().startsWith('wcag')),
-        [issue.criteria],
-    );
-
-    const tags = useMemo(
-        () => issue.criteria.filter((c) => !c.criteriaId.toLowerCase().startsWith('wcag')),
-        [issue.criteria],
+    const [wcagCriteria, tags] = useMemo(
+        () => getWcagCriteriaAndTags(issue),
+        [issue],
     );
 
     const onClickDelete = useCallback(
@@ -315,7 +311,7 @@ function EditableIssueItem(props: IssueListProps) {
                                 </Text>
                             </VStack>
                         )}
-                        {currentOccurence.note && (
+                        {issue.note && (
                             <VStack
                                 alignItems="baseline"
                                 spacing={2}
@@ -329,7 +325,7 @@ function EditableIssueItem(props: IssueListProps) {
                                     Note
                                 </Heading>
                                 <Text>
-                                    {currentOccurence.note}
+                                    {issue.note}
                                 </Text>
                             </VStack>
                         )}

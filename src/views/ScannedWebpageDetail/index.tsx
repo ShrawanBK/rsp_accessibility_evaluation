@@ -44,6 +44,7 @@ import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 import { formatDateTime } from '../../utils/common';
+import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
 
 function ScannedWebsiteDetail() {
     const { id } = useParams();
@@ -117,83 +118,28 @@ function ScannedWebsiteDetail() {
     }, []);
 
     const onSelectFilterableImpactLevel = useCallback(
-        (value: string) => {
-            if (value === '') {
-                setFilterableImpactLevel(undefined);
-                return;
-            }
-            setFilterableImpactLevel(value as Impact);
-        },
+        (value: string) => setFilterableImpactLevel(
+            value === '' ? undefined : value as Impact,
+        ),
         [],
     );
 
     const onSelectFilterableCriteria = useCallback(
-        (value: string) => {
-            if (value === '') {
-                setFilterableCriteria(undefined);
-                return;
-            }
-            setFilterableCriteria(value ?? undefined);
-        },
+        (value: string) => setFilterableCriteria(value === '' ? undefined : value),
         [],
     );
 
-    const filteredIssues = useMemo(() => {
-        if (!issues || issues.length === 0) {
-            return issues;
-        }
-
-        // remove the issue of there is no occurence.
-        const tmpIssues = [...issues].filter((item) => item.occurences.length > 0);
-
-        if (!filterableImpactLevel && !filterableCriteria) {
-            return tmpIssues;
-        }
-        if (filterableImpactLevel && !filterableCriteria) {
-            const filteredIssueByImpact = tmpIssues.filter(
-                (issue) => issue.impact === filterableImpactLevel,
-            );
-            return filteredIssueByImpact;
-        }
-        if (!filterableImpactLevel && filterableCriteria) {
-            const filteredIssueByCriteria = tmpIssues.filter((issue) => {
-                const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
-                const criteriaIndex = issueCriteriaIds.findIndex(
-                    (cid) => cid === filterableCriteria,
-                );
-
-                if (criteriaIndex < 0) {
-                    return undefined;
-                }
-
-                return issue;
-            });
-            return filteredIssueByCriteria.filter((issue) => !!issue);
-        }
-
-        const filteredIssueByImpact = tmpIssues.filter(
-            (issue) => issue.impact === filterableImpactLevel,
-        );
-        const filteredIssueByCriteria = filteredIssueByImpact.filter((issue) => {
-            const issueCriteriaIds = issue.criteria.map((c) => c.criteriaId);
-            const criteriaIndex = issueCriteriaIds.findIndex((cid) => cid === filterableCriteria);
-            if (criteriaIndex < 0) {
-                return undefined;
-            }
-            return issue;
-        });
-        return filteredIssueByCriteria.filter((issue) => !!issue);
-    }, [filterableCriteria, filterableImpactLevel, issues]);
+    const filteredIssues = useMemo(
+        () => getFilteredIssues(
+            issues,
+            filterableImpactLevel,
+            filterableCriteria,
+        ),
+        [issues, filterableCriteria, filterableImpactLevel],
+    );
 
     const totalIssuesCount = useMemo(
-        () => {
-            if (!impactStatistics) {
-                return undefined;
-            }
-            const countArray = [...impactStatistics].map((i) => i.count);
-            const sum = countArray.reduce((a, b) => a + b);
-            return sum;
-        },
+        () => getTotalIssuesCount(impactStatistics),
         [impactStatistics],
     );
 
@@ -204,6 +150,16 @@ function ScannedWebsiteDetail() {
         showToast,
         onCloseToast,
     } = useContext(ToastBoxContext);
+
+    // close toast message if open
+    useEffect(
+        () => {
+            if (toast) {
+                onCloseToast();
+            }
+        },
+        [onCloseToast, toast],
+    );
 
     const onCancelDeleteOccurence = useCallback(
         () => setDeletableOccurenceData(undefined),
@@ -484,15 +440,14 @@ function ScannedWebsiteDetail() {
 
     const scannedTime = useMemo(
         () => {
-            if (!basicData) {
-                return undefined;
-            }
-            return formatDateTime(basicData.scantime);
+            const dateString = basicData ? basicData.scantime : new Date().toISOString();
+            return formatDateTime(dateString);
         },
         [basicData],
     );
 
     const areYouSureMsg = `Are you sure you want to delete the occurence?${deletableOccurenceData?.issueDeletable ? 'This will delete the issue as well' : ''}`;
+
     return (
         <VStack
             align="stretch"
@@ -575,13 +530,7 @@ function ScannedWebsiteDetail() {
                             </Heading>
                             <Text>
                                 {/* FIXME: basicdata.name is not website name */}
-                                Website:
-                                {' '}
-                                {basicData?.name}
-                                {' '}
-                                |
-                                {' '}
-                                {`Scanned on ${scannedTime}`}
+                                {`Website: ${basicData?.name} | Scanned on ${scannedTime}`}
                             </Text>
                         </VStack>
                         <Button

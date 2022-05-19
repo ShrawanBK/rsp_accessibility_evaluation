@@ -24,6 +24,7 @@ function ImpactDataCard(props: Props) {
     if (!impactStatistics || impactStatistics.length <= 0) {
         return <Placeholder />;
     }
+
     return (
         <Grid
             p={2}

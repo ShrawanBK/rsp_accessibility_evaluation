@@ -15,7 +15,7 @@ export const getCriteriaOptions = (issues: IssueObject[] | undefined) => {
     });
     return filteredCriteria.map((item) => ({
         label: item.name,
-        value: item.criteriaId,
+        value: item.name,
     }));
 };
 

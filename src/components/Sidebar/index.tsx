@@ -45,11 +45,18 @@ function Sidebar() {
             spacing={4}
             role="complementary"
         >
-            <Image
-                src={logoPath}
-                alt="logo"
-                role="img"
-            />
+            <NavLink
+                to="/"
+                aria-label="logo"
+                tabIndex={-1}
+            >
+                <Image
+                    src={logoPath}
+                    alt="logo"
+                    role="img"
+                />
+            </NavLink>
+
             <Heading
                 as="h1"
                 size="md"

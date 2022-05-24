@@ -126,33 +126,39 @@ function SavedScans() {
         [currentPageIndex, savedScanList],
     );
 
+    const deletableItem = useMemo(() => {
+        if (!deletableId || !savedScanList) {
+            return undefined;
+        }
+        const item = [...savedScanList].find(
+            (scanItem) => scanItem.id === deletableId,
+        );
+        return item;
+    }, [savedScanList, deletableId]);
+
     const onDeleteItem = useCallback(
         async () => {
             try {
-                if (!deletableId) {
+                if (!deletableItem) {
                     return;
                 }
-                const response = await apis.delete(`/webpage/${deletableId}`);
+                const response = await apis.delete(`/webpage/${deletableItem.id}`);
                 const deleteDataResponse: string = await response.data;
                 // FIX - Get appropriate response status from BE
                 if (deleteDataResponse === 'sucessfully deleted') {
-                    // setSavedScanList((currentList) => (
-                    //     currentList?.filter((item) => item.id !== deletableId)
-                    // ));
-
                     // NOTE - MAKE IT ACCESSIBLE
                     const toastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
                         variant: 'subtle',
-                        id: deletableId,
+                        id: deletableItem.id,
                         duration: null,
                         position: 'top',
                         render: () => (
                             <ToastBox
                                 onCloseToast={onCloseToast}
                                 title="Delete Success"
-                                description={`Webpage - ${deletableId} deleted successfully`}
+                                description={`Webpage - '${deletableItem.name}' deleted successfully`}
                                 status="success"
                             />
                         ),
@@ -168,14 +174,14 @@ function SavedScans() {
                         status: 'error',
                         isClosable: true,
                         variant: 'subtle',
-                        id: deletableId,
+                        id: deletableItem.id,
                         duration: null,
                         position: 'top',
                         render: () => (
                             <ToastBox
                                 onCloseToast={onCloseToast}
                                 title="Delete Failure"
-                                description={`Webpage - ${deletableId} could not be deleted`}
+                                description={`Webpage - '${deletableItem.name}' could not be deleted`}
                                 status="error"
                             />
                         ),
@@ -189,14 +195,14 @@ function SavedScans() {
                     status: 'error',
                     isClosable: true,
                     variant: 'subtle',
-                    id: deletableId,
+                    id: deletableItem?.id,
                     duration: null,
                     position: 'top',
                     render: () => (
                         <ToastBox
                             onCloseToast={onCloseToast}
                             title="Delete Failure"
-                            description={`Error deleting Webpage - ${deletableId}`}
+                            description={`Error deleting Webpage - '${deletableItem?.name}'`}
                             status="error"
                         />
                     ),
@@ -205,7 +211,7 @@ function SavedScans() {
                 showToast(toastComponent);
             }
         },
-        [deletableId, onCloseToast, showToast, toast, getSavedScanList],
+        [deletableItem, toast, showToast, getSavedScanList, onCloseToast],
     );
 
     const openDeleteRecordDialog = !!deletableId;
@@ -214,16 +220,6 @@ function SavedScans() {
         () => setDeletableId(undefined),
         [setDeletableId],
     );
-
-    const deletableItem = useMemo(() => {
-        if (!deletableId || !savedScanList) {
-            return undefined;
-        }
-        const item = [...savedScanList].find(
-            (scanItem) => scanItem.id === deletableId,
-        );
-        return item;
-    }, [savedScanList, deletableId]);
 
     return (
         <VStack
@@ -258,7 +254,7 @@ function SavedScans() {
             <Box background="white" p={8} borderWidth="1px" borderRadius="md">
                 <HStack mb={4} spacing={8}>
                     <Heading as="h2" size="md">
-                        {`${savedScanList ? SavedScanList.length : ''} Result(s)`}
+                        {`${savedScanList ? savedScanList.length : ''} Result(s)`}
                     </Heading>
                     <Spacer />
                     <Box minW="19%">

@@ -17,10 +17,10 @@ import { IssueFormData } from '../../typings/forms';
 
 interface Props {
     onSaveAction: (formData: IssueFormData) => void;
-    onCloseAction: (() => void) | undefined;
+    // onCloseAction: (() => void) | undefined;
     editableIssue: IssueObject | undefined;
     criteriaListForForm: Criteria[] | undefined;
-    onResetEditableIssue: () => void;
+    onCloseAction: () => void;
 }
 
 const impactOptions = [
@@ -43,7 +43,7 @@ function IssueForm(props: Props) {
         onSaveAction,
         onCloseAction,
         editableIssue,
-        onResetEditableIssue,
+        // onResetEditableIssue,
         criteriaListForForm,
     } = props;
 
@@ -94,12 +94,9 @@ function IssueForm(props: Props) {
             setName('');
             setDescription('');
             setNote('');
-            onResetEditableIssue();
-            if (onCloseAction) {
-                onCloseAction();
-            }
+            onCloseAction();
         },
-        [onCloseAction, onResetEditableIssue],
+        [onCloseAction],
     );
 
     const onSelectImpact = useCallback(
@@ -211,11 +208,11 @@ function IssueForm(props: Props) {
                         isMulti
                         name="criteria"
                         options={criteriaOptions}
-                        placeholder="Select Criteria"
+                        placeholder="Select Criteria / Tag"
                         closeMenuOnSelect={false}
                         onChange={onSelectCriteria}
                         value={selectedCriteria}
-                        isDisabled={!!editableIssue}
+                        // isDisabled={!!editableIssue}
                     />
                 </FormControl>
                 <SelectField
@@ -236,7 +233,7 @@ function IssueForm(props: Props) {
                         placeholder="Enter issue description"
                         tabIndex={-1}
                         // isRequired
-                        rows={4}
+                        rows={3}
                     />
                 </FormControl>
                 <FormControl>
@@ -249,7 +246,7 @@ function IssueForm(props: Props) {
                         onChange={handleNoteChange}
                         placeholder="Enter notes for the issue."
                         tabIndex={-1}
-                        rows={4}
+                        rows={3}
                     />
                 </FormControl>
                 <HStack

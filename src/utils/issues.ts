@@ -63,6 +63,22 @@ export const getTotalIssuesCount = (
     return sum;
 };
 
+export const getSelectedIssues = (
+    filteredIssues: IssueObject[] | undefined,
+    selectedIssueIds: string[] | undefined,
+) => {
+    if (!filteredIssues) {
+        return undefined;
+    }
+    if (!selectedIssueIds || selectedIssueIds.length <= 0) {
+        return filteredIssues;
+    }
+    const tmpSelecteIsssues = filteredIssues.filter(
+        (issue) => selectedIssueIds.includes(issue.name),
+    );
+    return tmpSelecteIsssues;
+};
+
 export const getWcagCriteriaAndTags = (
     issue: IssueObject,
 ) => {

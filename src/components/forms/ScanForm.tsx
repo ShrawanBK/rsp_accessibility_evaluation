@@ -25,7 +25,7 @@ function ScanForm(props: Props) {
         onScanWebpage,
         label = 'URL',
         buttonLabel = 'SCAN',
-        placeholder = 'Enter webpageurl (https://www.examplewebsite.example)',
+        placeholder = 'Enter webpage url (https://www.examplewebsite.example)',
     } = props;
 
     const errored = !url;

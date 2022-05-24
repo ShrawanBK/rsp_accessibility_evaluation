@@ -55,7 +55,7 @@ import ToastBox from '../../components/ToastBox';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 import { formatDateTime } from '../../utils/common';
-import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
+import { getFilteredIssues, getSelectedIssues, getTotalIssuesCount } from '../../utils/issues';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -179,6 +179,7 @@ function ScanWebsite() {
         [filteredIssues, selectedIssueIds, setAllIdsSelected],
     );
 
+    // NOTE - name used as ids as they are found to be unique
     const onUpdateSelectedIssue = useCallback(
         (id: IssueObject['issueId']) => {
             // Add first checkbox
@@ -210,6 +211,11 @@ function ScanWebsite() {
             setAllIdsSelected.off();
         },
         [filteredIssues, selectedIssueIds, setAllIdsSelected],
+    );
+
+    const selectedIssues = useMemo(
+        () => getSelectedIssues(filteredIssues, selectedIssueIds),
+        [filteredIssues, selectedIssueIds],
     );
 
     const {
@@ -254,8 +260,7 @@ function ScanWebsite() {
                         name: formData.websiteName,
                         url: getBaseUrl(basicData.url),
                     },
-                    // NOte - should be Selected Issues
-                    issues: filteredIssues,
+                    issues: selectedIssues,
                 };
 
                 const response = await apis.post(
@@ -499,8 +504,8 @@ function ScanWebsite() {
                             />
                             <SelectField
                                 options={criteriaOptions}
-                                placeholder="All Criteria"
-                                label="Select Criteria"
+                                placeholder="All Criteria / Tag"
+                                label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
                             />
                         </HStack>

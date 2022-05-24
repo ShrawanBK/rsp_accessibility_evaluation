@@ -321,6 +321,22 @@ function ScannedWebsiteDetail() {
                         });
                     });
 
+                    // NOTE - Update the impact statistics
+                    setImpactStatistics((prevStat) => {
+                        if (!prevStat) {
+                            return undefined;
+                        }
+                        return prevStat.map((stat) => {
+                            if (stat.impact === issueData.impact) {
+                                return {
+                                    ...stat,
+                                    count: stat.count + 1,
+                                };
+                            }
+                            return stat;
+                        });
+                    });
+
                     const successToastComponent = toast && toast({
                         status: 'success',
                         isClosable: true,
@@ -546,7 +562,7 @@ function ScannedWebsiteDetail() {
                     </Box>
                     <Modal
                         isOpen={modalOpened}
-                        onClose={setModalOpened.off}
+                        onClose={onResetEditableIssue}
                         blockScrollOnMount={false}
                         closeOnOverlayClick={false}
                         aria-label="save-result-modal"
@@ -569,7 +585,7 @@ function ScannedWebsiteDetail() {
                                     as="h1"
                                     size="md"
                                 >
-                                    Add Issue
+                                    {editableIssue ? 'Edit Issue' : 'Add Issue'}
                                 </Heading>
                             </ModalHeader>
                             <ModalCloseButton tabIndex={-1} />
@@ -578,7 +594,7 @@ function ScannedWebsiteDetail() {
                                     onSaveAction={onSaveAction}
                                     onCloseAction={onResetEditableIssue}
                                     editableIssue={editableIssue}
-                                    onResetEditableIssue={onResetEditableIssue}
+                                    // onResetEditableIssue={onResetEditableIssue}
                                     criteriaListForForm={criteriaListForForm}
                                 />
                             </ModalBody>
@@ -607,8 +623,8 @@ function ScannedWebsiteDetail() {
                             />
                             <SelectField
                                 options={criteriaOptions}
-                                placeholder="All Criteria"
-                                label="Select Criteria"
+                                placeholder="All Criteria / Tag"
+                                label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
                             />
                         </HStack>

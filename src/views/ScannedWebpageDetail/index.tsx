@@ -623,7 +623,7 @@ function ScannedWebsiteDetail() {
                             />
                             <SelectField
                                 options={criteriaOptions}
-                                placeholder="All Criteria / Tag"
+                                placeholder="All Criteria / Tags"
                                 label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
                             />

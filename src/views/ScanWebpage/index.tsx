@@ -218,6 +218,8 @@ function ScanWebsite() {
         [filteredIssues, selectedIssueIds],
     );
 
+    console.log({ selectedIssues });
+
     const {
         toast,
         showToast,
@@ -334,7 +336,6 @@ function ScanWebsite() {
         },
         [
             basicData,
-            filteredIssues,
             onCloseToast,
             onRedirectToDetailPage,
             setAllIdsSelected,
@@ -342,6 +343,7 @@ function ScanWebsite() {
             setUrlInvalidStatus,
             toast,
             showToast,
+            selectedIssues,
         ],
     );
 
@@ -504,7 +506,7 @@ function ScanWebsite() {
                             />
                             <SelectField
                                 options={criteriaOptions}
-                                placeholder="All Criteria / Tag"
+                                placeholder="All Criteria / Tags"
                                 label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
                             />

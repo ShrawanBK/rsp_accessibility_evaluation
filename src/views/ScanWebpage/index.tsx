@@ -92,16 +92,6 @@ function ScanWebsite() {
 
     const issuesShown = !urlInvalidStatus && issues && !processingUrl;
 
-    const impactLevelOptions = useMemo(
-        () => getImpactLevelOptions(issues),
-        [issues],
-    );
-
-    const criteriaOptions = useMemo(
-        () => getCriteriaOptions(issues),
-        [issues],
-    );
-
     const onScanWebpage = useCallback(
         async () => {
             try {
@@ -135,10 +125,15 @@ function ScanWebsite() {
     );
 
     const onSelectFilterableImpactLevel = useCallback(
-        (value: string) => setFilterableImpactLevel(
-            value === '' ? undefined : value as Impact,
-        ),
-        [],
+        (value: string) => {
+            setFilterableImpactLevel(
+                value === '' ? undefined : value as Impact,
+            );
+            if (filterableCriteria) {
+                setFilterableCriteria(undefined);
+            }
+        },
+        [filterableCriteria],
     );
 
     const onSelectFilterableCriteria = useCallback(
@@ -218,7 +213,15 @@ function ScanWebsite() {
         [filteredIssues, selectedIssueIds],
     );
 
-    console.log({ selectedIssues });
+    const impactLevelOptions = useMemo(
+        () => getImpactLevelOptions(issues),
+        [issues],
+    );
+
+    const criteriaOptions = useMemo(
+        () => getCriteriaOptions(issues, filterableImpactLevel),
+        [issues, filterableImpactLevel],
+    );
 
     const {
         toast,

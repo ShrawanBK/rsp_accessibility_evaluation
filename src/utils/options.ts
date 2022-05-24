@@ -1,12 +1,22 @@
 import { IssueObject, Impact } from '../typings/webpage';
 
-export const getCriteriaOptions = (issues: IssueObject[] | undefined) => {
+export const getCriteriaOptions = (
+    issues: IssueObject[] | undefined,
+    filterableImpactLevel: Impact | undefined,
+) => {
     if (!issues || issues.length <= 0) {
         return [];
     }
-    const seen = new Set();
 
-    const tmpCriteria = [...issues].map((issue) => issue.criteria);
+    const seen = new Set();
+    let tmpCriteria;
+    if (!filterableImpactLevel) {
+        tmpCriteria = [...issues].map((issue) => issue.criteria);
+    } else {
+        tmpCriteria = [...issues].filter(
+            (issue) => issue.impact === filterableImpactLevel,
+        ).map((filteredIssue) => filteredIssue.criteria);
+    }
     const flatTmpCriteria = tmpCriteria.flat();
     const filteredCriteria = flatTmpCriteria.filter((c) => {
         const duplicate = seen.has(c.name);

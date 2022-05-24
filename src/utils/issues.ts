@@ -83,8 +83,10 @@ export const getWcagCriteriaAndTags = (
     issue: IssueObject,
 ) => {
     const wcagCriteria = issue.criteria.filter(
-        (c) => c.criteriaId.toLowerCase().startsWith('wcag'));
+        (c) => c.criteriaId.toLowerCase().startsWith('wcag'),
+    );
     const tags = issue.criteria.filter(
-        (c) => !c.criteriaId.toLowerCase().startsWith('wcag'));
+        (c) => !c.criteriaId.toLowerCase().startsWith('wcag'),
+    );
     return [wcagCriteria, tags];
 };

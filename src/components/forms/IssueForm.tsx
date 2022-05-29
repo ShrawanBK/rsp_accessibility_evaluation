@@ -80,7 +80,6 @@ function IssueForm(props: Props) {
                     ...criteria,
                     label: criteria.name,
                     value: criteria.criteriaId,
-                    isFixed: !!editableIssue,
                 }),
             );
             setSelectedCriteria(formMappedSelectedCriteria);
@@ -109,16 +108,28 @@ function IssueForm(props: Props) {
             if (!criteriaListForForm || criteriaListForForm.length <= 0) {
                 return [];
             }
-            return criteriaListForForm.map((criteria) => ({
+            const mappedCriteriaList = criteriaListForForm.filter(
+                (c) => !!c.name,
+            ).map((criteria) => ({
                 value: criteria.criteriaId,
                 label: criteria.name,
                 note: criteria.note,
                 criteriaId: criteria.criteriaId,
                 name: criteria.name,
-                isFixed: !!editableIssue,
             }));
+
+            //  sorted list by name
+            return mappedCriteriaList.sort((a, b) => {
+                if (a.name.toLowerCase() < b.name.toLowerCase()) {
+                    return -1;
+                }
+                if (a.name.toLowerCase() > b.name.toLowerCase()) {
+                    return 1;
+                }
+                return 0;
+            });
         },
-        [criteriaListForForm, editableIssue],
+        [criteriaListForForm],
     );
 
     const formattedSelectedCriteria = useMemo(
@@ -194,10 +205,9 @@ function IssueForm(props: Props) {
                         onChange={handleNameChange}
                         placeholder="Enter issue name"
                         background="whiteAlpha.900"
-                        tabIndex={-1}
                         // isRequired
                         height={12}
-                        isDisabled={!!editableIssue}
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
@@ -212,7 +222,7 @@ function IssueForm(props: Props) {
                         closeMenuOnSelect={false}
                         onChange={onSelectCriteria}
                         value={selectedCriteria}
-                        // isDisabled={!!editableIssue}
+                        placeholderColor="black"
                     />
                 </FormControl>
                 <SelectField
@@ -231,9 +241,9 @@ function IssueForm(props: Props) {
                         value={description}
                         onChange={handleDescriptionChange}
                         placeholder="Enter issue description"
-                        tabIndex={-1}
                         // isRequired
                         rows={3}
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
@@ -245,8 +255,8 @@ function IssueForm(props: Props) {
                         value={note}
                         onChange={handleNoteChange}
                         placeholder="Enter notes for the issue."
-                        tabIndex={-1}
                         rows={3}
+                        autoComplete="off"
                     />
                 </FormControl>
                 <HStack
@@ -259,7 +269,6 @@ function IssueForm(props: Props) {
                         colorScheme="brand"
                         variant="outline"
                         letterSpacing={1}
-                        tabIndex={-1}
                         onClick={onCancelSave}
                         py={4}
                     >
@@ -270,7 +279,6 @@ function IssueForm(props: Props) {
                         disabled={submitButtonDisabled}
                         letterSpacing={1}
                         colorScheme="brand"
-                        tabIndex={-1}
                         py={4}
                     >
                         {submitButtonLabel}

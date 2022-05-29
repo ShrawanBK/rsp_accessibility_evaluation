@@ -4,7 +4,6 @@ import { NavLink } from 'react-router-dom';
 import {
     Container,
     Flex,
-    Heading,
     Image,
     Text,
     VStack,
@@ -47,7 +46,7 @@ function Sidebar() {
         >
             <NavLink
                 to="/"
-                aria-label="logo"
+                aria-label="Home Page"
                 tabIndex={-1}
             >
                 <Image
@@ -57,14 +56,13 @@ function Sidebar() {
                 />
             </NavLink>
 
-            <Heading
-                as="h1"
-                size="md"
+            <span
                 role="heading"
                 aria-level={1}
+                style={{ fontSize: 20, fontWeight: 'bold' }}
             >
                 Accessibility Tools
-            </Heading>
+            </span>
             {
                 sidebarMenus.map((menu) => (
                     <Container

@@ -11,6 +11,7 @@ interface Props {
     pageIndex?: number;
     totalPages?: number;
     onChangePage: React.Dispatch<React.SetStateAction<number>>;
+    negativeTabIndex?: boolean;
 }
 
 function Paginator(props: Props) {
@@ -18,6 +19,7 @@ function Paginator(props: Props) {
         pageIndex = 0,
         totalPages = 1,
         onChangePage,
+        negativeTabIndex,
     } = props;
 
     const maxPageIndex = totalPages - 1;
@@ -53,7 +55,6 @@ function Paginator(props: Props) {
         <Flex
             justifyContent="space-between"
             alignItems="center"
-            aria-hidden="true"
         >
             <IconButton
                 onClick={onResetPage}
@@ -61,7 +62,7 @@ function Paginator(props: Props) {
                 icon={<DoublePreviousArrowIcon />}
                 variant="outline"
                 disabled={previousArrowDisabled}
-                tabIndex={-1}
+                tabIndex={negativeTabIndex ? -1 : undefined}
             />
             <IconButton
                 onClick={onDecrementPage}
@@ -69,7 +70,7 @@ function Paginator(props: Props) {
                 icon={<PreviousArrowIcon />}
                 variant="outline"
                 disabled={previousArrowDisabled}
-                tabIndex={-1}
+                tabIndex={negativeTabIndex ? -1 : undefined}
             />
             <Box
                 as="span"
@@ -87,7 +88,7 @@ function Paginator(props: Props) {
                 icon={<NextArrowIcon />}
                 variant="outline"
                 disabled={nextArrowDisabled}
-                tabIndex={-1}
+                tabIndex={negativeTabIndex ? -1 : undefined}
             />
             <IconButton
                 onClick={onSetMaxPage}
@@ -95,7 +96,7 @@ function Paginator(props: Props) {
                 icon={<DoubleNextArrowIcon />}
                 variant="outline"
                 disabled={nextArrowDisabled}
-                tabIndex={-1}
+                tabIndex={negativeTabIndex ? -1 : undefined}
             />
         </Flex>
     );

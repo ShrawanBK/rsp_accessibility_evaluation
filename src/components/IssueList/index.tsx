@@ -10,6 +10,7 @@ interface IssueListProps {
     issueList: IssueObject[] | undefined;
     selectedIssueIds: IssueObject['issueId'][] | undefined;
     onUpdateSelectedIssue: (id: IssueObject['issueId']) => void;
+    negativeTabIndex?: boolean;
 }
 
 function IssueList(props: IssueListProps) {
@@ -17,6 +18,7 @@ function IssueList(props: IssueListProps) {
         issueList,
         selectedIssueIds,
         onUpdateSelectedIssue,
+        negativeTabIndex = false,
     } = props;
 
     if (!issueList || issueList.length <= 0) {
@@ -32,6 +34,7 @@ function IssueList(props: IssueListProps) {
                     issue={issue}
                     selectedIssues={selectedIssueIds}
                     onUpdateSelectedIssue={onUpdateSelectedIssue}
+                    negativeTabIndex={negativeTabIndex}
                 />
             ))}
         </Box>

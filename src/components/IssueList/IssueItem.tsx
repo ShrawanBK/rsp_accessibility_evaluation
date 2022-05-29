@@ -13,10 +13,13 @@ import {
     Code,
     HStack,
     Tag,
-    Tooltip,
     Checkbox,
     useBoolean,
 } from '@chakra-ui/react';
+import {
+    ChevronDownIcon,
+    ChevronUpIcon,
+} from '@chakra-ui/icons';
 
 import { IssueObject } from '../../typings/webpage';
 
@@ -27,6 +30,7 @@ interface IssueListProps {
     issue: IssueObject;
     selectedIssues: IssueObject['name'][] | undefined;
     onUpdateSelectedIssue: (id: IssueObject['name']) => void;
+    negativeTabIndex?: boolean;
 }
 
 function IssueItem(props: IssueListProps) {
@@ -34,6 +38,7 @@ function IssueItem(props: IssueListProps) {
         issue,
         selectedIssues,
         onUpdateSelectedIssue,
+        negativeTabIndex = false,
     } = props;
 
     const [isExpanded, setIsExpanded] = useBoolean();
@@ -74,8 +79,9 @@ function IssueItem(props: IssueListProps) {
             allowToggle
             borderColor="transparent"
             onChange={setIsExpanded.toggle}
+            tabIndex={negativeTabIndex ? -1 : undefined}
         >
-            <AccordionItem>
+            <AccordionItem tabIndex={negativeTabIndex ? -1 : undefined}>
                 <HStack
                     justifyContent="center"
                     alignItems="center"
@@ -87,6 +93,7 @@ function IssueItem(props: IssueListProps) {
                         onChange={onClickCheckbox}
                         borderColor={isSelected ? 'transparent' : '#045981'}
                         marginLeft={4}
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                     />
                     <AccordionButton
                         _expanded={{
@@ -94,12 +101,18 @@ function IssueItem(props: IssueListProps) {
                             color: '#045981',
                         }}
                         justifyContent="space-between"
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                     >
                         <Text>
                             {issue.name}
                         </Text>
                         <Text>
-                            {issue.occurences.length}
+                            {`${issue.occurences.length} occurences |`}
+                            {isExpanded ? (
+                                <ChevronUpIcon w={6} h={6} />
+                            ) : (
+                                <ChevronDownIcon w={6} h={6} />
+                            )}
                         </Text>
                     </AccordionButton>
                 </HStack>
@@ -134,14 +147,9 @@ function IssueItem(props: IssueListProps) {
                                         WCAG Criteria:
                                     </Heading>
                                     {wcagCriteria.map((criteria) => (
-                                        <Tooltip
-                                            key={criteria.criteriaId + criteria.name}
-                                            label={criteria.note}
-                                        >
-                                            <Tag>
-                                                {criteria.name}
-                                            </Tag>
-                                        </Tooltip>
+                                        <Tag key={criteria.criteriaId + criteria.name}>
+                                            {criteria.name}
+                                        </Tag>
                                     ))}
                                     <Divider
                                         orientation="vertical"
@@ -159,14 +167,9 @@ function IssueItem(props: IssueListProps) {
                                     </Heading>
                                     <HStack>
                                         {tags.map((tag) => (
-                                            <Tooltip
-                                                key={tag.criteriaId + tag.name}
-                                                label={tag.note}
-                                            >
-                                                <Tag>
-                                                    {tag.name}
-                                                </Tag>
-                                            </Tooltip>
+                                            <Tag key={tag.criteriaId + tag.name}>
+                                                {tag.name}
+                                            </Tag>
                                         ))}
                                     </HStack>
                                 </HStack>
@@ -205,6 +208,7 @@ function IssueItem(props: IssueListProps) {
                                 pageIndex={currentOccurenceIndex}
                                 totalPages={issue.occurences.length}
                                 onChangePage={setCurrentOccurenceIndex}
+                                negativeTabIndex={negativeTabIndex}
                             />
                         </Box>
                         <Divider />

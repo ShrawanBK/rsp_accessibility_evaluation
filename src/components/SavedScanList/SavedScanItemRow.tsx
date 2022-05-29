@@ -14,12 +14,14 @@ import { SavedScanItem } from '../../typings/savedscans';
 export interface Props {
     setDeletableId: React.Dispatch<React.SetStateAction<string | undefined>>;
     item: SavedScanItem;
+    negativeTabIndex?: boolean;
 }
 
 function SavedScansItemRow(props: Props) {
     const {
         item,
         setDeletableId,
+        negativeTabIndex,
     } = props;
 
     const navigate = useNavigate();
@@ -50,9 +52,9 @@ function SavedScansItemRow(props: Props) {
                         type="button"
                         h={10}
                         letterSpacing={1}
-                        tabIndex={-1}
                         colorScheme="blue"
                         background="blue.700"
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                         onClick={onViewButtonClicked}
                     >
                         View
@@ -61,9 +63,9 @@ function SavedScansItemRow(props: Props) {
                         type="button"
                         h={10}
                         letterSpacing={1}
-                        tabIndex={-1}
                         colorScheme="red"
                         background="red.700"
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                         onClick={onDeleteButtonClicked}
                     >
                         Delete

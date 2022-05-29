@@ -10,11 +10,9 @@ import {
 interface Props {
     processingUrl: boolean;
     onScanWebpage: () => void;
-    label?: string;
-    buttonLabel?: string;
-    placeholder?: string;
     handleUrlChange: (e: ChangeEvent<HTMLInputElement>) => void;
     url: string;
+    negativeTabIndex?: boolean;
 }
 
 function ScanForm(props: Props) {
@@ -23,9 +21,7 @@ function ScanForm(props: Props) {
         url,
         processingUrl,
         onScanWebpage,
-        label = 'URL',
-        buttonLabel = 'SCAN',
-        placeholder = 'Enter webpage url (https://www.examplewebsite.example)',
+        negativeTabIndex = false,
     } = props;
 
     const errored = !url;
@@ -45,10 +41,8 @@ function ScanForm(props: Props) {
                 isInvalid={false}
                 flex={2}
             >
-                <FormLabel
-                    htmlFor={label}
-                >
-                    {label}
+                <FormLabel htmlFor="url">
+                    URL
                 </FormLabel>
                 <HStack spacing={0}>
                     <Input
@@ -57,12 +51,13 @@ function ScanForm(props: Props) {
                         value={url}
                         onChange={handleUrlChange}
                         width="90%"
-                        placeholder={placeholder}
+                        placeholder="Enter webpage url (https://www.examplewebsite.example)"
                         background="whiteAlpha.900"
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
-                        tabIndex={-1}
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                         height={12}
+                        autoComplete="off"
                     />
                     <Button
                         type="submit"
@@ -71,10 +66,10 @@ function ScanForm(props: Props) {
                         colorScheme="brand"
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
-                        tabIndex={-1}
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                         height={12}
                     >
-                        {buttonLabel}
+                        SCAN
                     </Button>
                 </HStack>
                 {/*

@@ -5,8 +5,8 @@ export const formatDateTime = (dateValue: string) => {
     const formattedDate = date.toLocaleDateString(
         'en-us',
         {
-            month: 'short',
             year: 'numeric',
+            month: 'short',
             day: 'numeric',
         },
     );

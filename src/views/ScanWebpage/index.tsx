@@ -113,8 +113,11 @@ function ScanWebsite() {
                     url: dataResponse.url,
                     name: dataResponse.name,
                 });
+                const ids = dataResponse.issues.map((issue) => issue.name);
+                setSelectedIssueIds(ids);
+                setAllIdsSelected.on();
+
                 setUrlInvalidStatus.off();
-                setAllIdsSelected.off();
                 setProcessingUrl.off();
             } catch (error) {
                 setProcessingUrl.off();
@@ -301,7 +304,6 @@ function ScanWebsite() {
                                         type="button"
                                         h={10}
                                         letterSpacing={1}
-                                        tabIndex={-1}
                                         colorScheme="white"
                                         background="white.700"
                                         onClick={() => onRedirectToDetailPage(id)}
@@ -367,7 +369,7 @@ function ScanWebsite() {
         >
             <Flex>
                 <Heading
-                    as="h2"
+                    as="h1"
                     size="lg"
                     role="heading"
                 >
@@ -384,6 +386,7 @@ function ScanWebsite() {
                     onScanWebpage={onScanWebpage}
                     handleUrlChange={handleUrlChange}
                     url={webpageUrl}
+                    negativeTabIndex={modalOpened}
                 />
             </Box>
             <Box width="60%">
@@ -434,7 +437,7 @@ function ScanWebsite() {
                             colorScheme="brand"
                             letterSpacing={1}
                             onClick={setModalOpened.on}
-                            tabIndex={-1}
+                            tabIndex={modalOpened ? -1 : undefined}
                             py={4}
                         >
                             SAVE
@@ -443,32 +446,16 @@ function ScanWebsite() {
                     <Modal
                         isOpen={modalOpened}
                         onClose={setModalOpened.off}
-                        // blockScrollOnMount
                         closeOnOverlayClick={false}
-                        aria-label="save-result-modal"
-                        id="modalling"
-                        aria-describedby="save-result-modal"
-                        aria-modal="false"
                         isCentered
                     >
-                        <ModalOverlay aria-modal="true" role="dialog" />
-                        <ModalContent
-                            role="main"
-                            tabIndex={-1}
-                            py={2}
-                        >
-                            <ModalHeader
-                                tabIndex={-1}
-                            >
-                                <Heading
-                                    as="h1"
-                                    size="md"
-                                >
-                                    Save Result
-                                </Heading>
+                        <ModalOverlay role="dialog" />
+                        <ModalContent py={2}>
+                            <ModalHeader as="h1">
+                                Save Result
                             </ModalHeader>
-                            <ModalCloseButton tabIndex={-1} />
-                            <ModalBody tabIndex={-1}>
+                            <ModalCloseButton />
+                            <ModalBody role="main">
                                 <SaveResultForm
                                     onSaveAction={onSaveResult}
                                     basicData={basicData}
@@ -492,13 +479,13 @@ function ScanWebsite() {
                         marginTop={8}
                     >
                         <Checkbox
-                            aria-label="issue.name"
+                            aria-label="Select all issues"
                             maxWidth="20px"
                             margin={4}
                             borderColor="#045981"
                             onChange={onSelectAllIssues}
                             isChecked={allIdsSelected}
-                            tabIndex={-1}
+                            tabIndex={modalOpened ? -1 : undefined}
                         />
                         <HStack width="80%">
                             <SelectField
@@ -506,12 +493,14 @@ function ScanWebsite() {
                                 placeholder={`All Issues (${totalIssuesCount})`}
                                 label="Select Issues"
                                 onSelectOption={onSelectFilterableImpactLevel}
+                                negativeTabIndex={modalOpened}
                             />
                             <SelectField
                                 options={criteriaOptions}
                                 placeholder="All Criteria / Tags"
                                 label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
+                                negativeTabIndex={modalOpened}
                             />
                         </HStack>
                     </HStack>
@@ -520,6 +509,7 @@ function ScanWebsite() {
                             issueList={filteredIssues}
                             selectedIssueIds={selectedIssueIds}
                             onUpdateSelectedIssue={onUpdateSelectedIssue}
+                            negativeTabIndex={modalOpened}
                         />
                     </Box>
                 </Box>

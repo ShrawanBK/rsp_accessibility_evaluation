@@ -469,6 +469,7 @@ function ScannedWebsiteDetail() {
 
     const areYouSureMsg = `Are you sure you want to delete the occurence?${deletableOccurenceData?.issueDeletable ? 'This will delete the issue as well' : ''}`;
 
+    const negativeTabIndex = openDeleteOccurenceDialog || modalOpened;
     return (
         <VStack
             align="stretch"
@@ -479,7 +480,6 @@ function ScannedWebsiteDetail() {
             <DeleteConfirmationDialog
                 open={openDeleteOccurenceDialog}
                 onCancelDelete={onCancelDeleteOccurence}
-                deletableItemId={deletableOccurenceData?.occurenceId}
                 onDelete={deletableOccurenceData?.issueDeletable
                     ? onDeleteIssue : onDeleteOccurence}
                 header="Delete Issue"
@@ -512,7 +512,7 @@ function ScannedWebsiteDetail() {
                 <Spacer />
             </HStack>
             <Heading
-                as="h2"
+                as="h1"
                 size="lg"
                 role="heading"
             >
@@ -542,7 +542,6 @@ function ScannedWebsiteDetail() {
                                 fontWeight="semibold"
                                 letterSpacing="wide"
                                 fontSize="2xl"
-                                role="heading"
                                 as="h2"
                             >
                                 URL:
@@ -559,7 +558,7 @@ function ScannedWebsiteDetail() {
                             colorScheme="brand"
                             letterSpacing={1}
                             onClick={setModalOpened.on}
-                            tabIndex={-1}
+                            tabIndex={negativeTabIndex ? -1 : undefined}
                             py={4}
                         >
                             Add Issue
@@ -576,25 +575,16 @@ function ScannedWebsiteDetail() {
                         aria-modal="false"
                         isCentered
                     >
-                        <ModalOverlay aria-modal="true" role="dialog" />
+                        <ModalOverlay role="dialog" />
                         <ModalContent
-                            role="main"
-                            tabIndex={-1}
                             py={2}
                             minW="xl"
                         >
-                            <ModalHeader
-                                tabIndex={-1}
-                            >
-                                <Heading
-                                    as="h1"
-                                    size="md"
-                                >
-                                    {editableIssue ? 'Edit Issue' : 'Add Issue'}
-                                </Heading>
+                            <ModalHeader as="h1">
+                                {editableIssue ? 'Edit Issue' : 'Add Issue'}
                             </ModalHeader>
-                            <ModalCloseButton tabIndex={-1} />
-                            <ModalBody tabIndex={-1}>
+                            <ModalCloseButton />
+                            <ModalBody role="main">
                                 <IssueForm
                                     onSaveAction={onSaveAction}
                                     onCloseAction={onResetEditableIssue}
@@ -625,12 +615,14 @@ function ScannedWebsiteDetail() {
                                 placeholder={`All Issues (${totalIssuesCount})`}
                                 label="Select Issues"
                                 onSelectOption={onSelectFilterableImpactLevel}
+                                negativeTabIndex={negativeTabIndex}
                             />
                             <SelectField
                                 options={criteriaOptions}
                                 placeholder="All Criteria / Tags"
                                 label="Select Criteria / Tag"
                                 onSelectOption={onSelectFilterableCriteria}
+                                negativeTabIndex={negativeTabIndex}
                             />
                         </HStack>
                     </HStack>
@@ -639,6 +631,7 @@ function ScannedWebsiteDetail() {
                             issueList={filteredIssues}
                             setDeletableOccurenceData={setDeletableOccurenceData}
                             onSetEditableIssue={onSetEditableIssue}
+                            negativeTabIndex={negativeTabIndex}
                         />
                     </Box>
                 </Box>

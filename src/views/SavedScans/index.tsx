@@ -239,6 +239,7 @@ function SavedScans() {
                             onSubmitSearch={setSearchField}
                             searchFormText={searchFormText}
                             setSearchFormText={setSearchFormText}
+                            negativeTabIndex={openDeleteRecordDialog}
                         />
                     </Box>
                     <Spacer />
@@ -247,6 +248,7 @@ function SavedScans() {
                             options={sortByOptions}
                             label="Sort By"
                             onSelectOption={onSelectSortBy}
+                            negativeTabIndex={openDeleteRecordDialog}
                         />
                     </Box>
                 </Flex>
@@ -262,6 +264,7 @@ function SavedScans() {
                             options={orderOptions}
                             label="Order"
                             onSelectOption={onSelectOrder}
+                            negativeTabIndex={openDeleteRecordDialog}
                         />
                     </Box>
                 </HStack>
@@ -309,6 +312,7 @@ function SavedScans() {
                                 pageIndex={currentPageIndex}
                                 totalPages={totalPages}
                                 onChangePage={setCurrentPageIndex}
+                                negativeTabIndex={openDeleteRecordDialog}
                             />
                         </HStack>
                     </VStack>
@@ -317,20 +321,15 @@ function SavedScans() {
                 <DeleteConfirmationDialog
                     open={openDeleteRecordDialog}
                     onCancelDelete={onCloseDeleteRecordDialog}
-                    deletableItemId={deletableItem?.id}
                     onDelete={onDeleteItem}
                     header="Delete webpage"
                     areYouSureMsg="Are you sure you want to delete the following webpage?"
                     dialogBody={(
                         <>
                             <br />
-                            Webpage:
-                            {' '}
-                            {deletableItem?.name}
+                            {`Webpage: ${deletableItem?.name}`}
                             <br />
-                            Website:
-                            {' '}
-                            {deletableItem?.website}
+                            {`Website: ${deletableItem?.website}`}
                         </>
                     )}
                 />

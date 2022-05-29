@@ -10,6 +10,7 @@ interface IssueListProps {
     issueList: IssueObject[] | undefined;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
     onSetEditableIssue: (issueItem: IssueObject) => void;
+    negativeTabIndex?: boolean;
 }
 
 function EditableIssueList(props: IssueListProps) {
@@ -17,6 +18,7 @@ function EditableIssueList(props: IssueListProps) {
         issueList,
         setDeletableOccurenceData,
         onSetEditableIssue,
+        negativeTabIndex = false,
     } = props;
 
     if (!issueList || issueList.length <= 0) {
@@ -33,6 +35,7 @@ function EditableIssueList(props: IssueListProps) {
                     issue={issue}
                     setDeletableOccurenceData={setDeletableOccurenceData}
                     onSetEditableIssue={onSetEditableIssue}
+                    negativeTabIndex={negativeTabIndex}
                 />
             ))}
         </Box>

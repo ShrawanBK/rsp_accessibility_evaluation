@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import {
     Button,
     FormControl,
@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react';
 import { BasicData } from '../../typings/webpage';
 import { SaveResultFormData } from '../../typings/forms';
+import { formatDateTime } from '../../utils/common';
 
 interface Props {
     isLoading?: boolean;
@@ -73,6 +74,14 @@ function SaveResultForm(props: Props) {
         [basicData, errored, note, onCancelSave, onSaveAction, webpageName, websiteName],
     );
 
+    const scanTime = useMemo(
+        () => {
+            const dateString = basicData ? basicData.scantime : new Date().toISOString();
+            return formatDateTime(dateString);
+        },
+        [basicData],
+    );
+
     return (
         <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
@@ -87,7 +96,6 @@ function SaveResultForm(props: Props) {
                         value={basicData?.url ?? ''}
                         placeholder="Website"
                         background="blackAlpha.300"
-                        tabIndex={-1}
                         readOnly
                     />
                 </FormControl>
@@ -98,10 +106,9 @@ function SaveResultForm(props: Props) {
                     <Input
                         id="scantime"
                         type="text"
-                        value={basicData?.scantime ?? ''}
+                        value={scanTime}
                         placeholder="Scan Time"
                         background="blackAlpha.300"
-                        tabIndex={-1}
                         readOnly
                     />
                 </FormControl>
@@ -115,8 +122,8 @@ function SaveResultForm(props: Props) {
                         onChange={handleWebpageNameChange}
                         placeholder="Enter webpage name (Example - Homepage)"
                         background="whiteAlpha.900"
-                        tabIndex={-1}
                         isRequired
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
@@ -129,8 +136,8 @@ function SaveResultForm(props: Props) {
                         onChange={handleWebsiteNameChange}
                         placeholder="Enter website name (Example Website)"
                         background="whiteAlpha.900"
-                        tabIndex={-1}
                         isRequired
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
@@ -142,8 +149,7 @@ function SaveResultForm(props: Props) {
                         value={note}
                         onChange={handleNoteChange}
                         placeholder="Enter notes for the result."
-                        tabIndex={-1}
-                        rows={5}
+                        rows={4}
                     />
                 </FormControl>
                 <HStack
@@ -156,7 +162,6 @@ function SaveResultForm(props: Props) {
                         colorScheme="brand"
                         variant="outline"
                         letterSpacing={1}
-                        tabIndex={-1}
                         onClick={onCancelSave}
                         py={4}
                     >
@@ -167,7 +172,6 @@ function SaveResultForm(props: Props) {
                         disabled={errored || isLoading}
                         letterSpacing={1}
                         colorScheme="brand"
-                        tabIndex={-1}
                         py={4}
                     >
                         Save

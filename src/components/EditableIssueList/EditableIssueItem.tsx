@@ -19,10 +19,10 @@ import {
     Code,
     HStack,
     Tag,
-    Tooltip,
     useBoolean,
     Button,
 } from '@chakra-ui/react';
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
 import Paginator from '../Paginator';
 
@@ -33,6 +33,7 @@ interface IssueListProps {
     issue: IssueObject;
     setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
     onSetEditableIssue: (issueItem: IssueObject) => void;
+    negativeTabIndex?: boolean;
 }
 
 function EditableIssueItem(props: IssueListProps) {
@@ -40,6 +41,7 @@ function EditableIssueItem(props: IssueListProps) {
         issue,
         setDeletableOccurenceData,
         onSetEditableIssue,
+        negativeTabIndex = false,
     } = props;
 
     const [isExpanded, setIsExpanded] = useBoolean();
@@ -83,8 +85,9 @@ function EditableIssueItem(props: IssueListProps) {
             allowToggle
             borderColor="transparent"
             onChange={setIsExpanded.toggle}
+            tabIndex={negativeTabIndex ? -1 : undefined}
         >
-            <AccordionItem>
+            <AccordionItem tabIndex={negativeTabIndex ? -1 : undefined}>
                 <HStack
                     justifyContent="center"
                     alignItems="center"
@@ -96,12 +99,18 @@ function EditableIssueItem(props: IssueListProps) {
                             color: '#045981',
                         }}
                         justifyContent="space-between"
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                     >
                         <Text>
                             {issue.name}
                         </Text>
                         <Text>
-                            {issue.occurences.length}
+                            {`${issue.occurences.length} occurences |`}
+                            {isExpanded ? (
+                                <ChevronUpIcon w={6} h={6} />
+                            ) : (
+                                <ChevronDownIcon w={6} h={6} />
+                            )}
                         </Text>
                     </AccordionButton>
                 </HStack>
@@ -136,14 +145,9 @@ function EditableIssueItem(props: IssueListProps) {
                                         WCAG Criteria:
                                     </Heading>
                                     {wcagCriteria.map((criteria) => (
-                                        <Tooltip
-                                            key={criteria.criteriaId}
-                                            label={criteria.note}
-                                        >
-                                            <Tag>
-                                                {criteria.name}
-                                            </Tag>
-                                        </Tooltip>
+                                        <Tag key={criteria.criteriaId}>
+                                            {criteria.name}
+                                        </Tag>
                                     ))}
                                     <Divider
                                         orientation="vertical"
@@ -161,14 +165,9 @@ function EditableIssueItem(props: IssueListProps) {
                                     </Heading>
                                     <HStack>
                                         {tags.map((tag) => (
-                                            <Tooltip
-                                                key={tag.criteriaId}
-                                                label={tag.note}
-                                            >
-                                                <Tag>
-                                                    {tag.name}
-                                                </Tag>
-                                            </Tooltip>
+                                            <Tag key={tag.criteriaId}>
+                                                {tag.name}
+                                            </Tag>
                                         ))}
                                     </HStack>
                                 </HStack>
@@ -208,13 +207,14 @@ function EditableIssueItem(props: IssueListProps) {
                                     pageIndex={currentOccurenceIndex}
                                     totalPages={issue.occurences.length}
                                     onChangePage={setCurrentOccurenceIndex}
+                                    negativeTabIndex={negativeTabIndex}
                                 />
                                 <HStack spacing={2}>
                                     <Button
                                         type="button"
                                         h={10}
                                         letterSpacing={1}
-                                        tabIndex={-1}
+                                        tabIndex={negativeTabIndex ? -1 : undefined}
                                         colorScheme="blue"
                                         background="blue.700"
                                         onClick={onClickEdit}
@@ -225,7 +225,7 @@ function EditableIssueItem(props: IssueListProps) {
                                         type="button"
                                         h={10}
                                         letterSpacing={1}
-                                        tabIndex={-1}
+                                        tabIndex={negativeTabIndex ? -1 : undefined}
                                         colorScheme="red"
                                         background="red.700"
                                         onClick={onClickDelete}

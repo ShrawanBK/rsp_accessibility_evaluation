@@ -27,9 +27,12 @@ function ToastBoxContextProvider({ children }: { children: React.ReactChild }) {
     const toastIdRef = React.useRef<string | number | undefined>();
     const toast: Toast = useToast();
 
-    function showToast(showableToast: ToastId | undefined) {
+    const showToast = useCallback((showableToast: ToastId | undefined) => {
+        if (toastIdRef.current) {
+            toast.close(toastIdRef.current);
+        }
         toastIdRef.current = showableToast;
-    }
+    }, [toast]);
 
     const onCloseToast = useCallback(() => {
         if (toastIdRef.current) {
@@ -44,7 +47,7 @@ function ToastBoxContextProvider({ children }: { children: React.ReactChild }) {
             showToast,
             onCloseToast,
         }),
-        [onCloseToast, toast],
+        [onCloseToast, showToast, toast],
     );
     return (
         <ToastBoxContext.Provider value={value}>

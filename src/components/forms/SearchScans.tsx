@@ -12,6 +12,7 @@ interface Props {
     onSubmitSearch: React.Dispatch<React.SetStateAction<string>>;
     searchFormText: string;
     setSearchFormText: React.Dispatch<React.SetStateAction<string>>;
+    negativeTabIndex?: boolean;
 }
 
 function SearchScans(props: Props) {
@@ -19,6 +20,7 @@ function SearchScans(props: Props) {
         onSubmitSearch,
         searchFormText,
         setSearchFormText,
+        negativeTabIndex,
     } = props;
 
     const onSearchValueChange = useCallback(
@@ -37,7 +39,7 @@ function SearchScans(props: Props) {
     return (
         <form onSubmit={handleSubmit}>
             <FormControl isInvalid={false} flex={2}>
-                <FormLabel htmlFor="serachField">Webpage or Website Name</FormLabel>
+                <FormLabel htmlFor="searchField">Webpage or Website Name</FormLabel>
                 <HStack spacing={0}>
                     <Input
                         id="searchField"
@@ -48,6 +50,9 @@ function SearchScans(props: Props) {
                         borderTopRightRadius={0}
                         borderBottomRightRadius={0}
                         value={searchFormText}
+                        type="search"
+                        autoComplete="off"
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                     />
                     <Button
                         type="submit"
@@ -55,6 +60,7 @@ function SearchScans(props: Props) {
                         colorScheme="brand"
                         borderTopLeftRadius={0}
                         borderBottomLeftRadius={0}
+                        tabIndex={negativeTabIndex ? -1 : undefined}
                     >
                         Search
                     </Button>

@@ -21,7 +21,8 @@ export interface SelectFieldProps<Type extends OptionValue> {
     placeholder?: string;
     variant?: variant;
     onSelectOption: (value: string) => void;
-    value?: string | number | readonly string[] | undefined
+    value?: string | number | readonly string[] | undefined;
+    negativeTabIndex?: boolean;
 }
 
 function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
@@ -32,6 +33,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
         variant = 'outline',
         onSelectOption,
         value,
+        negativeTabIndex = false,
     } = props;
 
     const onChange = useCallback(
@@ -60,7 +62,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                 title={label}
                 id={label}
                 onChange={onChange}
-                tabIndex={-1}
+                tabIndex={negativeTabIndex ? -1 : undefined}
                 background="white"
                 value={value}
             >

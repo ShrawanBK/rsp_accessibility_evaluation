@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useContext } from 'react';
 
 import { NavLink } from 'react-router-dom';
 import {
@@ -12,6 +12,8 @@ import {
 import ScanIcon from '../icons/Scan';
 import BookmarkIcon from '../icons/Bookmark';
 import logoPath from '../../resources/logo.png';
+
+import { SideBarContext } from '../../contexts/SideBarContext';
 
 import './styles.css';
 
@@ -38,6 +40,9 @@ const sidebarMenus: SidebarMenu[] = [
 ];
 
 function Sidebar() {
+    const {
+        sideBarNegativeTabIndex,
+    } = useContext(SideBarContext);
     return (
         <VStack
             p={2}
@@ -47,7 +52,7 @@ function Sidebar() {
             <NavLink
                 to="/"
                 aria-label="Home Page"
-                tabIndex={-1}
+                tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
             >
                 <Image
                     src={logoPath}
@@ -72,17 +77,17 @@ function Sidebar() {
                         display="flex"
                         id={menu.ariaLabel}
                         aria-label={menu.ariaLabel}
-                        tabIndex={-1}
+                        tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
                     >
                         <NavLink
                             to={menu.path}
                             className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
                             aria-labelledby={menu.ariaLabel}
-                            tabIndex={-1}
+                            tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
                         >
                             <Flex
                                 justifyContent="space-around"
-                                tabIndex={-1}
+                                tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
                             >
                                 {menu.icon}
                                 <Text width="70%">

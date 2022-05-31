@@ -21,6 +21,14 @@ import { useParams, Link } from 'react-router-dom';
 import IssueStats from '../../components/IssueStats';
 import SelectField from '../../components/SelectField';
 
+import IssueForm from '../../components/forms/IssueForm';
+
+import EditableIssueList from '../../components/EditableIssueList';
+import NextArrowIcon from '../../components/icons/NextArrow';
+import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
+import ToastBox from '../../components/ToastBox';
+import Loading from '../../components/Loading';
+
 import {
     IssueObject,
     ImpactStatistics,
@@ -31,20 +39,14 @@ import {
     DeletableOccurenceData,
     ScanWebsiteResponse,
 } from '../../typings/webpage';
-
-import IssueForm from '../../components/forms/IssueForm';
 import { IssueFormData } from '../../typings/forms';
-
-import EditableIssueList from '../../components/EditableIssueList';
-import NextArrowIcon from '../../components/icons/NextArrow';
-import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
-import ToastBox from '../../components/ToastBox';
 import apis from '../../utils/apis';
-import { ToastBoxContext } from '../../contexts/ToastBoxContext';
-import Loading from '../../components/Loading';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 import { formatDateTime } from '../../utils/common';
 import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
+
+import { SideBarContext } from '../../contexts/SideBarContext';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 function ScannedWebsiteDetail() {
     const { id } = useParams();
@@ -156,6 +158,11 @@ function ScannedWebsiteDetail() {
         onCloseToast,
     } = useContext(ToastBoxContext);
 
+    const {
+        sideBarNegativeTabIndex,
+        setSideBarNegativeTabIndex,
+    } = useContext(SideBarContext);
+
     // close toast message if open
     useEffect(
         () => {
@@ -167,8 +174,19 @@ function ScannedWebsiteDetail() {
     );
 
     const onCancelDeleteOccurence = useCallback(
-        () => setDeletableOccurenceData(undefined),
-        [setDeletableOccurenceData],
+        () => {
+            setDeletableOccurenceData(undefined);
+            setSideBarNegativeTabIndex.off();
+        },
+        [setSideBarNegativeTabIndex],
+    );
+
+    const onSetDeletableOccurenceData = useCallback(
+        (data: DeletableOccurenceData) => {
+            setDeletableOccurenceData(data);
+            setSideBarNegativeTabIndex.on();
+        },
+        [setSideBarNegativeTabIndex],
     );
 
     const onDeleteOccurence = useCallback(
@@ -277,20 +295,28 @@ function ScannedWebsiteDetail() {
 
     const [editableIssue, setEditableIssue] = useState<IssueObject>();
 
+    const onOpenIssueFormModal = useCallback(
+        () => {
+            setModalOpened.on();
+            setSideBarNegativeTabIndex.on();
+        },
+        [setModalOpened, setSideBarNegativeTabIndex],
+    );
     const onSetEditableIssue = useCallback(
         (issueItem: IssueObject) => {
             setEditableIssue(issueItem);
-            setModalOpened.on();
+            onOpenIssueFormModal();
         },
-        [setModalOpened],
+        [onOpenIssueFormModal],
     );
 
     const onResetEditableIssue = useCallback(
         () => {
             setEditableIssue(undefined);
             setModalOpened.off();
+            setSideBarNegativeTabIndex.off();
         },
-        [setModalOpened],
+        [setModalOpened, setSideBarNegativeTabIndex],
     );
 
     const onSaveIssue = useCallback(
@@ -478,23 +504,11 @@ function ScannedWebsiteDetail() {
             p={4}
             role="main"
         >
-            <DeleteConfirmationDialog
-                open={openDeleteOccurenceDialog}
-                onCancelDelete={onCancelDeleteOccurence}
-                onDelete={deletableOccurenceData?.issueDeletable
-                    ? onDeleteIssue : onDeleteOccurence}
-                header="Delete Issue"
-                areYouSureMsg={areYouSureMsg}
-                dialogBody={(
-                    <>
-                        <br />
-                        {deletableOccurenceData?.issueName}
-                    </>
-                )}
-            />
-
             <HStack spacing={0}>
-                <Link to="/saved_scans">
+                <Link
+                    to="/saved_scans"
+                    tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
+                >
                     <Text
                         textDecoration="underline"
                         color="blue.700"
@@ -558,7 +572,7 @@ function ScannedWebsiteDetail() {
                             type="button"
                             colorScheme="brand"
                             letterSpacing={1}
-                            onClick={setModalOpened.on}
+                            onClick={onOpenIssueFormModal}
                             tabIndex={negativeTabIndex ? -1 : undefined}
                             py={4}
                         >
@@ -630,13 +644,27 @@ function ScannedWebsiteDetail() {
                     <Box marginTop={4}>
                         <EditableIssueList
                             issueList={filteredIssues}
-                            setDeletableOccurenceData={setDeletableOccurenceData}
+                            onSetDeletableOccurenceData={onSetDeletableOccurenceData}
                             onSetEditableIssue={onSetEditableIssue}
                             negativeTabIndex={negativeTabIndex}
                         />
                     </Box>
                 </Box>
             )}
+            <DeleteConfirmationDialog
+                open={openDeleteOccurenceDialog}
+                onCancelDelete={onCancelDeleteOccurence}
+                onDelete={deletableOccurenceData?.issueDeletable
+                    ? onDeleteIssue : onDeleteOccurence}
+                header="Delete Issue"
+                areYouSureMsg={areYouSureMsg}
+                dialogBody={(
+                    <>
+                        <br />
+                        {deletableOccurenceData?.issueName}
+                    </>
+                )}
+            />
         </VStack>
     );
 }

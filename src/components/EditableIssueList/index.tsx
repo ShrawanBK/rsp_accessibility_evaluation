@@ -1,14 +1,15 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React from 'react';
 
 import { Box } from '@chakra-ui/react';
 
 import EditableIssueItem from './EditableIssueItem';
-import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
 import Placeholder from '../Placeholder';
+
+import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
 
 interface IssueListProps {
     issueList: IssueObject[] | undefined;
-    setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
+    onSetDeletableOccurenceData: (data: DeletableOccurenceData) => void;
     onSetEditableIssue: (issueItem: IssueObject) => void;
     negativeTabIndex?: boolean;
 }
@@ -16,7 +17,7 @@ interface IssueListProps {
 function EditableIssueList(props: IssueListProps) {
     const {
         issueList,
-        setDeletableOccurenceData,
+        onSetDeletableOccurenceData,
         onSetEditableIssue,
         negativeTabIndex = false,
     } = props;
@@ -33,7 +34,7 @@ function EditableIssueList(props: IssueListProps) {
                 <EditableIssueItem
                     key={issue.issueId}
                     issue={issue}
-                    setDeletableOccurenceData={setDeletableOccurenceData}
+                    onSetDeletableOccurenceData={onSetDeletableOccurenceData}
                     onSetEditableIssue={onSetEditableIssue}
                     negativeTabIndex={negativeTabIndex}
                 />

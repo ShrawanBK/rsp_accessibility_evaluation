@@ -2,8 +2,6 @@ import React, {
     useCallback,
     useMemo,
     useState,
-    SetStateAction,
-    Dispatch,
 } from 'react';
 
 import {
@@ -31,15 +29,15 @@ import { getWcagCriteriaAndTags } from '../../utils/issues';
 
 interface IssueListProps {
     issue: IssueObject;
-    setDeletableOccurenceData: Dispatch<SetStateAction<DeletableOccurenceData | undefined>>;
     onSetEditableIssue: (issueItem: IssueObject) => void;
+    onSetDeletableOccurenceData: (data: DeletableOccurenceData) => void;
     negativeTabIndex?: boolean;
 }
 
 function EditableIssueItem(props: IssueListProps) {
     const {
         issue,
-        setDeletableOccurenceData,
+        onSetDeletableOccurenceData,
         onSetEditableIssue,
         negativeTabIndex = false,
     } = props;
@@ -57,7 +55,7 @@ function EditableIssueItem(props: IssueListProps) {
 
     const onClickDelete = useCallback(
         () => {
-            setDeletableOccurenceData({
+            onSetDeletableOccurenceData({
                 occurenceId: currentOccurence.occurenceId,
                 issueId: issue.issueId,
                 issueName: issue.name,
@@ -68,7 +66,7 @@ function EditableIssueItem(props: IssueListProps) {
             currentOccurence.occurenceId,
             issue.issueId,
             issue.name,
-            setDeletableOccurenceData,
+            onSetDeletableOccurenceData,
             issue.occurences,
         ],
     );

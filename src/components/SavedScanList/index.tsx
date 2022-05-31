@@ -15,7 +15,7 @@ import { Column, SavedScanItem } from '../../typings/savedscans';
 interface Props {
     columns: Column[];
     data: SavedScanItem[];
-    setDeletableId: React.Dispatch<React.SetStateAction<string | undefined>>;
+    onSetDeletableId: (id: string) => void;
     negativeTabIndex?: boolean;
 }
 
@@ -23,7 +23,7 @@ function SavedScanList(props: Props) {
     const {
         columns,
         data,
-        setDeletableId,
+        onSetDeletableId,
         negativeTabIndex = false,
     } = props;
 
@@ -44,7 +44,7 @@ function SavedScanList(props: Props) {
                         <SavedScansItemRow
                             key={item.id}
                             item={item}
-                            setDeletableId={setDeletableId}
+                            onSetDeletableId={onSetDeletableId}
                             negativeTabIndex={negativeTabIndex}
                         />
                     ))}

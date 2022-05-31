@@ -13,19 +13,23 @@ import {
     useBoolean,
 } from '@chakra-ui/react';
 
+import { savedScanItemColumn, sortByOptions } from './constant';
+
 import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import Info from '../../components/Info';
 import Paginator from '../../components/Paginator';
 import SavedScanList from '../../components/SavedScanList';
-import { savedScanItemColumn, sortByOptions, orderOptions } from './constant';
 import ToastBox from '../../components/ToastBox';
-import apis from '../../utils/apis';
 import SearchScans from '../../components/forms/SearchScans';
 import SelectField from '../../components/SelectField';
-import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import Loading from '../../components/Loading';
 import DeleteConfirmationDialog from '../../components/DeleteConfirmationDialog';
+
 import { GetSavedScanResponse, SavedScanItem } from '../../typings/savedscans';
+import apis from '../../utils/apis';
+
+import { SideBarContext } from '../../contexts/SideBarContext';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 function SavedScans() {
     const [savedScanList, setSavedScanList] = useState<SavedScanItem[]>();
@@ -107,6 +111,10 @@ function SavedScans() {
         onCloseToast,
     } = useContext(ToastBoxContext);
 
+    const {
+        setSideBarNegativeTabIndex,
+    } = useContext(SideBarContext);
+
     // close toast message if open
     useEffect(
         () => {
@@ -117,7 +125,6 @@ function SavedScans() {
         [onCloseToast, toast],
     );
 
-    // NOTE - To show on pagination
     const [listCountStart, listCountEnd] = useMemo(
         () => {
             const startCount = currentPageIndex * 10 + 1;
@@ -219,8 +226,19 @@ function SavedScans() {
     const openDeleteRecordDialog = !!deletableId;
 
     const onCloseDeleteRecordDialog = useCallback(
-        () => setDeletableId(undefined),
-        [setDeletableId],
+        () => {
+            setSideBarNegativeTabIndex.off();
+            setDeletableId(undefined);
+        },
+        [setSideBarNegativeTabIndex],
+    );
+
+    const onSetDeletableId = useCallback(
+        (id: string) => {
+            setSideBarNegativeTabIndex.on();
+            setDeletableId(id);
+        },
+        [setSideBarNegativeTabIndex],
     );
 
     return (
@@ -298,7 +316,8 @@ function SavedScans() {
                         <SavedScanList
                             columns={savedScanItemColumn}
                             data={savedScanList}
-                            setDeletableId={setDeletableId}
+                            onSetDeletableId={onSetDeletableId}
+                            negativeTabIndex={!!deletableId}
                         />
                         <HStack justifyContent="flex-end">
                             {loadingScanList ? (

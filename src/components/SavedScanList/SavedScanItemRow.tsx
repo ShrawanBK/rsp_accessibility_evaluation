@@ -12,7 +12,7 @@ import { formatDateTime } from '../../utils/common';
 import { SavedScanItem } from '../../typings/savedscans';
 
 export interface Props {
-    setDeletableId: React.Dispatch<React.SetStateAction<string | undefined>>;
+    onSetDeletableId: (id: string) => void;
     item: SavedScanItem;
     negativeTabIndex?: boolean;
 }
@@ -20,7 +20,7 @@ export interface Props {
 function SavedScansItemRow(props: Props) {
     const {
         item,
-        setDeletableId,
+        onSetDeletableId,
         negativeTabIndex,
     } = props;
 
@@ -31,8 +31,8 @@ function SavedScansItemRow(props: Props) {
     );
 
     const onDeleteButtonClicked = useCallback(
-        () => setDeletableId(item.id),
-        [item.id, setDeletableId],
+        () => onSetDeletableId(item.id),
+        [item.id, onSetDeletableId],
     );
 
     const scannedTime = useMemo(

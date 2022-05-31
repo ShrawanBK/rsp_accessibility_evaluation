@@ -36,6 +36,8 @@ import Loading from '../../components/Loading';
 import Info from '../../components/Info';
 import ScanAndAuditIcon from '../../components/icons/ScanAndAudit';
 import InvalidUrlIcon from '../../components/icons/InvalidUrl';
+import SaveResultForm from '../../components/forms/SaveResult';
+import ToastBox from '../../components/ToastBox';
 
 import {
     IssueObject,
@@ -47,15 +49,15 @@ import {
     ScanWebsiteResponse,
 } from '../../typings/webpage';
 
-import SaveResultForm from '../../components/forms/SaveResult';
 import { SaveResultFormData } from '../../typings/forms';
 
 import apis from '../../utils/apis';
-import ToastBox from '../../components/ToastBox';
-import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
 import { formatDateTime } from '../../utils/common';
 import { getFilteredIssues, getSelectedIssues, getTotalIssuesCount } from '../../utils/issues';
+
+import { SideBarContext } from '../../contexts/SideBarContext';
+import { ToastBoxContext } from '../../contexts/ToastBoxContext';
 
 const getBaseUrl = (url: string) => {
     const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
@@ -232,6 +234,10 @@ function ScanWebsite() {
         onCloseToast,
     } = useContext(ToastBoxContext);
 
+    const {
+        setSideBarNegativeTabIndex,
+    } = useContext(SideBarContext);
+
     // close toast message if open
     useEffect(
         () => {
@@ -360,6 +366,20 @@ function ScanWebsite() {
         [basicData],
     );
 
+    const onOpenSaveResultModal = useCallback(
+        () => {
+            setSideBarNegativeTabIndex.on();
+            setModalOpened.on();
+        }, [setModalOpened, setSideBarNegativeTabIndex],
+    );
+
+    const onCloseSaveResultModal = useCallback(
+        () => {
+            setSideBarNegativeTabIndex.off();
+            setModalOpened.off();
+        }, [setModalOpened, setSideBarNegativeTabIndex],
+    );
+
     return (
         <VStack
             align="stretch"
@@ -436,7 +456,7 @@ function ScanWebsite() {
                             type="button"
                             colorScheme="brand"
                             letterSpacing={1}
-                            onClick={setModalOpened.on}
+                            onClick={onOpenSaveResultModal}
                             tabIndex={modalOpened ? -1 : undefined}
                             py={4}
                         >
@@ -445,7 +465,7 @@ function ScanWebsite() {
                     </Box>
                     <Modal
                         isOpen={modalOpened}
-                        onClose={setModalOpened.off}
+                        onClose={onCloseSaveResultModal}
                         closeOnOverlayClick={false}
                         isCentered
                     >
@@ -459,7 +479,7 @@ function ScanWebsite() {
                                 <SaveResultForm
                                     onSaveAction={onSaveResult}
                                     basicData={basicData}
-                                    onCloseAction={setModalOpened.off}
+                                    onCloseAction={onCloseSaveResultModal}
                                 />
                             </ModalBody>
                         </ModalContent>

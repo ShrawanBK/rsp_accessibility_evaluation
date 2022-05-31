@@ -1,5 +1,18 @@
-import React, { createContext, useCallback, useMemo } from 'react';
-import { CloseAllToastsOptions, ToastId, useToast, UseToastOptions } from '@chakra-ui/react';
+import React, {
+    createContext,
+    useCallback,
+    useContext,
+    useMemo,
+} from 'react';
+
+import {
+    CloseAllToastsOptions,
+    ToastId,
+    useToast,
+    UseToastOptions,
+} from '@chakra-ui/react';
+
+import { SideBarContext } from './SideBarContext';
 
 export interface Toast {
     (options?: UseToastOptions | undefined): ToastId | undefined;
@@ -27,19 +40,25 @@ function ToastBoxContextProvider({ children }: { children: React.ReactChild }) {
     const toastIdRef = React.useRef<string | number | undefined>();
     const toast: Toast = useToast();
 
+    const {
+        setSideBarNegativeTabIndex,
+    } = useContext(SideBarContext);
+
     const showToast = useCallback((showableToast: ToastId | undefined) => {
         if (toastIdRef.current) {
             toast.close(toastIdRef.current);
         }
         toastIdRef.current = showableToast;
-    }, [toast]);
+        setSideBarNegativeTabIndex.on();
+    }, [setSideBarNegativeTabIndex, toast]);
 
     const onCloseToast = useCallback(() => {
         if (toastIdRef.current) {
             toast.close(toastIdRef.current);
             toast.closeAll();
+            setSideBarNegativeTabIndex.off();
         }
-    }, [toast]);
+    }, [setSideBarNegativeTabIndex, toast]);
 
     const value = useMemo(
         () => ({

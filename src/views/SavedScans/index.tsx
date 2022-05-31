@@ -83,17 +83,19 @@ function SavedScans() {
 
     const onSelectSortBy = useCallback(
         (value: string) => {
-            setSortBy(value);
+            const [sortByValue, orderByValue] = value.split('-');
+            setSortBy(sortByValue);
+            setOrder(orderByValue);
         },
         [],
     );
 
-    const onSelectOrder = useCallback(
-        (value: string) => {
-            setOrder(value);
-        },
-        [],
-    );
+    // const onSelectOrder = useCallback(
+    //     (value: string) => {
+    //         setOrder(value);
+    //     },
+    //     [],
+    // );
 
     const [deletableId, setDeletableId] = useState<string>();
 
@@ -243,7 +245,7 @@ function SavedScans() {
                         />
                     </Box>
                     <Spacer />
-                    <Box width="20%">
+                    <Box width="25%">
                         <SelectField
                             options={sortByOptions}
                             label="Sort By"
@@ -259,14 +261,14 @@ function SavedScans() {
                         {`${savedScanList ? savedScanList.length : ''} Result(s)`}
                     </Heading>
                     <Spacer />
-                    <Box minW="19%">
+                    {/* <Box minW="19%">
                         <SelectField
                             options={orderOptions}
                             label="Order"
                             onSelectOption={onSelectOrder}
                             negativeTabIndex={openDeleteRecordDialog}
                         />
-                    </Box>
+                    </Box> */}
                 </HStack>
                 {loadingScanList && (
                     <Loading message="Waiting for Result" />

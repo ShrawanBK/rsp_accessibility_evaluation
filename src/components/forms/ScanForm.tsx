@@ -1,10 +1,11 @@
-import React, { ChangeEvent, useCallback } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import {
     Button,
     FormControl,
     FormLabel,
     Input,
     HStack,
+    FormErrorMessage,
 } from '@chakra-ui/react';
 
 interface Props {
@@ -24,21 +25,34 @@ function ScanForm(props: Props) {
         negativeTabIndex = false,
     } = props;
 
-    const errored = !url;
+    const [urlError, setUrlError] = useState('');
 
     const handleSubmit = useCallback(
         (event) => {
             event.preventDefault();
+            if (!url) {
+                setUrlError('Please enter a valid url');
+                return;
+            }
             onScanWebpage();
         },
-        [onScanWebpage],
+        [onScanWebpage, url],
+    );
+
+    const onChangeUrlInput = useCallback(
+        (e: ChangeEvent<HTMLInputElement>) => {
+            if (urlError) {
+                setUrlError('');
+            }
+            handleUrlChange(e);
+        },
+        [handleUrlChange, urlError],
     );
 
     return (
         <form onSubmit={handleSubmit}>
-            {/* TODO: Handle isInvalid later */}
             <FormControl
-                isInvalid={false}
+                isInvalid={!!urlError}
                 flex={2}
             >
                 <FormLabel htmlFor="url">
@@ -47,9 +61,9 @@ function ScanForm(props: Props) {
                 <HStack spacing={0}>
                     <Input
                         id="url"
-                        type="url"
+                        // type="url"
                         value={url}
-                        onChange={handleUrlChange}
+                        onChange={onChangeUrlInput}
                         width="90%"
                         placeholder="Enter webpage url (https://www.examplewebsite.example)"
                         background="whiteAlpha.900"
@@ -61,7 +75,7 @@ function ScanForm(props: Props) {
                     />
                     <Button
                         type="submit"
-                        disabled={errored || processingUrl}
+                        disabled={processingUrl}
                         width="10%"
                         colorScheme="brand"
                         borderTopLeftRadius={0}
@@ -72,15 +86,11 @@ function ScanForm(props: Props) {
                         SCAN
                     </Button>
                 </HStack>
-                {/*
-                WIP: Handle error
-                {!errored ? (
-                    <FormHelperText>
-                        The website url is incorrect.
-                    </FormHelperText>
-                ) : (
-                    <FormErrorMessage>Email is required.</FormErrorMessage>
-                )} */}
+                {urlError && (
+                    <FormErrorMessage>
+                        {urlError}
+                    </FormErrorMessage>
+                )}
             </FormControl>
         </form>
     );

@@ -390,9 +390,10 @@ function ScannedWebsiteDetail() {
                 if (!editableIssue) {
                     return;
                 }
+                const { occurenceId } = editableIssue.occurences[0];
                 // FIXME - pass only data that was modified
                 const requestBody = formData;
-                const apiUrl = `issue?webpageId=${id}&issueId=${editableIssue.issueId}`;
+                const apiUrl = `issue?webpageId=${id}&issueId=${editableIssue.issueId}&occurenceId=${occurenceId}`;
                 const updateResponse = await apis.put(apiUrl, requestBody);
 
                 if (updateResponse.status === 200) {

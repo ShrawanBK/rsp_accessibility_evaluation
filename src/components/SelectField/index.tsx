@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 
 import {
     FormControl,
+    FormErrorMessage,
     FormLabel,
     Select,
 } from '@chakra-ui/react';
@@ -23,6 +24,8 @@ export interface SelectFieldProps<Type extends OptionValue> {
     onSelectOption: (value: string) => void;
     value?: string | number | readonly string[] | undefined;
     negativeTabIndex?: boolean;
+    isInvalid?: boolean;
+    errorMessage?: string;
 }
 
 function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
@@ -34,6 +37,8 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
         onSelectOption,
         value,
         negativeTabIndex = false,
+        isInvalid = false,
+        errorMessage = '',
     } = props;
 
     const onChange = useCallback(
@@ -45,9 +50,7 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
     );
 
     return (
-        <FormControl
-            isInvalid={false}
-        >
+        <FormControl isInvalid={isInvalid}>
             <FormLabel
                 htmlFor={label}
             >
@@ -75,6 +78,11 @@ function SelectField<Type extends OptionValue>(props: SelectFieldProps<Type>) {
                     </option>
                 ))}
             </Select>
+            {errorMessage && (
+                <FormErrorMessage>
+                    {errorMessage}
+                </FormErrorMessage>
+            )}
         </FormControl>
     );
 }

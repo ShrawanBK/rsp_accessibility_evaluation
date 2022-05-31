@@ -4,8 +4,9 @@ export interface IssueFormData {
     name: string;
     impact: Impact;
     found: FoundType;
-    note?: string;
     occurences: {
+        occurenceId?: string;
+        note?: string;
         description: string;
     }[];
     criteria: Criteria[];

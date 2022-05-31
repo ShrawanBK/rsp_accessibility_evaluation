@@ -24,7 +24,9 @@ function SearchScans(props: Props) {
     } = props;
 
     const onSearchValueChange = useCallback(
-        (e: ChangeEvent<HTMLInputElement>) => setSearchFormText(e.target.value),
+        (e: ChangeEvent<HTMLInputElement>) => {
+            setSearchFormText(e.target.value);
+        },
         [setSearchFormText],
     );
 
@@ -38,7 +40,7 @@ function SearchScans(props: Props) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <FormControl isInvalid={false} flex={2}>
+            <FormControl flex={2}>
                 <FormLabel htmlFor="searchField">Webpage or Website Name</FormLabel>
                 <HStack spacing={0}>
                     <Input

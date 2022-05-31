@@ -75,9 +75,12 @@ function EditableIssueItem(props: IssueListProps) {
 
     const onClickEdit = useCallback(
         () => {
-            onSetEditableIssue(issue);
+            onSetEditableIssue({
+                ...issue,
+                occurences: [currentOccurence],
+            });
         },
-        [onSetEditableIssue, issue],
+        [onSetEditableIssue, issue, currentOccurence],
     );
 
     return (
@@ -311,7 +314,7 @@ function EditableIssueItem(props: IssueListProps) {
                                 </Text>
                             </VStack>
                         )}
-                        {issue.note && (
+                        {currentOccurence.note && (
                             <VStack
                                 alignItems="baseline"
                                 spacing={2}
@@ -325,7 +328,7 @@ function EditableIssueItem(props: IssueListProps) {
                                     Note
                                 </Heading>
                                 <Text>
-                                    {issue.note}
+                                    {currentOccurence.note}
                                 </Text>
                             </VStack>
                         )}

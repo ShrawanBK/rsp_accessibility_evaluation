@@ -7,6 +7,7 @@ import {
     HStack,
     VStack,
     Textarea,
+    FormErrorMessage,
 } from '@chakra-ui/react';
 
 import { MultiValue, OptionBase, Select } from 'chakra-react-select';
@@ -54,17 +55,35 @@ function IssueForm(props: Props) {
 
     const [selectedCriteria, setSelectedCriteria] = useState<MultiValue<MultiCriteriaOption>>();
 
-    const handleNameChange = (e: ChangeEvent<HTMLInputElement>) => setName(e.target.value);
+    const [nameError, setNameError] = useState('');
+    const [criteriaError, setCriteriaError] = useState('');
+    const [impactError, setImpactError] = useState('');
+    const [descriptionError, setDescriptionError] = useState('');
+
+    const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        if (nameError) {
+            setNameError('');
+        }
+        setName(e.target.value);
+    }, [nameError]);
 
     const handleDescriptionChange = (
         e: ChangeEvent<HTMLTextAreaElement>,
-    ) => setDescription(e.target.value);
+    ) => {
+        if (descriptionError) {
+            setDescriptionError('');
+        }
+        setDescription(e.target.value);
+    };
     const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
 
     const onSelectCriteria = useCallback(
         (newValue: MultiValue<MultiCriteriaOption>) => {
+            if (criteriaError) {
+                setCriteriaError('');
+            }
             setSelectedCriteria(newValue);
-        }, [],
+        }, [criteriaError],
     );
 
     useEffect(
@@ -74,7 +93,7 @@ function IssueForm(props: Props) {
             }
             setName(editableIssue.name);
             setDescription(editableIssue.occurences[0].description);
-            setNote(editableIssue.note);
+            setNote(editableIssue.occurences[0].note ?? '');
             const formMappedSelectedCriteria = editableIssue.criteria.map(
                 (criteria) => ({
                     ...criteria,
@@ -99,8 +118,13 @@ function IssueForm(props: Props) {
     );
 
     const onSelectImpact = useCallback(
-        (value: string) => setSelectedImpact(value),
-        [],
+        (value: string) => {
+            if (impactError) {
+                setImpactError('');
+            }
+            setSelectedImpact(value);
+        },
+        [impactError],
     );
 
     const criteriaOptions: MultiCriteriaOption[] = useMemo(
@@ -148,14 +172,35 @@ function IssueForm(props: Props) {
 
     const handleSubmit = useCallback(
         (event) => {
+            let errorCount = 0;
             event.preventDefault();
+            if (!name) {
+                setNameError('Please enter issue name');
+                errorCount += 1;
+            }
+            if (formattedSelectedCriteria.length <= 0) {
+                setCriteriaError('Please select at least one criteria');
+                errorCount += 1;
+            }
+            if (!selectedImpact) {
+                setImpactError('Please select at impact');
+                errorCount += 1;
+            }
+            if (!description) {
+                setDescriptionError('Please enter description');
+                errorCount += 1;
+            }
+            if (errorCount > 0) {
+                return;
+            }
             onSaveAction({
                 name,
                 impact: selectedImpact as Impact,
-                note,
                 found: editableIssue ? editableIssue.found as FoundType : 'manual',
                 occurences: [
                     {
+                        occurenceId: editableIssue?.occurences[0].occurenceId,
+                        note,
                         description,
                     },
                 ],
@@ -164,39 +209,39 @@ function IssueForm(props: Props) {
         },
         [
             name,
+            formattedSelectedCriteria,
             note,
             onSaveAction,
             selectedImpact,
-            formattedSelectedCriteria,
             description,
             editableIssue,
         ],
     );
 
-    const submitButtonDisabled = useMemo(
-        () => {
-            if (!editableIssue) {
-                return !name || !selectedCriteria || selectedCriteria.length <= 0 || !description;
-            }
-            const descriptionUnchanged = description === editableIssue.occurences[0].description;
-            const impactUnchanged = selectedImpact === editableIssue.impact;
-            const noteUnchanged = note === editableIssue.note;
+    // const submitButtonDisabled = useMemo(
+    //     () => {
+    //         if (!editableIssue) {
+    //             return !name || !selectedCriteria
+    // || selectedCriteria.length <= 0 || !description;
+    //         }
+    //         const descriptionUnchanged = description === editableIssue.occurences[0].description;
+    //         const impactUnchanged = selectedImpact === editableIssue.impact;
+    //         const noteUnchanged = note === editableIssue.note;
 
-            const nothingChanged = descriptionUnchanged && impactUnchanged && noteUnchanged;
-            return nothingChanged;
-        },
-        [description, editableIssue, name, note, selectedCriteria, selectedImpact],
-    );
+    //         const nothingChanged = descriptionUnchanged && impactUnchanged && noteUnchanged;
+    //         return nothingChanged;
+    //     },
+    //     [description, editableIssue, name, note, selectedCriteria, selectedImpact],
+    // );
 
     const submitButtonLabel = editableIssue ? 'Update' : 'Add';
 
     return (
         <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
-                {/* TODO: Handle isInvalid later */}
-                <FormControl>
+                <FormControl isInvalid={!!nameError}>
                     <FormLabel htmlFor="name">
-                        Name
+                        Name *
                     </FormLabel>
                     <Input
                         id="name"
@@ -209,10 +254,15 @@ function IssueForm(props: Props) {
                         height={12}
                         autoComplete="off"
                     />
+                    {nameError && (
+                        <FormErrorMessage>
+                            {nameError}
+                        </FormErrorMessage>
+                    )}
                 </FormControl>
-                <FormControl>
+                <FormControl isInvalid={!!criteriaError}>
                     <FormLabel>
-                        Criteria / Tags
+                        Criteria / Tags *
                     </FormLabel>
                     <Select
                         isMulti
@@ -224,15 +274,22 @@ function IssueForm(props: Props) {
                         value={selectedCriteria}
                         placeholderColor="black"
                     />
+                    {criteriaError && (
+                        <FormErrorMessage>
+                            {criteriaError}
+                        </FormErrorMessage>
+                    )}
                 </FormControl>
                 <SelectField
                     options={impactOptions}
                     placeholder="Select option"
-                    label="Impact"
+                    label="Impact *"
                     onSelectOption={onSelectImpact}
                     value={selectedImpact}
+                    isInvalid={!!impactError}
+                    errorMessage={impactError}
                 />
-                <FormControl>
+                <FormControl isInvalid={!!descriptionError}>
                     <FormLabel htmlFor="description">
                         Description *
                     </FormLabel>
@@ -244,7 +301,13 @@ function IssueForm(props: Props) {
                         // isRequired
                         rows={3}
                         autoComplete="off"
+                        isInvalid={!!descriptionError}
                     />
+                    {descriptionError && (
+                        <FormErrorMessage>
+                            {descriptionError}
+                        </FormErrorMessage>
+                    )}
                 </FormControl>
                 <FormControl>
                     <FormLabel htmlFor="note">
@@ -276,7 +339,6 @@ function IssueForm(props: Props) {
                     </Button>
                     <Button
                         type="submit"
-                        disabled={submitButtonDisabled}
                         letterSpacing={1}
                         colorScheme="brand"
                         py={4}
@@ -285,15 +347,6 @@ function IssueForm(props: Props) {
                     </Button>
                 </HStack>
             </VStack>
-            {/*
-                WIP: Handle error
-                {!errored ? (
-                    <FormHelperText>
-                        The website url is incorrect.
-                    </FormHelperText>
-                ) : (
-                    <FormErrorMessage>Email is isRequired
-                )} */}
         </form>
     );
 }

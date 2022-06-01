@@ -15,9 +15,23 @@ function Loading(props: LoadingProps) {
         message,
     } = props;
     return (
-        <VStack p={5} spacing={4}>
-            <CircularProgress isIndeterminate />
-            <Text mt={4} width="50%" align="center" fontSize="xl">{message}</Text>
+        <VStack
+            p={5}
+            spacing={8}
+        >
+            <CircularProgress
+                isIndeterminate
+                size="100px"
+            />
+            <Text
+                mt={4}
+                width="50%"
+                align="center"
+                fontSize="x-large"
+                fontWeight="bold"
+            >
+                {message}
+            </Text>
         </VStack>
     );
 }

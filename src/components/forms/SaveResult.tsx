@@ -27,8 +27,8 @@ function SaveResultForm(props: Props) {
         onCloseAction,
     } = props;
 
-    const [webpageName, setWebpageName] = useState<string>('');
-    const [websiteName, setWebsiteName] = useState<string>('');
+    const [webpageName, setWebpageName] = useState<string>(basicData?.webpageName ?? '');
+    const [websiteName, setWebsiteName] = useState<string>(basicData?.websiteName ?? '');
     const [note, setNote] = useState<string>();
 
     const handleWebpageNameChange = (
@@ -178,15 +178,6 @@ function SaveResultForm(props: Props) {
                     </Button>
                 </HStack>
             </VStack>
-            {/*
-                WIP: Handle error
-                {!errored ? (
-                    <FormHelperText>
-                        The website url is incorrect.
-                    </FormHelperText>
-                ) : (
-                    <FormErrorMessage>Email is isRequired
-                )} */}
         </form>
     );
 }

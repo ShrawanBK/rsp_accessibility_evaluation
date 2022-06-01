@@ -68,36 +68,34 @@ function Sidebar() {
             >
                 Accessibility Tools
             </span>
-            {
-                sidebarMenus.map((menu) => (
-                    <Container
-                        key={menu.title}
-                        role="navigation"
-                        width="100%"
-                        display="flex"
-                        id={menu.ariaLabel}
-                        aria-label={menu.ariaLabel}
+            {sidebarMenus.map((menu) => (
+                <Container
+                    key={menu.title}
+                    role="navigation"
+                    width="100%"
+                    display="flex"
+                    id={menu.ariaLabel}
+                    aria-label={menu.ariaLabel}
+                    tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
+                >
+                    <NavLink
+                        to={menu.path}
+                        className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
+                        aria-labelledby={menu.ariaLabel}
                         tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
                     >
-                        <NavLink
-                            to={menu.path}
-                            className={({ isActive }) => (isActive ? 'nav-link-active' : 'nav-link')}
-                            aria-labelledby={menu.ariaLabel}
+                        <Flex
+                            justifyContent="space-around"
                             tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
                         >
-                            <Flex
-                                justifyContent="space-around"
-                                tabIndex={sideBarNegativeTabIndex ? -1 : undefined}
-                            >
-                                {menu.icon}
-                                <Text width="70%">
-                                    {menu.title}
-                                </Text>
-                            </Flex>
-                        </NavLink>
-                    </Container>
-                ))
-            }
+                            {menu.icon}
+                            <Text width="70%">
+                                {menu.title}
+                            </Text>
+                        </Flex>
+                    </NavLink>
+                </Container>
+            ))}
         </VStack>
     );
 }

@@ -69,7 +69,7 @@ export default function IssueTypeCard(props: Props) {
                     letterSpacing={1}
                     fontWeight="semibold"
                 >
-                    {`${automatic} issues (${reviewable} need reviews)`}
+                    {`${automatic} issues ${reviewable <= 0 ? '' : `(${reviewable} needs review)`}`}
                 </Text>
             </Box>
             <Box p={2} display="flex">
@@ -117,7 +117,6 @@ export default function IssueTypeCard(props: Props) {
                     </VStack>
                 )}
             </Box>
-
         </VStack>
     );
 }

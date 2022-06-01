@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 export const formatDateTime = (dateValue: string) => {
     const date = new Date(dateValue);
 
@@ -12,4 +11,12 @@ export const formatDateTime = (dateValue: string) => {
     );
     const formattedTime = date.toLocaleTimeString();
     return `${formattedTime} ${formattedDate}`;
+};
+
+export const getBaseUrl = (url: string) => {
+    const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
+    if (!matchedUrl) {
+        return '';
+    }
+    return matchedUrl[0];
 };

@@ -12,7 +12,6 @@ import {
     Divider,
     Code,
     HStack,
-    Tag,
     Checkbox,
     useBoolean,
 } from '@chakra-ui/react';
@@ -21,10 +20,11 @@ import {
     ChevronUpIcon,
 } from '@chakra-ui/icons';
 
-import { IssueObject } from '../../typings/webpage';
-
+import CriteriaList from '../CriteriaList';
 import Paginator from '../Paginator';
+
 import { getWcagCriteriaAndTags } from '../../utils/issues';
+import { IssueObject } from '../../typings/webpage';
 
 interface IssueListProps {
     issue: IssueObject;
@@ -107,7 +107,7 @@ function IssueItem(props: IssueListProps) {
                             {issue.name}
                         </Text>
                         <Text>
-                            {`${issue.occurences.length} occurences |`}
+                            {`${issue.occurences.length} occurence(s) |`}
                             {isExpanded ? (
                                 <ChevronUpIcon w={6} h={6} />
                             ) : (
@@ -137,42 +137,14 @@ function IssueItem(props: IssueListProps) {
                                 alignItems="baseline"
                                 spacing={2}
                             >
-                                <HStack alignItems="center">
-                                    <Heading
-                                        fontWeight="semibold"
-                                        letterSpacing="wide"
-                                        fontSize="md"
-                                        as="h3"
-                                    >
-                                        WCAG Criteria:
-                                    </Heading>
-                                    {wcagCriteria.map((criteria) => (
-                                        <Tag key={criteria.criteriaId + criteria.name}>
-                                            {criteria.name}
-                                        </Tag>
-                                    ))}
-                                    <Divider
-                                        orientation="vertical"
-                                        borderColor="black"
-                                        borderLeftWidth={2}
-                                        height={4}
-                                    />
-                                    <Heading
-                                        fontWeight="semibold"
-                                        letterSpacing="wide"
-                                        fontSize="md"
-                                        as="h3"
-                                    >
-                                        Tags:
-                                    </Heading>
-                                    <HStack>
-                                        {tags.map((tag) => (
-                                            <Tag key={tag.criteriaId + tag.name}>
-                                                {tag.name}
-                                            </Tag>
-                                        ))}
-                                    </HStack>
-                                </HStack>
+                                <CriteriaList
+                                    title="WCAG Criteria"
+                                    itemList={wcagCriteria}
+                                />
+                                <CriteriaList
+                                    title="Tags"
+                                    itemList={tags}
+                                />
                                 <HStack alignItems="center">
                                     <Heading
                                         fontWeight="semibold"
@@ -204,12 +176,14 @@ function IssueItem(props: IssueListProps) {
                                     </Text>
                                 </HStack>
                             </VStack>
-                            <Paginator
-                                pageIndex={currentOccurenceIndex}
-                                totalPages={issue.occurences.length}
-                                onChangePage={setCurrentOccurenceIndex}
-                                negativeTabIndex={negativeTabIndex}
-                            />
+                            {issue.occurences.length > 1 && (
+                                <Paginator
+                                    pageIndex={currentOccurenceIndex}
+                                    totalPages={issue.occurences.length}
+                                    onChangePage={setCurrentOccurenceIndex}
+                                    negativeTabIndex={negativeTabIndex}
+                                />
+                            )}
                         </Box>
                         <Divider />
                         <VStack
@@ -231,6 +205,7 @@ function IssueItem(props: IssueListProps) {
                         <VStack
                             spacing={2}
                             alignItems="baseline"
+                            align="stretch"
                         >
                             <Heading
                                 fontWeight="semibold"
@@ -241,9 +216,9 @@ function IssueItem(props: IssueListProps) {
                             >
                                 • Element Location
                             </Heading>
-                            <Text>
+                            <Code ml={1} p={4}>
                                 {currentOccurence.location}
-                            </Text>
+                            </Code>
                         </VStack>
                         <VStack
                             align="stretch"

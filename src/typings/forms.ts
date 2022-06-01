@@ -8,6 +8,7 @@ export interface IssueFormData {
         occurenceId?: string;
         note?: string;
         description: string;
+        needsReview: boolean;
     }[];
     criteria: Criteria[];
 }

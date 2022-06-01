@@ -1,9 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
 
 import {
+    Box,
     Button,
     HStack,
     Td,
+    Text,
     Tr,
 } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
@@ -42,9 +44,19 @@ function SavedScansItemRow(props: Props) {
 
     return (
         <Tr>
-            <Td>{item.name}</Td>
-            <Td>{item.url}</Td>
-            <Td>{item.website}</Td>
+            <Td>
+                <Box>
+                    {item.name}
+                </Box>
+            </Td>
+            <Td>
+                <Box maxWidth={300}>
+                    {item.url}
+                </Box>
+            </Td>
+            <Td>
+                {item.website}
+            </Td>
             <Td>{scannedTime}</Td>
             <Td>
                 <HStack spacing={2}>

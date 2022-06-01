@@ -16,12 +16,12 @@ import {
     Divider,
     Code,
     HStack,
-    Tag,
     useBoolean,
     Button,
 } from '@chakra-ui/react';
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 
+import CriteriaList from '../CriteriaList';
 import Paginator from '../Paginator';
 
 import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
@@ -80,7 +80,6 @@ function EditableIssueItem(props: IssueListProps) {
         },
         [onSetEditableIssue, issue, currentOccurence],
     );
-
     return (
         <Accordion
             allowToggle
@@ -106,7 +105,7 @@ function EditableIssueItem(props: IssueListProps) {
                             {issue.name}
                         </Text>
                         <Text>
-                            {`${issue.occurences.length} occurences |`}
+                            {`${issue.occurences.length} occurence(s) |`}
                             {isExpanded ? (
                                 <ChevronUpIcon w={6} h={6} />
                             ) : (
@@ -136,42 +135,14 @@ function EditableIssueItem(props: IssueListProps) {
                                 alignItems="baseline"
                                 spacing={2}
                             >
-                                <HStack alignItems="center">
-                                    <Heading
-                                        fontWeight="semibold"
-                                        letterSpacing="wide"
-                                        fontSize="md"
-                                        as="h3"
-                                    >
-                                        WCAG Criteria:
-                                    </Heading>
-                                    {wcagCriteria.map((criteria) => (
-                                        <Tag key={criteria.criteriaId}>
-                                            {criteria.name}
-                                        </Tag>
-                                    ))}
-                                    <Divider
-                                        orientation="vertical"
-                                        borderColor="black"
-                                        borderLeftWidth={2}
-                                        height={4}
-                                    />
-                                    <Heading
-                                        fontWeight="semibold"
-                                        letterSpacing="wide"
-                                        fontSize="md"
-                                        as="h3"
-                                    >
-                                        Tags:
-                                    </Heading>
-                                    <HStack>
-                                        {tags.map((tag) => (
-                                            <Tag key={tag.criteriaId}>
-                                                {tag.name}
-                                            </Tag>
-                                        ))}
-                                    </HStack>
-                                </HStack>
+                                <CriteriaList
+                                    title="WCAG Criteria"
+                                    itemList={wcagCriteria}
+                                />
+                                <CriteriaList
+                                    title="Tags"
+                                    itemList={tags}
+                                />
                                 <HStack alignItems="center">
                                     <Heading
                                         fontWeight="semibold"
@@ -204,12 +175,14 @@ function EditableIssueItem(props: IssueListProps) {
                                 </HStack>
                             </VStack>
                             <VStack alignItems="flex-end">
-                                <Paginator
-                                    pageIndex={currentOccurenceIndex}
-                                    totalPages={issue.occurences.length}
-                                    onChangePage={setCurrentOccurenceIndex}
-                                    negativeTabIndex={negativeTabIndex}
-                                />
+                                {issue.occurences.length > 1 && (
+                                    <Paginator
+                                        pageIndex={currentOccurenceIndex}
+                                        totalPages={issue.occurences.length}
+                                        onChangePage={setCurrentOccurenceIndex}
+                                        negativeTabIndex={negativeTabIndex}
+                                    />
+                                )}
                                 <HStack spacing={2}>
                                     <Button
                                         type="button"
@@ -235,7 +208,6 @@ function EditableIssueItem(props: IssueListProps) {
                                     </Button>
                                 </HStack>
                             </VStack>
-
                         </Box>
                         <Divider />
                         <VStack
@@ -258,6 +230,7 @@ function EditableIssueItem(props: IssueListProps) {
                             <VStack
                                 spacing={2}
                                 alignItems="baseline"
+                                align="stretch"
                             >
                                 <Heading
                                     fontWeight="semibold"
@@ -268,9 +241,9 @@ function EditableIssueItem(props: IssueListProps) {
                                 >
                                     • Element Location
                                 </Heading>
-                                <Text>
+                                <Code ml={1} p={4}>
                                     {currentOccurence.location}
-                                </Text>
+                                </Code>
                             </VStack>
                         )}
                         {currentOccurence.source && (

@@ -53,19 +53,11 @@ import { SaveResultFormData } from '../../typings/forms';
 
 import apis from '../../utils/apis';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
-import { formatDateTime } from '../../utils/common';
+import { formatDateTime, getBaseUrl } from '../../utils/common';
 import { getFilteredIssues, getSelectedIssues, getTotalIssuesCount } from '../../utils/issues';
 
 import { SideBarContext } from '../../contexts/SideBarContext';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
-
-const getBaseUrl = (url: string) => {
-    const matchedUrl = url.match(/^https?:\/\/[^#?/]+/);
-    if (!matchedUrl) {
-        return '';
-    }
-    return matchedUrl[0];
-};
 
 const scanBaseUrl = 'https://axe-playwright-nodejs.herokuapp.com';
 
@@ -93,7 +85,6 @@ function ScanWebsite() {
     const [basicData, setBasicData] = useState<BasicData>();
 
     const issuesShown = !urlInvalidStatus && issues && !processingUrl;
-
     const onScanWebpage = useCallback(
         async () => {
             try {
@@ -101,6 +92,7 @@ function ScanWebsite() {
                 setUrlInvalidStatus.off();
                 const response = await axios.get(`${scanBaseUrl}/scan?url=${webpageUrl}`);
                 const dataResponse: ScanWebsiteResponse = response.data;
+
                 if (!dataResponse) {
                     setProcessingUrl.off();
                     return;
@@ -113,7 +105,8 @@ function ScanWebsite() {
                 setBasicData({
                     scantime: dataResponse.scanTime,
                     url: dataResponse.url,
-                    name: dataResponse.name,
+                    webpageName: dataResponse.webpageName,
+                    websiteName: getBaseUrl(dataResponse.url),
                 });
                 const ids = dataResponse.issues.map((issue) => issue.name);
                 setSelectedIssueIds(ids);
@@ -271,7 +264,7 @@ function ScanWebsite() {
                     scantime: basicData.scantime,
                     note: formData.note,
                     website: {
-                        name: formData.websiteName,
+                        name: getBaseUrl(basicData.url),
                         url: getBaseUrl(basicData.url),
                     },
                     issues: selectedIssues,

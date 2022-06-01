@@ -42,7 +42,7 @@ import {
 import { IssueFormData } from '../../typings/forms';
 import apis from '../../utils/apis';
 import { getCriteriaOptions, getImpactLevelOptions } from '../../utils/options';
-import { formatDateTime } from '../../utils/common';
+import { formatDateTime, getBaseUrl } from '../../utils/common';
 import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
 
 import { SideBarContext } from '../../contexts/SideBarContext';
@@ -101,7 +101,8 @@ function ScannedWebsiteDetail() {
                 setBasicData({
                     scantime: dataResponse.scanTime,
                     url: dataResponse.url,
-                    name: dataResponse.name,
+                    webpageName: dataResponse.webpageName,
+                    websiteName: getBaseUrl(dataResponse.url),
                 });
                 setProcessingUrl.off();
             } catch (error) {
@@ -325,7 +326,6 @@ function ScannedWebsiteDetail() {
                 const requestBody = formData;
                 const apiUrl = `issue?webpageId=${id}`;
                 const response = await apis.post(apiUrl, requestBody);
-
                 if (response.status === 200) {
                     const issueData: IssueObject = response.data;
                     setIssues((prevIssues) => {
@@ -522,7 +522,7 @@ function ScannedWebsiteDetail() {
                     <NextArrowIcon fill="black" />
                 </Box>
                 <Text>
-                    {basicData?.name}
+                    {basicData?.webpageName}
                 </Text>
                 <Spacer />
             </HStack>
@@ -531,8 +531,8 @@ function ScannedWebsiteDetail() {
                 size="lg"
                 role="heading"
             >
-                {basicData?.name}
-                {basicData?.name && ' - '}
+                {basicData?.webpageName}
+                {basicData?.webpageName && ' - '}
                 Scan Detail
                 <Divider />
             </Heading>
@@ -552,20 +552,21 @@ function ScannedWebsiteDetail() {
                         display="flex"
                         justifyContent="space-between"
                     >
-                        <VStack alignItems="baseline">
+                        <VStack
+                            alignItems="baseline"
+                            maxWidth="80%"
+                        >
                             <Heading
                                 fontWeight="semibold"
                                 letterSpacing="wide"
                                 fontSize="2xl"
                                 as="h2"
+                                wordBreak="break-word"
                             >
-                                URL:
-                                {' '}
-                                {basicData?.url}
+                                {`URL: ${basicData?.url}`}
                             </Heading>
                             <Text>
-                                {/* FIXME: basicdata.name is not website name */}
-                                {`Website: ${basicData?.name} | Scanned on ${scannedTime}`}
+                                {`Website: ${basicData?.websiteName} | Scanned on ${scannedTime}`}
                             </Text>
                         </VStack>
                         <Button

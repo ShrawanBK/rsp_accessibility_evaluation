@@ -298,7 +298,7 @@ function SavedScans() {
                         icon={<ScanAndAuditIcon />}
                     />
                 )}
-                {savedScanList && savedScanList.length > 0 && (
+                {!loadingScanList && savedScanList && savedScanList.length > 0 && (
                     <VStack align="stretch">
                         {resetButtonShown && (
                             <Center>

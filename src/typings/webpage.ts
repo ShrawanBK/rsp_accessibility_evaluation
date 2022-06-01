@@ -26,6 +26,7 @@ export interface Occurence {
     source?: string;
     fix?: string;
     note?: string;
+    needsReview?: boolean;
 }
 
 export interface IssueObject {
@@ -54,7 +55,8 @@ export interface FoundStatistics {
 export interface BasicData {
     scantime: string;
     url: string;
-    name: string;
+    webpageName: string;
+    websiteName: string;
 }
 
 export interface DeletableOccurenceData {
@@ -65,7 +67,7 @@ export interface DeletableOccurenceData {
 }
 
 export interface ScanWebsiteResponse {
-    name: string;
+    webpageName: string;
     url: string;
     scanTime: string;
     issues: IssueObject[];

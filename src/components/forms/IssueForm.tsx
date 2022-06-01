@@ -8,6 +8,8 @@ import {
     VStack,
     Textarea,
     FormErrorMessage,
+    useBoolean,
+    Checkbox,
 } from '@chakra-ui/react';
 
 import { MultiValue, OptionBase, Select } from 'chakra-react-select';
@@ -52,6 +54,8 @@ function IssueForm(props: Props) {
     const [description, setDescription] = useState<string>('');
     const [note, setNote] = useState<string>('');
     const [selectedImpact, setSelectedImpact] = useState<string>('');
+
+    const [needsReview, setNeedsReview] = useBoolean();
 
     const [selectedCriteria, setSelectedCriteria] = useState<MultiValue<MultiCriteriaOption>>();
 
@@ -103,8 +107,13 @@ function IssueForm(props: Props) {
             );
             setSelectedCriteria(formMappedSelectedCriteria);
             setSelectedImpact(editableIssue.impact);
+            if (editableIssue.occurences[0].needsReview) {
+                setNeedsReview.on();
+            } else {
+                setNeedsReview.off();
+            }
         },
-        [editableIssue],
+        [editableIssue, setNeedsReview],
     );
 
     const onCancelSave = useCallback(
@@ -202,6 +211,7 @@ function IssueForm(props: Props) {
                         occurenceId: editableIssue?.occurences[0].occurenceId,
                         note,
                         description,
+                        needsReview,
                     },
                 ],
                 criteria: formattedSelectedCriteria,
@@ -215,24 +225,9 @@ function IssueForm(props: Props) {
             selectedImpact,
             description,
             editableIssue,
+            needsReview,
         ],
     );
-
-    // const submitButtonDisabled = useMemo(
-    //     () => {
-    //         if (!editableIssue) {
-    //             return !name || !selectedCriteria
-    // || selectedCriteria.length <= 0 || !description;
-    //         }
-    //         const descriptionUnchanged = description === editableIssue.occurences[0].description;
-    //         const impactUnchanged = selectedImpact === editableIssue.impact;
-    //         const noteUnchanged = note === editableIssue.note;
-
-    //         const nothingChanged = descriptionUnchanged && impactUnchanged && noteUnchanged;
-    //         return nothingChanged;
-    //     },
-    //     [description, editableIssue, name, note, selectedCriteria, selectedImpact],
-    // );
 
     const submitButtonLabel = editableIssue ? 'Update' : 'Add';
 
@@ -322,6 +317,17 @@ function IssueForm(props: Props) {
                         autoComplete="off"
                     />
                 </FormControl>
+                <Checkbox
+                    aria-label="needs-review"
+                    width="100%"
+                    margin={4}
+                    borderColor="#045981"
+                    onChange={() => setNeedsReview.toggle()}
+                    isChecked={needsReview}
+                    alignItems="center"
+                >
+                    Needs Review
+                </Checkbox>
                 <HStack
                     width="100%"
                     justifyContent="flex-end"

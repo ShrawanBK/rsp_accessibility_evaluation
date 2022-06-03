@@ -115,6 +115,8 @@ function ScanWebsite() {
                 setUrlInvalidStatus.off();
                 setProcessingUrl.off();
             } catch (error) {
+                // TODO: HANDLE THIS ERROR
+
                 setProcessingUrl.off();
                 setUrlInvalidStatus.on();
             }
@@ -258,7 +260,6 @@ function ScanWebsite() {
                     return;
                 }
                 const requestBody = {
-                    // TODO : Fix the name here
                     name: formData.webpageName,
                     url: basicData.url,
                     scantime: basicData.scantime,
@@ -309,7 +310,7 @@ function ScanWebsite() {
                                         variant="link"
                                         color="white"
                                     >
-                                        Click here to go view the detail!
+                                        Click here to go see the detail!
                                     </Button>
                                 )}
                             />
@@ -318,6 +319,8 @@ function ScanWebsite() {
                     showToast(successToastComponent);
                 }
             } catch (error) {
+                // TODO: HANDLE THIS ERROR
+
                 const failureToastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,

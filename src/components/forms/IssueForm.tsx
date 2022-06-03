@@ -64,30 +64,50 @@ function IssueForm(props: Props) {
     const [impactError, setImpactError] = useState('');
     const [descriptionError, setDescriptionError] = useState('');
 
+    // Display when the form submitted without editing - for update
+    const [notEditedError, setNotEditedError] = useState('');
+
     const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         if (nameError) {
             setNameError('');
         }
+        if (notEditedError) {
+            setNotEditedError('');
+        }
         setName(e.target.value);
-    }, [nameError]);
+    }, [nameError, notEditedError]);
 
-    const handleDescriptionChange = (
+    const handleDescriptionChange = useCallback((
         e: ChangeEvent<HTMLTextAreaElement>,
     ) => {
         if (descriptionError) {
             setDescriptionError('');
         }
+        if (notEditedError) {
+            setNotEditedError('');
+        }
         setDescription(e.target.value);
-    };
-    const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
+    }, [descriptionError, notEditedError]);
+
+    const handleNoteChange = useCallback(
+        (e: ChangeEvent<HTMLTextAreaElement>) => {
+            setNote(e.target.value);
+            if (notEditedError) {
+                setNotEditedError('');
+            }
+        }, [notEditedError],
+    );
 
     const onSelectCriteria = useCallback(
         (newValue: MultiValue<MultiCriteriaOption>) => {
             if (criteriaError) {
                 setCriteriaError('');
             }
+            if (notEditedError) {
+                setNotEditedError('');
+            }
             setSelectedCriteria(newValue);
-        }, [criteriaError],
+        }, [criteriaError, notEditedError],
     );
 
     useEffect(
@@ -131,9 +151,12 @@ function IssueForm(props: Props) {
             if (impactError) {
                 setImpactError('');
             }
+            if (notEditedError) {
+                setNotEditedError('');
+            }
             setSelectedImpact(value);
         },
-        [impactError],
+        [impactError, notEditedError],
     );
 
     const criteriaOptions: MultiCriteriaOption[] = useMemo(
@@ -198,6 +221,34 @@ function IssueForm(props: Props) {
             if (!description) {
                 setDescriptionError('Please enter description');
                 errorCount += 1;
+            }
+            if (editableIssue) {
+                // NOTE: for criteria field changed
+                let criteriaChanged = false;
+                const editableIssueCriteriaId = editableIssue.criteria.map((c) => c.criteriaId);
+                const formIssueCriteriaId = formattedSelectedCriteria.map((c) => c.criteriaId);
+
+                if (editableIssueCriteriaId.length !== formIssueCriteriaId.length) {
+                    criteriaChanged = true;
+                }
+
+                const idDifference = editableIssueCriteriaId.filter(
+                    (eID) => !formIssueCriteriaId.includes(eID),
+                );
+                criteriaChanged = !(idDifference.length === 0);
+
+                const otherFieldsChanged = name !== editableIssue.name
+                    || selectedImpact !== editableIssue.impact
+                    || description !== editableIssue.occurences[0].description
+                    || needsReview !== editableIssue.occurences[0].needsReview
+                    || note !== editableIssue.occurences[0].note;
+
+                const formUpdated = otherFieldsChanged || criteriaChanged;
+
+                if (!formUpdated) {
+                    setNotEditedError('Please update at least one field');
+                    errorCount += 1;
+                }
             }
             if (errorCount > 0) {
                 return;
@@ -328,6 +379,13 @@ function IssueForm(props: Props) {
                 >
                     Needs Review
                 </Checkbox>
+                {notEditedError && (
+                    <FormControl isInvalid={!!notEditedError}>
+                        <FormErrorMessage>
+                            {notEditedError}
+                        </FormErrorMessage>
+                    </FormControl>
+                )}
                 <HStack
                     width="100%"
                     justifyContent="flex-end"

@@ -18,6 +18,9 @@ function Info(props: InfoProps) {
         title,
         message,
     } = props;
+
+    const formattedMessage = message.charAt(0).toUpperCase() + message.slice(1);
+
     return (
         <VStack
             p={5}
@@ -31,6 +34,7 @@ function Info(props: InfoProps) {
                 fontSize="x-large"
                 fontWeight="bold"
                 zIndex={999}
+                textTransform="capitalize"
             >
                 {title}
             </Text>
@@ -41,7 +45,7 @@ function Info(props: InfoProps) {
                 fontSize="xl"
                 zIndex={999}
             >
-                {message}
+                {formattedMessage}
             </Text>
         </VStack>
     );

@@ -64,6 +64,9 @@ export interface DeletableOccurenceData {
     issueId: string;
     issueName: string;
     issueDeletable: boolean;
+    impact: Impact;
+    found: FoundType;
+    needsReview: boolean;
 }
 
 export interface ScanWebsiteResponse {

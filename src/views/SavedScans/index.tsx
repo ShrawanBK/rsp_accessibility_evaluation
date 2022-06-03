@@ -67,6 +67,8 @@ function SavedScans() {
                 setSavedScanList(scanListResponse);
                 setLoadingScanList.off();
             } catch (error) {
+                // TODO: HANDLE THIS ERROR
+
                 console.warn({ error });
             }
         },
@@ -179,6 +181,8 @@ function SavedScans() {
                     getSavedScanList();
                 } else {
                     // NOTE MAKE IT ACCESSIBLE
+                    // TODO: HANDLE THIS ERROR
+
                     const toastComponent = toast && toast({
                         status: 'error',
                         isClosable: true,
@@ -200,6 +204,8 @@ function SavedScans() {
             } catch (error) {
                 console.warn({ error });
                 // NOTE MAKE IT ACCESSIBLE
+                // TODO: HANDLE THIS ERROR
+
                 const toastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,
@@ -279,14 +285,6 @@ function SavedScans() {
                         {`${savedScanList ? savedScanList.length : ''} Result(s)`}
                     </Heading>
                     <Spacer />
-                    {/* <Box minW="19%">
-                        <SelectField
-                            options={orderOptions}
-                            label="Order"
-                            onSelectOption={onSelectOrder}
-                            negativeTabIndex={openDeleteRecordDialog}
-                        />
-                    </Box> */}
                 </HStack>
                 {loadingScanList && (
                     <Loading message="Waiting for Result" />

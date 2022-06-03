@@ -174,6 +174,19 @@ function IssueItem(props: IssueListProps) {
                                     <Text>
                                         {issue.found}
                                     </Text>
+                                    {currentOccurence.needsReview && (
+                                        <>
+                                            <Divider
+                                                orientation="vertical"
+                                                borderColor="black"
+                                                borderLeftWidth={2}
+                                                height={4}
+                                            />
+                                            <Text fontWeight="bold">
+                                                Needs Review
+                                            </Text>
+                                        </>
+                                    )}
                                 </HStack>
                             </VStack>
                             {issue.occurences.length > 1 && (

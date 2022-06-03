@@ -17,6 +17,7 @@ import {
     VStack,
 } from '@chakra-ui/react';
 import { useParams, Link } from 'react-router-dom';
+import axios, { AxiosError } from 'axios';
 
 import IssueStats from '../../components/IssueStats';
 import SelectField from '../../components/SelectField';
@@ -47,6 +48,13 @@ import { getFilteredIssues, getTotalIssuesCount } from '../../utils/issues';
 
 import { SideBarContext } from '../../contexts/SideBarContext';
 import { ToastBoxContext } from '../../contexts/ToastBoxContext';
+import Info from '../../components/Info';
+import InvalidUrlIcon from '../../components/icons/InvalidUrl';
+
+interface ResponseError {
+    message: string;
+    status: 'error';
+}
 
 function ScannedWebsiteDetail() {
     const { id } = useParams();
@@ -64,6 +72,8 @@ function ScannedWebsiteDetail() {
     const [basicData, setBasicData] = useState<BasicData>();
 
     const issuesShown = issues && !processingUrl;
+
+    const [responseError, setResponseError] = useState<ResponseError>();
 
     const filteredIssues = useMemo(
         () => getFilteredIssues(
@@ -97,7 +107,6 @@ function ScannedWebsiteDetail() {
                 setIssues(dataResponse.issues);
                 setImpactStatistics(dataResponse.impactStatistics);
                 setFoundStatistics(dataResponse.foundStatistics);
-                // setSelectedIssueIds(undefined);
                 setBasicData({
                     scantime: dataResponse.scanTime,
                     url: dataResponse.url,
@@ -105,8 +114,15 @@ function ScannedWebsiteDetail() {
                     websiteName: getBaseUrl(dataResponse.url),
                 });
                 setProcessingUrl.off();
+                setResponseError(undefined);
             } catch (error) {
-                console.warn({ error });
+                if (!axios.isAxiosError(error)) {
+                    return;
+                }
+                const axiosError = error as AxiosError;
+                const dataError = axiosError?.response?.data as ResponseError;
+                setResponseError(dataError);
+                setProcessingUrl.off();
             }
         };
         getWebpageDetail();
@@ -123,7 +139,8 @@ function ScannedWebsiteDetail() {
                     setCriteriaListForForm(criteriaList);
                 }
             } catch (error) {
-                console.warn({ error });
+                // TODO: HANDLE THIS ERROR
+                setCriteriaListForForm([]);
             }
         };
         getCriteria();
@@ -196,6 +213,7 @@ function ScannedWebsiteDetail() {
                 return;
             }
             try {
+                console.log('eta aayo');
                 const apiUrl = `/occurence?webpageId=${id}&issueId=${deletableOccurenceData.issueId}&occurenceId=${deletableOccurenceData.occurenceId}`;
                 const response = await apis.delete(apiUrl);
                 const deleteResponse = await response.data;
@@ -218,6 +236,43 @@ function ScannedWebsiteDetail() {
                         });
                         return updatedIssueList;
                     });
+                    // setImpactStatistics((prevSta));
+                    setImpactStatistics((prevStat) => {
+                        if (!prevStat) {
+                            return undefined;
+                        }
+                        return prevStat.map((stat) => {
+                            if (stat.impact === deletableOccurenceData.impact) {
+                                return {
+                                    ...stat,
+                                    count: stat.count - 1,
+                                };
+                            }
+                            return stat;
+                        });
+                    });
+
+                    // NOTE - Update the manual count
+                    setFoundStatistics((prevStat) => {
+                        if (!prevStat) {
+                            return undefined;
+                        }
+                        return prevStat.map((stat) => {
+                            if (stat.found === 'needsReview' && deletableOccurenceData.needsReview) {
+                                return {
+                                    ...stat,
+                                    count: stat.count - 1,
+                                };
+                            }
+                            if (stat.found !== deletableOccurenceData.found) {
+                                return stat;
+                            }
+                            return {
+                                ...stat,
+                                count: stat.count - 1,
+                            };
+                        });
+                    });
 
                     const toastComponent = toast && toast({
                         status: 'success',
@@ -239,6 +294,7 @@ function ScannedWebsiteDetail() {
                     setDeletableOccurenceData(undefined);
                 }
             } catch (onDeleteOccurenceError) {
+                // TODO: HANDLE THIS ERROR
                 console.warn({ onDeleteOccurenceError });
             }
         },
@@ -252,7 +308,6 @@ function ScannedWebsiteDetail() {
                     return;
                 }
 
-                // NOTE - Delete the issue as well.
                 const apiUrl = `/issue?issueId=${deletableOccurenceData.issueId}&webpageId=${id}`;
                 const response = await apis.delete(apiUrl);
                 const deleteResponse = await response.data;
@@ -286,6 +341,7 @@ function ScannedWebsiteDetail() {
                 showToast(toastComponent);
                 setDeletableOccurenceData(undefined);
             } catch (onDeleteOccurenceError) {
+                // TODO: HANDLE THIS ERROR
                 console.warn({ onDeleteOccurenceError });
             }
         },
@@ -342,9 +398,16 @@ function ScannedWebsiteDetail() {
                             return undefined;
                         }
                         return prevStat.map((stat) => {
+                            if (stat.found === 'needsReview' && formData.occurences[0].needsReview) {
+                                return {
+                                    ...stat,
+                                    count: stat.count + 1,
+                                };
+                            }
                             if (stat.found !== 'manual') {
                                 return stat;
                             }
+
                             return {
                                 ...stat,
                                 count: stat.count + 1,
@@ -387,6 +450,14 @@ function ScannedWebsiteDetail() {
                     showToast(successToastComponent);
                 }
             } catch (error) {
+                // TODO: HANDLE THIS ERROR
+
+                if (!axios.isAxiosError(error)) {
+                    return;
+                }
+                const axiosError = error as AxiosError;
+                const dataError = axiosError?.response?.data;
+                console.log({ dataError });
                 const failureToastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,
@@ -435,6 +506,27 @@ function ScannedWebsiteDetail() {
                         );
                         return updatedIssueList;
                     });
+
+                    setFoundStatistics((prevStat) => {
+                        if (!prevStat) {
+                            return undefined;
+                        }
+                        return prevStat.map((stat) => {
+                            if (stat.found !== 'needsReview') {
+                                return stat;
+                            }
+                            // NOTE: MAKE IT BETTER
+                            const prevNeedsReview = editableIssue.occurences[0].needsReview;
+                            const responseNeedsReview = updatedIssueData.occurences[0].needsReview;
+                            if (prevNeedsReview === responseNeedsReview) {
+                                return stat;
+                            }
+                            return {
+                                ...stat,
+                                count: responseNeedsReview ? stat.count + 1 : stat.count - 1,
+                            };
+                        });
+                    });
                     setModalOpened.off();
 
                     setEditableIssue(undefined);
@@ -458,6 +550,8 @@ function ScannedWebsiteDetail() {
                     // setEditableIssue(undefined);
                 }
             } catch (error) {
+                // TODO: HANDLE THIS ERROR
+
                 const failureToastComponent = toast && toast({
                     status: 'error',
                     isClosable: true,
@@ -540,7 +634,13 @@ function ScannedWebsiteDetail() {
             {processingUrl && !issuesShown && (
                 <Loading message="Waiting for data to load" />
             )}
-
+            {!processingUrl && responseError && (
+                <Info
+                    title="Error Getting Webpage Detail"
+                    message={responseError.message}
+                    icon={<InvalidUrlIcon />}
+                />
+            )}
             {issuesShown && (
                 <Box
                     background="white"

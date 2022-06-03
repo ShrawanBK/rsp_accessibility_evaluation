@@ -24,7 +24,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons';
 import CriteriaList from '../CriteriaList';
 import Paginator from '../Paginator';
 
-import { IssueObject, DeletableOccurenceData } from '../../typings/webpage';
+import { IssueObject, DeletableOccurenceData, FoundType } from '../../typings/webpage';
 import { getWcagCriteriaAndTags } from '../../utils/issues';
 
 interface IssueListProps {
@@ -60,6 +60,9 @@ function EditableIssueItem(props: IssueListProps) {
                 issueId: issue.issueId,
                 issueName: issue.name,
                 issueDeletable: issue.occurences.length === 1,
+                impact: issue.impact,
+                found: issue.found as FoundType,
+                needsReview: currentOccurence.needsReview ?? false,
             });
         },
         [
@@ -68,6 +71,9 @@ function EditableIssueItem(props: IssueListProps) {
             issue.name,
             onSetDeletableOccurenceData,
             issue.occurences,
+            issue.impact,
+            issue.found,
+            currentOccurence.needsReview,
         ],
     );
 
@@ -172,6 +178,19 @@ function EditableIssueItem(props: IssueListProps) {
                                     <Text>
                                         {issue.found}
                                     </Text>
+                                    {currentOccurence.needsReview && (
+                                        <>
+                                            <Divider
+                                                orientation="vertical"
+                                                borderColor="black"
+                                                borderLeftWidth={2}
+                                                height={4}
+                                            />
+                                            <Text fontWeight="bold">
+                                                Needs Review
+                                            </Text>
+                                        </>
+                                    )}
                                 </HStack>
                             </VStack>
                             <VStack alignItems="flex-end">

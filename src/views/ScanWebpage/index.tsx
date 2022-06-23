@@ -90,7 +90,17 @@ function ScanWebsite() {
             try {
                 setProcessingUrl.on();
                 setUrlInvalidStatus.off();
-                const response = await axios.get(`${scanBaseUrl}/scan?url=${webpageUrl}`);
+                const webpageUrlSplit = webpageUrl.split('://');
+                let urlWithHttp = '';
+                if (webpageUrlSplit.length <= 1) {
+                    urlWithHttp = `http://${webpageUrl}`;
+                } else {
+                    const urlHasHttp = webpageUrlSplit[0] === 'http' || webpageUrlSplit[0] === 'https';
+                    urlWithHttp = urlHasHttp ? webpageUrl : `http://${webpageUrlSplit[1]}`;
+                }
+                console.log({ urlWithHttp });
+
+                const response = await axios.get(`${scanBaseUrl}/scan?url=${urlWithHttp}`);
                 const dataResponse: ScanWebsiteResponse = response.data;
 
                 if (!dataResponse) {

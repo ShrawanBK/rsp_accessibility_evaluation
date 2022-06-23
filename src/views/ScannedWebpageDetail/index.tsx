@@ -450,13 +450,11 @@ function ScannedWebsiteDetail() {
                     showToast(successToastComponent);
                 }
             } catch (error) {
-                // TODO: HANDLE THIS ERROR
-
                 if (!axios.isAxiosError(error)) {
                     return;
                 }
                 const axiosError = error as AxiosError;
-                const dataError = axiosError?.response?.data;
+                const dataError = axiosError?.response?.data as ResponseError;
                 console.log({ dataError });
                 const failureToastComponent = toast && toast({
                     status: 'error',
@@ -468,8 +466,8 @@ function ScannedWebsiteDetail() {
                     render: () => (
                         <ToastBox
                             onCloseToast={onCloseToast}
-                            title="Error adding"
-                            description="Could not add. Try again"
+                            title="Error"
+                            description={dataError.message}
                             status="error"
                         />
                     ),
@@ -491,10 +489,13 @@ function ScannedWebsiteDetail() {
                 // FIXME - pass only data that was modified
                 const requestBody = formData;
                 const apiUrl = `issue?webpageId=${id}&issueId=${editableIssue.issueId}&occurenceId=${occurenceId}`;
-                const updateResponse = await apis.put(apiUrl, requestBody);
+                console.log({ apiUrl });
 
+                const updateResponse = await apis.put(apiUrl, requestBody);
+                console.log({ updateResponse });
                 if (updateResponse.status === 200) {
                     const updatedIssueData: IssueObject = updateResponse.data;
+                    console.log({ editableIssue, updatedIssueData });
                     setIssues((prevIssues) => {
                         if (!prevIssues || prevIssues.length <= 0) {
                             return [updatedIssueData];

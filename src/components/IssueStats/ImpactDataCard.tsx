@@ -9,28 +9,29 @@ import ImpactDataItem from './ImpactDataItem';
 import Placeholder from '../Placeholder';
 
 import {
-    ImpactStats,
-} from '../../views/ScanWebsite/data';
+    ImpactStatistics,
+} from '../../typings/webpage';
 
 export interface Props {
-    impactStats: ImpactStats[] | undefined;
+    impactStatistics: ImpactStatistics[] | undefined;
 }
 
 function ImpactDataCard(props: Props) {
     const {
-        impactStats,
+        impactStatistics,
     } = props;
 
-    if (!impactStats || impactStats.length <= 0) {
+    if (!impactStatistics || impactStatistics.length <= 0) {
         return <Placeholder />;
     }
+
     return (
         <Grid
             p={2}
             templateRows="repeat(2, 1fr)"
             templateColumns="repeat(2, 1fr)"
         >
-            {impactStats?.map((item) => (
+            {impactStatistics?.map((item) => (
                 <ImpactDataItem
                     key={item.impact}
                     impact={item.impact}

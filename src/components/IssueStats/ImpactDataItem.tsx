@@ -6,7 +6,7 @@ import {
     Text,
 } from '@chakra-ui/react';
 
-import { Impact } from '../../views/ScanWebsite/data';
+import { Impact } from '../../typings/webpage';
 
 interface ImpactDataItemProps {
     impact: Impact,

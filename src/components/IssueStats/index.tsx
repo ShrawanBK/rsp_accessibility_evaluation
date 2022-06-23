@@ -12,21 +12,21 @@ import IssueTypeCard from './IssueTypeCard';
 import ImpactDataCard from './ImpactDataCard';
 
 import {
-    ImpactStats,
-    IssueTypeStats,
-} from '../../views/ScanWebsite/data';
+    FoundStatistics,
+    ImpactStatistics,
+} from '../../typings/webpage';
 
 export interface IssueStatsProps {
-    issueTypeStats: IssueTypeStats[] | undefined;
-    impactStats: ImpactStats[] | undefined;
+    impactStatistics: ImpactStatistics[] | undefined;
+    foundStatistics: FoundStatistics[] | undefined;
     totalIssuesCount: number | undefined;
 }
 
 // TODO: Finalize the data structure with BE
 function IssueStats(props: IssueStatsProps) {
     const {
-        impactStats,
-        issueTypeStats,
+        impactStatistics,
+        foundStatistics,
         totalIssuesCount,
     } = props;
 
@@ -40,6 +40,8 @@ function IssueStats(props: IssueStatsProps) {
             <GridItem
                 rowSpan={2}
                 colSpan={1}
+                height="100%"
+                py={3}
             >
                 <TotalIssueCard totalCount={totalIssuesCount} />
             </GridItem>
@@ -47,7 +49,7 @@ function IssueStats(props: IssueStatsProps) {
                 colSpan={3}
                 rowSpan={2}
             >
-                <IssueTypeCard issueTypeStats={issueTypeStats} />
+                <IssueTypeCard foundStatistics={foundStatistics} />
             </GridItem>
             <GridItem
                 rowSpan={2}
@@ -68,7 +70,7 @@ function IssueStats(props: IssueStatsProps) {
                 rowSpan={2}
             >
                 <ImpactDataCard
-                    impactStats={impactStats}
+                    impactStatistics={impactStatistics}
                 />
             </GridItem>
         </Grid>

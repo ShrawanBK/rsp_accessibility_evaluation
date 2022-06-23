@@ -4,40 +4,47 @@ import {
     Box,
     Heading,
     Text,
+    Spacer,
 } from '@chakra-ui/react';
 
-import { IssueTypeStats } from '../../views/ScanWebsite/data';
+import { FoundStatistics } from '../../typings/webpage';
 
 export interface Props {
-    issueTypeStats: IssueTypeStats[] | undefined;
+    foundStatistics: FoundStatistics[] | undefined;
 }
 
 const getIssueTypeCount = (
-    type: IssueTypeStats['typeFound'],
-    list: IssueTypeStats[] | undefined,
-) => list?.find((i) => i.typeFound === type)?.count ?? 'N/A';
+    type: FoundStatistics['found'],
+    list: FoundStatistics[] | undefined,
+) => list?.find((i) => i.found === type)?.count ?? 'N/A';
 
 export default function IssueTypeCard(props: Props) {
     const {
-        issueTypeStats,
+        foundStatistics,
         ...rest
     } = props;
 
     const automatic = useMemo(
-        () => getIssueTypeCount('automatic', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('automatic', foundStatistics),
+        [foundStatistics],
     );
 
     const reviewable = useMemo(
-        () => getIssueTypeCount('needs review', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('needsReview', foundStatistics),
+        [foundStatistics],
     );
 
     const guided = useMemo(
-        () => getIssueTypeCount('guided', issueTypeStats),
-        [issueTypeStats],
+        () => getIssueTypeCount('guided', foundStatistics),
+        [foundStatistics],
     );
 
+    const manual = useMemo(
+        () => getIssueTypeCount('manual', foundStatistics),
+        [foundStatistics],
+    );
+
+    const manualShown = manual > 0 && manual !== 'N/A';
     return (
         <VStack
             p={2}
@@ -62,28 +69,53 @@ export default function IssueTypeCard(props: Props) {
                     letterSpacing={1}
                     fontWeight="semibold"
                 >
-                    {`${automatic} issues (${reviewable} need reviews)`}
+                    {`${automatic} issues ${reviewable <= 0 ? '' : `(${reviewable} needs review)`}`}
                 </Text>
             </Box>
-            <Box p={2}>
-                <Heading
-                    fontSize="small"
-                    textTransform="uppercase"
-                    fontWeight="semibold"
-                    letterSpacing={2}
-                    as="h3"
-                >
-                    guided
-                </Heading>
-                <Text
-                    mt={1}
-                    fontSize="xl"
-                    fontWeight="bold"
-                >
-                    {guided}
-                    {' '}
-                    Issues
-                </Text>
+            <Box p={2} display="flex">
+                <VStack alignItems="flex-start">
+                    <Heading
+                        fontSize="small"
+                        textTransform="uppercase"
+                        fontWeight="semibold"
+                        letterSpacing={2}
+                        as="h3"
+                    >
+                        guided
+                    </Heading>
+                    <Text
+                        mt={1}
+                        fontSize="xl"
+                        fontWeight="bold"
+                    >
+                        {guided}
+                        {' '}
+                        Issues
+                    </Text>
+                </VStack>
+                <Spacer maxWidth="md" />
+                {manualShown && (
+                    <VStack alignItems="flex-start">
+                        <Heading
+                            fontSize="small"
+                            textTransform="uppercase"
+                            fontWeight="semibold"
+                            letterSpacing={2}
+                            as="h3"
+                        >
+                            manual
+                        </Heading>
+                        <Text
+                            mt={1}
+                            fontSize="xl"
+                            fontWeight="bold"
+                        >
+                            {manual}
+                            {' '}
+                            Issues
+                        </Text>
+                    </VStack>
+                )}
             </Box>
         </VStack>
     );

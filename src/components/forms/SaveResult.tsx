@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import {
     Button,
     FormControl,
@@ -8,18 +8,13 @@ import {
     VStack,
     Textarea,
 } from '@chakra-ui/react';
-import { BasicData } from '../../views/ScanWebsite';
+import { BasicData } from '../../typings/webpage';
+import { SaveResultFormData } from '../../typings/forms';
+import { formatDateTime } from '../../utils/common';
 
-interface ResultFormData {
-    url: BasicData['url'];
-    scanTime: BasicData['timeDate'];
-    website: string;
-    webpage: string;
-    note?: string;
-}
 interface Props {
     isLoading?: boolean;
-    onSaveAction: (data: ResultFormData) => void;
+    onSaveAction: (data: SaveResultFormData) => void;
     basicData: BasicData | undefined;
     onCloseAction: (() => void) | undefined;
 }
@@ -32,19 +27,24 @@ function SaveResultForm(props: Props) {
         onCloseAction,
     } = props;
 
-    const [webpage, setWebpage] = useState<string>('');
-    const [website, setWebsite] = useState<string>('');
+    const [webpageName, setWebpageName] = useState<string>(basicData?.webpageName ?? '');
+    const [websiteName, setWebsiteName] = useState<string>(basicData?.websiteName ?? '');
     const [note, setNote] = useState<string>();
 
-    const handleWebpageChange = (e: ChangeEvent<HTMLInputElement>) => setWebpage(e.target.value);
-    const handleWebsiteChange = (e: ChangeEvent<HTMLInputElement>) => setWebsite(e.target.value);
+    const handleWebpageNameChange = (
+        e: ChangeEvent<HTMLInputElement>,
+    ) => setWebpageName(e.target.value);
+
+    const handleWebsiteNameChange = (
+        e: ChangeEvent<HTMLInputElement>,
+    ) => setWebsiteName(e.target.value);
+
     const handleNoteChange = (e: ChangeEvent<HTMLTextAreaElement>) => setNote(e.target.value);
 
-    console.log({ note });
     const onCancelSave = useCallback(
         () => {
-            setWebpage('');
-            setWebsite('');
+            setWebpageName('');
+            setWebsiteName('');
             setNote(undefined);
             if (onCloseAction) {
                 onCloseAction();
@@ -53,7 +53,7 @@ function SaveResultForm(props: Props) {
         [onCloseAction],
     );
 
-    const errored = !website || !webpage;
+    const errored = !websiteName || !webpageName;
 
     const handleSubmit = useCallback(
         (event) => {
@@ -62,15 +62,24 @@ function SaveResultForm(props: Props) {
                 return;
             }
             onSaveAction({
-                url: basicData.url,
-                scanTime: basicData.timeDate,
-                website,
-                webpage,
+                websiteName,
+                webpageName,
                 note,
             });
+
+            onCancelSave();
+
             // NOTE: Time out is the response time when url processed
         },
-        [basicData, errored, note, onSaveAction, webpage, website],
+        [basicData, errored, note, onCancelSave, onSaveAction, webpageName, websiteName],
+    );
+
+    const scanTime = useMemo(
+        () => {
+            const dateString = basicData ? basicData.scantime : new Date().toISOString();
+            return formatDateTime(dateString);
+        },
+        [basicData],
     );
 
     return (
@@ -87,52 +96,48 @@ function SaveResultForm(props: Props) {
                         value={basicData?.url ?? ''}
                         placeholder="Website"
                         background="blackAlpha.300"
-                        tabIndex={-1}
                         readOnly
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="scanTime">
+                    <FormLabel htmlFor="scantime">
                         Scan Time
                     </FormLabel>
                     <Input
-                        id="scanTime"
+                        id="scantime"
                         type="text"
-                        value={basicData?.timeDate ?? ''}
+                        value={scanTime}
                         placeholder="Scan Time"
                         background="blackAlpha.300"
-                        tabIndex={-1}
                         readOnly
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="webpage">
+                    <FormLabel htmlFor="webpageName">
                         Webpage *
                     </FormLabel>
                     <Input
-                        id="webpage"
-                        type="text"
-                        value={webpage}
-                        onChange={handleWebpageChange}
+                        id="webpageName"
+                        value={webpageName}
+                        onChange={handleWebpageNameChange}
                         placeholder="Enter webpage name (Example - Homepage)"
                         background="whiteAlpha.900"
-                        tabIndex={-1}
                         isRequired
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
-                    <FormLabel htmlFor="website">
+                    <FormLabel htmlFor="websiteName">
                         Website *
                     </FormLabel>
                     <Input
-                        id="website"
-                        type="url"
-                        value={website}
-                        onChange={handleWebsiteChange}
+                        id="websiteName"
+                        value={websiteName}
+                        onChange={handleWebsiteNameChange}
                         placeholder="Enter website name (Example Website)"
                         background="whiteAlpha.900"
-                        tabIndex={-1}
                         isRequired
+                        autoComplete="off"
                     />
                 </FormControl>
                 <FormControl>
@@ -144,8 +149,7 @@ function SaveResultForm(props: Props) {
                         value={note}
                         onChange={handleNoteChange}
                         placeholder="Enter notes for the result."
-                        tabIndex={-1}
-                        rows={5}
+                        rows={4}
                     />
                 </FormControl>
                 <HStack
@@ -157,34 +161,23 @@ function SaveResultForm(props: Props) {
                         type="reset"
                         colorScheme="brand"
                         variant="outline"
-                        h={8}
                         letterSpacing={1}
-                        tabIndex={-1}
                         onClick={onCancelSave}
+                        py={4}
                     >
                         Cancel
                     </Button>
                     <Button
                         type="submit"
                         disabled={errored || isLoading}
-                        h={8}
                         letterSpacing={1}
                         colorScheme="brand"
-                        tabIndex={-1}
+                        py={4}
                     >
                         Save
                     </Button>
                 </HStack>
             </VStack>
-            {/*
-                WIP: Handle error
-                {!errored ? (
-                    <FormHelperText>
-                        The website url is incorrect.
-                    </FormHelperText>
-                ) : (
-                    <FormErrorMessage>Email is isRequired
-                )} */}
         </form>
     );
 }
